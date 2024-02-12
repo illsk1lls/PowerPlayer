@@ -25,12 +25,12 @@ function dropDownMenu () {
 function PlayOrPause () {
 	Switch($global:Playing){
 		0{
-			$Global:PlayImage.Source='.\resources\Pause.png'
+			$PlayImage.Source='.\resources\Pause.png'
 			$mediaPlayer.Play()
 			$global:Playing=1
 		}
 		1{
-			$Global:PlayImage.Source='.\resources\Play.png'
+			$PlayImage.Source='.\resources\Play.png'
 			$mediaPlayer.Pause()
 			$global:Playing=0
 		}
