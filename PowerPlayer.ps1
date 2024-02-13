@@ -88,7 +88,6 @@ Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.For
 Add-Type -TypeDefinition 'using System.Runtime.InteropServices;
 [Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 interface IAudioEndpointVolume {
-  // f(), g(), ... are unused COM method slots. Define these if you care
   int f(); int g(); int h(); int i();
   int SetMasterVolumeLevelScalar(float fLevel, System.Guid pguidEventContext);
   int j();
@@ -103,7 +102,7 @@ interface IMMDevice {
 }
 [Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 interface IMMDeviceEnumerator {
-  int f(); // Unused
+  int f();
   int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice endpoint);
 }
 [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")] class MMDeviceEnumeratorComObject { }
