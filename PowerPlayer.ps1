@@ -131,55 +131,55 @@ set { Marshal.ThrowExceptionForHR(Vol().SetMute(value, System.Guid.Empty)); }
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="PowerPlayer" Height="180" Width="300" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-<Border CornerRadius="10" BorderBrush="#111111" BorderThickness="15" Background="#111111">
-<Grid Name="MainWindow">
-<Grid.Background>
-<VisualBrush>
-<VisualBrush.Visual>
-<Image Name="BGimage"/>
-</VisualBrush.Visual>
-</VisualBrush>
-</Grid.Background>
-<Canvas>
-<TextBlock Name="Status" Canvas.Left="18" Canvas.Top="40" Foreground="#CCCCCC" Text="Now Playing:"/>
-<TextBlock Name="CurrentTrack" Canvas.Top="63" Foreground="#CCCCCC" FontSize="12" FontWeight="Bold" Text="TrackName" TextAlignment="Center" Width="270"/>
-<Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="50">Menu</Button>
-				<Button Name="minWin" Canvas.Left="225" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22">___</Button>
-				<Button Name="X" Canvas.Left="248" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold">X</Button>
-<Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open File</Button>
-<Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open Folder</Button>
-<Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Exit</Button>
-<Button Name="Prev" Canvas.Left="35" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
-<Button.Resources>
-<Style TargetType="Border">
-<Setter Property="CornerRadius" Value="10"/>
-</Style>
-</Button.Resources>
-<Image Name="PrevButton" Height="23" Width="40"></Image>
-</Button>
-<Button Name="Play" Canvas.Left="109" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
-<Button.Resources>
-<Style TargetType="Border">
-<Setter Property="CornerRadius" Value="10"/>
-</Style>
-</Button.Resources>
-<Image Name="PlayButton" Height="23" Width="50"></Image>
-</Button>
-<Button Name="Next" Canvas.Left="190" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
-<Button.Resources>
-<Style TargetType="Border">
-<Setter Property="CornerRadius" Value="10"/>
-</Style>
-</Button.Resources>
-<Image Name="NextButton" Height="23" Width="40"></Image>
-</Button>
-				<Slider Name="Volume" Canvas.Left="175" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.9" />
-</Canvas>
-</Grid>
-</Border>
-	<Window.TaskbarItemInfo>
-		<TaskbarItemInfo/>
-	</Window.TaskbarItemInfo>
+    <Border CornerRadius="10" BorderBrush="#111111" BorderThickness="15" Background="#111111">
+        <Grid Name="MainWindow">
+            <Grid.Background>
+                <VisualBrush>
+                    <VisualBrush.Visual>
+                        <Image Name="BGimage"/>
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Grid.Background>
+            <Canvas>
+                <TextBlock Name="Status" Canvas.Left="18" Canvas.Top="40" Foreground="#CCCCCC" Text="Now Playing:"/>
+                <TextBlock Name="CurrentTrack" Canvas.Top="63" Foreground="#CCCCCC" FontSize="12" FontWeight="Bold" Text="TrackName" TextAlignment="Center" Width="270"/>
+                <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="50">Menu</Button>
+                <Button Name="minWin" Canvas.Left="225" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22">___</Button>
+                <Button Name="X" Canvas.Left="248" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold">X</Button>
+                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open File</Button>
+                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open Folder</Button>
+                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Exit</Button>
+                <Button Name="Prev" Canvas.Left="35" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10"/>
+                        </Style>
+                    </Button.Resources>
+                    <Image Name="PrevButton" Height="23" Width="40"></Image>
+                </Button>
+                <Button Name="Play" Canvas.Left="109" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10"/>
+                        </Style>
+                    </Button.Resources>
+                    <Image Name="PlayButton" Height="23" Width="50"></Image>
+                </Button>
+                <Button Name="Next" Canvas.Left="190" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10"/>
+                        </Style>
+                    </Button.Resources>
+                    <Image Name="NextButton" Height="23" Width="40"></Image>
+                </Button>
+                <Slider Name="Volume" Canvas.Left="175" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.9" />
+            </Canvas>
+        </Grid>
+    </Border>
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo/>
+    </Window.TaskbarItemInfo>
 </Window>'
 $reader=(New-Object System.Xml.XmlNodeReader $xaml)
 $window=[Windows.Markup.XamlReader]::Load($reader)
@@ -263,6 +263,7 @@ $MenuFolder.Add_Click({
 	Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
 		$files+=$_
 	}
+	TogglePlay
 	for($icurrent = 0; $icurrent -lt $files.Length;$icurrent++)
 	{
 	NextTrack
