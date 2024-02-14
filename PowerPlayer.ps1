@@ -4,9 +4,6 @@ Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
 $hWnd=(Get-Process -Id $PID).MainWindowHandle
 $Null=[Win32.Functions]::ShowWindow($hWnd,$SW_HIDE)
 $global:Playing=0
-$global:file
-$global:files
-$global:Fullname
 $global:icurrent=-1
 function Update-Gui{
 $window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
