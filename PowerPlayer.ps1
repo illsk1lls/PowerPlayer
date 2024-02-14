@@ -7,7 +7,7 @@ $global:Playing=0
 $global:file
 $global:files
 $global:Fullname
-$global:icurrent
+$global:icurrent=-1
 function Update-Gui{
 $window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
 }
@@ -27,7 +27,7 @@ function dropDownMenu(){
 		}
 	}
 }
-function TogglePlay(){
+function TogglePlayButton(){
 	Switch($global:Playing){
 		0{
 			$PlayImage.Source='.\resources\Pause.png'
@@ -42,47 +42,43 @@ function TogglePlay(){
 	}
 }
 function NextTrack(){
-	$file = $files[$icurrent++]
-	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-	$FullName="$path\$file"
-	$mediaPlayer.open($FullName)
-	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-	$mediaPlayer.Play()
-	trackLength
-	Update-Gui
-	WaitForSong
+	if($icurrent -lt $files.Length - 1){
+	$global:icurrent++
+	$file = $files[$icurrent]
+	PlayTrack
+	}
 }
 function PrevTrack(){
-	$file = $files[$icurrent--]
-	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-	$FullName="$path\$file"
-	$mediaPlayer.open($FullName)
-	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-	$mediaPlayer.Play()
-	trackLength
-	Update-Gui
-	WaitForSong
+	if($icurrent -ge 1){
+	$global:icurrent--
+	$file = $files[$icurrent]
+	PlayTrack
+	}
 }
 function trackLength(){
 	$Shell = New-Object -COMObject Shell.Application
-	$Folder = $shell.Namespace($(Split-Path $FullName))
-	$File = $Folder.ParseName($(Split-Path $FullName -Leaf))
-	[int]$h, [int]$m, [int]$s = ($Folder.GetDetailsOf($File, 27)).split(":")
+	$FolderL = $shell.Namespace($(Split-Path $FullName))
+	$FileL = $FolderL.ParseName($(Split-Path $FullName -Leaf))
+	[int]$h, [int]$m, [int]$s = ($FolderL.GetDetailsOf($FileL, 27)).split(":")
 	$global:totaltime=$h*60*60 + $m*60 +$s
+	$global:PositionSlider.Maximum=$totaltime
 }
 function WaitForSong(){
-	$meter=(Get-Date).ToString("ss")
-	:waiting while($true){
-		if($meter -ne (Get-Date).ToString("ss")){
-			$meter=(Get-Date).ToString("ss")
-			$totaltime--
-		}
+	while(([Math]::Ceiling(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)) -lt ([ref] $script:totaltime).Value){
+		$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 		Update-Gui
 		Start-Sleep -milliseconds 50
-		if($totaltime -le .01){
-			break waiting
-		}
 	}
+}
+function PlayTrack(){
+	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+	$FullName="$path\$file"
+	$mediaPlayer.open($FullName)
+	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
+	$mediaPlayer.Play()
+	trackLength
+	Update-Gui
+	WaitForSong	
 }
 Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, WindowsFormsIntegration, presentationCore
 Add-Type -TypeDefinition 'using System.Runtime.InteropServices;
@@ -148,7 +144,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open File</Button>
                 <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open Folder</Button>
                 <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Exit</Button>
-                <Button Name="Prev" Canvas.Left="35" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Prev" Canvas.Left="35" Canvas.Top="112" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -156,7 +152,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PrevButton" Height="23" Width="40"></Image>
                 </Button>
-                <Button Name="Play" Canvas.Left="109" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Play" Canvas.Left="109" Canvas.Top="112" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -164,7 +160,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PlayButton" Height="23" Width="50"></Image>
                 </Button>
-                <Button Name="Next" Canvas.Left="190" Canvas.Top="105" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Next" Canvas.Left="190" Canvas.Top="112" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -173,6 +169,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     <Image Name="NextButton" Height="23" Width="40"></Image>
                 </Button>
                 <Slider Name="Volume" Canvas.Left="175" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.9" />
+                <Slider Name="Position" Canvas.Left="50" Canvas.Top="93" Height="6" Width="169" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.9" />
             </Canvas>
         </Grid>
     </Border>
@@ -190,8 +187,11 @@ $VolumeSlider.Value=[audio]::Volume
 $VolumeSlider.Add_PreviewMouseUp({
 	[audio]::Volume=$VolumeSlider.Value
 })
-$VolumeSlider.Add_PreviewMouseUp({
-	[audio]::Volume=$VolumeSlider.Value
+$PositionSlider=$Window.FindName("Position")
+$PositionSlider.Add_PreviewMouseUp({
+	$s=[Math]::Truncate($PositionSlider.Value)
+	$ts=[timespan]::fromseconds($s)
+	$mediaPlayer.Position=("{0:hh\:mm\:ss\.fff}" -f $ts)
 })
 $BG=$Window.FindName("BGimage")
 $BG.Source='.\resources\bg.png'
@@ -234,14 +234,13 @@ $MenuFile.Add_Click({
 	}
 	$null=$getFile.ShowDialog()
 	$file=$getFile.Filename
-	$FullName=$file
+	$path = Split-Path $file -Parent
+	$path = $path+'\'
+	$file = Split-Path $file -leaf
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-	$mediaPlayer.open("$file")
 	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-	TogglePlay
-	trackLength
-	Update-GUI
-	WaitForSong
+	TogglePlayButton
+	PlayTrack
 })
 $MenuFolder=$Window.FindName("Folder")
 $MenuFolder.Add_MouseEnter({
@@ -262,10 +261,9 @@ $MenuFolder.Add_Click({
 	Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
 		$files+=$_
 	}
-	TogglePlay
-	for($icurrent = 0; $icurrent -lt $files.Length;$icurrent++)
-	{
-	NextTrack
+	TogglePlayButton
+	while($global:icurrent -lt $files.Length + 1){
+			NextTrack
 	}
 })
 $MenuExit=$Window.FindName("Exit")
@@ -290,7 +288,7 @@ $minWin.Add_MouseLeave({
 	$minWin.Foreground="#CCCCCC"
 })
 $minWin.Add_Click({
-	$Window.WindowState = 'Minimized'
+	$Window.WindowState='Minimized'
 })
 $Xbutton=$Window.FindName("X")
 $Xbutton.Add_MouseEnter({
@@ -311,9 +309,7 @@ $Prev.Add_Click({
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
 	if($checkposition -le 2){
-		$global:totaltime=0
 		PrevTrack
-		break waiting
 	} else {
 		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	}
@@ -322,14 +318,13 @@ $Play=$Window.FindName("Play")
 $PlayImage=$Window.FindName("PlayButton")
 $PlayImage.Source='.\resources\Play.png'
 $Play.Add_Click({
-	TogglePlay;
+	TogglePlayButton;
 })
 $Next=$Window.FindName("Next")
 $NextImage=$Window.FindName("NextButton")
 $NextImage.Source='.\resources\Next.png'
 $Next.Add_Click({
-	$global:totaltime=0
-	break waiting
+	NextTrack
 })
 $window.Show()
 $appContext=New-Object System.Windows.Forms.ApplicationContext
