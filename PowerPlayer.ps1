@@ -32,11 +32,13 @@ function TogglePlayButton(){
 				$PlayImage.Source='.\resources\Pause.png'
 				$mediaPlayer.Play()
 				$global:Playing=1
+				$StatusInfo.Text="Now Playing:"
 			}
 			1{
 				$PlayImage.Source='.\resources\Play.png'
 				$mediaPlayer.Pause()
 				$global:Playing=0
+				$StatusInfo.Text="Paused:"
 			}
 		}
 	}
@@ -61,12 +63,16 @@ function trackLength(){
 	$FileL = $FolderL.ParseName($(Split-Path $FullName -Leaf))
 	[int]$h, [int]$m, [int]$s = ($FolderL.GetDetailsOf($FileL, 27)).split(":")
 	$global:totaltime=$h*60*60 + $m*60 +$s
+	$ReadableTotal=[timespan]::fromseconds($totaltime)
+	$TimerB.Text=("{0:mm\:ss}" -f $ReadableTotal)
 	$global:PositionSlider.Maximum=$totaltime
 }
 function WaitForSong(){
 	while(([Math]::Ceiling(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)) -lt ([ref] $script:totaltime).Value){
 		if(([ref] $script:tracking).Value -eq 0){
 			$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
+			$TimePassed=[timespan]::fromseconds(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)
+			$TimerA.Text=("{0:mm\:ss}" -f $TimePassed)
 		}
 		Update-Gui
 		Start-Sleep -milliseconds 50
@@ -97,7 +103,11 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 </VisualBrush>
             </Grid.Background>
             <Canvas>
-                <TextBlock Name="Status" Canvas.Left="32" Canvas.Top="40" Foreground="#CCCCCC" Text="Now Playing:"/>
+                <TextBlock Canvas.Left="32" Canvas.Top="40" Foreground="#CCCCCC">
+					<TextBlock.Inlines>
+						<Run Name="Status" FontStyle="Italic"/>
+					</TextBlock.Inlines>
+				</TextBlock>
                 <TextBlock Name="CurrentTrack" Canvas.Top="69" Foreground="#CCCCCC" FontSize="12" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="280"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="50">Menu</Button>
                 <Button Name="minWin" Canvas.Left="236" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22">___</Button>
@@ -131,6 +141,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 </Button>
                 <Slider Name="Volume" Canvas.Left="179" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.9" />
                 <Slider Name="Position" Canvas.Left="54" Canvas.Top="100" Height="6" Width="173" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.9" />
+                <TextBlock Name="TimerA" Canvas.Left="18" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
+                <TextBlock Name="TimerB" Canvas.Left="233" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
             </Canvas>
         </Grid>
     </Border>
@@ -150,6 +162,9 @@ $mediaPlayer.Add_MediaEnded({
 	$CurrentTrack.Text='No Media Loaded'
 	$global:Playing=0
 	$global:icurrent=-1
+	$StatusInfo.Text=''
+	$TimerA.Text=''
+	$TimerB.Text=''	
 })
 $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pid})
 $VolumeSlider=$Window.FindName("Volume")
@@ -159,9 +174,7 @@ $VolumeSlider.Add_PreviewMouseUp({
 })
 $PositionSlider=$Window.FindName("Position")
 $PositionSlider.Add_PreviewMouseUp({
-	$s=[Math]::Truncate($PositionSlider.Value)
-	$ts=[timespan]::fromseconds($s)
-	$mediaPlayer.Position=("{0:hh\:mm\:ss\.fff}" -f $ts)
+	$mediaPlayer.Position=("{0:hh\:mm\:ss\.fff}" -f ([timespan]::fromseconds([Math]::Truncate($PositionSlider.Value))))
 	$global:tracking=0
 })
 $PositionSlider.Add_PreviewMouseDown({
@@ -177,7 +190,11 @@ $window.TaskbarItemInfo.Description=$window.Title
 $window.add_MouseLeftButtonDown({
 $window.DragMove()
 })
+$StatusInfo=$Window.FindName("Status")
+$StatusInfo.Text=''
 $CurrentTrack=$Window.FindName("CurrentTrack")
+$TimerA=$Window.FindName("TimerA")
+$TimerB=$Window.FindName("TimerB")
 $MenuMain=$Window.FindName("Menu")
 $MenuMain.Add_MouseEnter({
 	$MenuMain.Background="#CCCCCC"
