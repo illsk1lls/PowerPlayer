@@ -4,6 +4,7 @@ Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
 $hWnd=(Get-Process -Id $PID).MainWindowHandle
 $Null=[Win32.Functions]::ShowWindow($hWnd,$SW_HIDE)
 $global:Playing=0
+$global:tracking=0
 $global:icurrent=-1
 function Update-Gui{
 $window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
@@ -25,16 +26,18 @@ function dropDownMenu(){
 	}
 }
 function TogglePlayButton(){
-	Switch($global:Playing){
-		0{
-			$PlayImage.Source='.\resources\Pause.png'
-			$mediaPlayer.Play()
-			$global:Playing=1
-		}
-		1{
-			$PlayImage.Source='.\resources\Play.png'
-			$mediaPlayer.Pause()
-			$global:Playing=0
+	if($files -ne $null){
+		Switch($global:Playing){
+			0{
+				$PlayImage.Source='.\resources\Pause.png'
+				$mediaPlayer.Play()
+				$global:Playing=1
+			}
+			1{
+				$PlayImage.Source='.\resources\Play.png'
+				$mediaPlayer.Pause()
+				$global:Playing=0
+			}
 		}
 	}
 }
@@ -62,7 +65,9 @@ function trackLength(){
 }
 function WaitForSong(){
 	while(([Math]::Ceiling(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)) -lt ([ref] $script:totaltime).Value){
-		$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
+		if(([ref] $script:tracking).Value -eq 0){
+			$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
+		}
 		Update-Gui
 		Start-Sleep -milliseconds 50
 	}
@@ -78,51 +83,11 @@ function PlayTrack(){
 	WaitForSong	
 }
 Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, WindowsFormsIntegration, presentationCore
-Add-Type -TypeDefinition 'using System.Runtime.InteropServices;
-[Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-interface IAudioEndpointVolume {
-	int f(); int g(); int h(); int i();
-	int SetMasterVolumeLevelScalar(float fLevel, System.Guid pguidEventContext);
-	int j();
-	int GetMasterVolumeLevelScalar(out float pfLevel);
-	int k(); int l(); int m(); int n();
-	int SetMute([MarshalAs(UnmanagedType.Bool)] bool bMute, System.Guid pguidEventContext);
-	int GetMute(out bool pbMute);
-}
-[Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-interface IMMDevice {
-	int Activate(ref System.Guid id, int clsCtx, int activationParams, out IAudioEndpointVolume aev);
-}
-[Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-interface IMMDeviceEnumerator {
-	int f();
-	int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice endpoint);
-}
-[ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")] class MMDeviceEnumeratorComObject { }
-public class Audio {
-	static IAudioEndpointVolume Vol() {
-		var enumerator = new MMDeviceEnumeratorComObject() as IMMDeviceEnumerator;
-		IMMDevice dev = null;
-		Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(/*eRender*/ 0, /*eMultimedia*/ 1, out dev));
-		IAudioEndpointVolume epv = null;
-		var epvid = typeof(IAudioEndpointVolume).GUID;
-		Marshal.ThrowExceptionForHR(dev.Activate(ref epvid, /*CLSCTX_ALL*/ 23, 0, out epv));
-		return epv;
-	}
-	public static float Volume {
-		get {float v = -1; Marshal.ThrowExceptionForHR(Vol().GetMasterVolumeLevelScalar(out v)); return v;}
-		set {Marshal.ThrowExceptionForHR(Vol().SetMasterVolumeLevelScalar(value, System.Guid.Empty));}
-	}
-	public static bool Mute {
-		get { bool mute; Marshal.ThrowExceptionForHR(Vol().GetMute(out mute)); return mute; }
-		set { Marshal.ThrowExceptionForHR(Vol().SetMute(value, System.Guid.Empty)); }
-	}
-}'
 [xml]$xaml='
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="PowerPlayer" Height="180" Width="300" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-    <Border CornerRadius="10" BorderBrush="#111111" BorderThickness="15" Background="#111111">
+    <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
             <Grid.Background>
                 <VisualBrush>
@@ -132,15 +97,15 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 </VisualBrush>
             </Grid.Background>
             <Canvas>
-                <TextBlock Name="Status" Canvas.Left="18" Canvas.Top="40" Foreground="#CCCCCC" Text="Now Playing:"/>
-                <TextBlock Name="CurrentTrack" Canvas.Top="63" Foreground="#CCCCCC" FontSize="12" FontWeight="Bold" Text="TrackName" TextAlignment="Center" Width="270"/>
+                <TextBlock Name="Status" Canvas.Left="32" Canvas.Top="40" Foreground="#CCCCCC" Text="Now Playing:"/>
+                <TextBlock Name="CurrentTrack" Canvas.Top="69" Foreground="#CCCCCC" FontSize="12" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="280"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="50">Menu</Button>
-                <Button Name="minWin" Canvas.Left="225" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22">___</Button>
-                <Button Name="X" Canvas.Left="248" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold">X</Button>
+                <Button Name="minWin" Canvas.Left="236" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22">___</Button>
+                <Button Name="X" Canvas.Left="258" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold">X</Button>
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open File</Button>
                 <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open Folder</Button>
                 <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Exit</Button>
-                <Button Name="Prev" Canvas.Left="35" Canvas.Top="112" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Prev" Canvas.Left="39" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -148,7 +113,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PrevButton" Height="23" Width="40"></Image>
                 </Button>
-                <Button Name="Play" Canvas.Left="109" Canvas.Top="112" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Play" Canvas.Left="116" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -156,7 +121,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PlayButton" Height="23" Width="50"></Image>
                 </Button>
-                <Button Name="Next" Canvas.Left="190" Canvas.Top="112" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Next" Canvas.Left="199" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -164,8 +129,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="NextButton" Height="23" Width="40"></Image>
                 </Button>
-                <Slider Name="Volume" Canvas.Left="175" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.9" />
-                <Slider Name="Position" Canvas.Left="50" Canvas.Top="93" Height="6" Width="169" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.9" />
+                <Slider Name="Volume" Canvas.Left="179" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.9" />
+                <Slider Name="Position" Canvas.Left="54" Canvas.Top="100" Height="6" Width="173" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.9" />
             </Canvas>
         </Grid>
     </Border>
@@ -177,17 +142,30 @@ $reader=(New-Object System.Xml.XmlNodeReader $xaml)
 $window=[Windows.Markup.XamlReader]::Load($reader)
 $window.Title='PowerPlayer'
 $mediaPlayer=New-Object system.windows.media.mediaplayer
+$mediaPlayer.Add_MediaEnded({
+	$mediaPlayer.Stop()
+	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
+	$PlayImage.Source='.\resources\Play.png'
+	$CurrentTrack.Text='No Media Loaded'
+	$global:Playing=0
+	$global:icurrent=-1
+})
 $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pid})
 $VolumeSlider=$Window.FindName("Volume")
-$VolumeSlider.Value=[audio]::Volume
+$VolumeSlider.Value=$mediaPlayer.Volume
 $VolumeSlider.Add_PreviewMouseUp({
-	[audio]::Volume=$VolumeSlider.Value
+	$mediaPlayer.Volume=$VolumeSlider.Value
 })
 $PositionSlider=$Window.FindName("Position")
 $PositionSlider.Add_PreviewMouseUp({
 	$s=[Math]::Truncate($PositionSlider.Value)
 	$ts=[timespan]::fromseconds($s)
 	$mediaPlayer.Position=("{0:hh\:mm\:ss\.fff}" -f $ts)
+	$global:tracking=0
+})
+$PositionSlider.Add_PreviewMouseDown({
+	$global:tracking=1
 })
 $BG=$Window.FindName("BGimage")
 $BG.Source='.\resources\bg.png'
@@ -232,11 +210,12 @@ $MenuFile.Add_Click({
 	$file=$getFile.Filename
 	$path = Split-Path $file -Parent
 	$path = $path+'\'
-	$file = Split-Path $file -leaf
+	$files=@()
+	$files+=Split-Path $file -leaf
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
 	TogglePlayButton
-	PlayTrack
+	NextTrack
 })
 $MenuFolder=$Window.FindName("Folder")
 $MenuFolder.Add_MouseEnter({
@@ -314,7 +293,7 @@ $Play=$Window.FindName("Play")
 $PlayImage=$Window.FindName("PlayButton")
 $PlayImage.Source='.\resources\Play.png'
 $Play.Add_Click({
-	TogglePlayButton;
+	TogglePlayButton
 })
 $Next=$Window.FindName("Next")
 $NextImage=$Window.FindName("NextButton")
