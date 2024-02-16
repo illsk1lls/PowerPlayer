@@ -65,7 +65,7 @@ function trackLength(){
 	$FileL = $FolderL.ParseName($(Split-Path $FullName -Leaf))
 	[int]$h, [int]$m, [int]$s = ($FolderL.GetDetailsOf($FileL, 27)).split(":")
 	$global:totaltime=$h*60*60 + $m*60 +$s
-	$ReadableTotal=[timespan]::fromseconds($totaltime)
+	$ReadableTotal=[timespan]::fromseconds($totaltime - 2)
 	$TimerB.Text=("{0:mm\:ss}" -f $ReadableTotal)
 	$global:PositionSlider.Maximum=$totaltime
 }
@@ -155,6 +155,7 @@ $mediaPlayer.Add_MediaEnded({
 	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 	$PlayImage.Source='.\resources\Play.png'
 	$CurrentTrack.Text='No Media Loaded'
+	$BG.Stop()
 	$global:Playing=0
 	$global:icurrent=-1
 	$StatusInfo.Text=''
