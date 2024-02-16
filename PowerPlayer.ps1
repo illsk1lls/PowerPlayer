@@ -18,7 +18,7 @@ function dropDownMenu(){
 			$MenuExit.Visibility='Collapsed'
 		}
 		'Collapsed'{
-			$MenuMain.BorderBrush='#CCCCCC'
+			$MenuMain.BorderBrush='#333333'
 			$MenuFile.Visibility='Visible'
 			$MenuFolder.Visibility='Visible'
 			$MenuExit.Visibility='Visible'
@@ -94,6 +94,19 @@ Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.For
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="PowerPlayer" Height="180" Width="300" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+	<Window.Resources>
+		<ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
+			<Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+				<ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+			</Border>
+			<ControlTemplate.Triggers>
+				<Trigger Property="IsEnabled" Value="False">
+					<Setter Property="Background" Value="{x:Static SystemColors.ControlLightBrush}"/>
+					<Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}"/>
+				</Trigger>
+			</ControlTemplate.Triggers>
+		</ControlTemplate>
+	</Window.Resources>
     <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
 			<MediaElement Name="BG" Height="160" Width="280" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
@@ -104,13 +117,13 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					</TextBlock.Inlines>
 				</TextBlock>
                 <TextBlock Name="CurrentTrack" Canvas.Top="69" Foreground="#CCCCCC" FontSize="12" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="280"/>
-                <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="50">Menu</Button>
-                <Button Name="minWin" Canvas.Left="236" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22">___</Button>
-                <Button Name="X" Canvas.Left="258" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold">X</Button>
-                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open File</Button>
-                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open Folder</Button>
-                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Exit</Button>
-                <Button Name="Prev" Canvas.Left="39" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85">
+                <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
+                <Button Name="minWin" Canvas.Left="236" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
+                <Button Name="X" Canvas.Left="258" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
+                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}">&#160;&#160;&#160;Play File</Button>
+                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}">&#160;&#160;&#160;Play Folder</Button>
+                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}">&#160;&#160;&#160;Exit</Button>
+                <Button Name="Prev" Canvas.Left="39" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -118,7 +131,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PrevButton" Height="23" Width="40"></Image>
                 </Button>
-                <Button Name="Play" Canvas.Left="116" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85">
+                <Button Name="Play" Canvas.Left="116" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -126,7 +139,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PlayButton" Height="23" Width="50"></Image>
                 </Button>
-                <Button Name="Next" Canvas.Left="199" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85">
+                <Button Name="Next" Canvas.Left="199" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -134,8 +147,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="NextButton" Height="23" Width="40"></Image>
                 </Button>
-                <Slider Name="Volume" Canvas.Left="179" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85" />
-                <Slider Name="Position" Canvas.Left="54" Canvas.Top="100" Height="6" Width="173" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85" />
+                <Slider Name="Volume" Canvas.Left="179" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
+                <Slider Name="Position" Canvas.Left="54" Canvas.Top="100" Height="6" Width="173" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85"/>
                 <TextBlock Name="TimerA" Canvas.Left="18" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="233" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
             </Canvas>
@@ -208,24 +221,24 @@ $TimerA=$Window.FindName("TimerA")
 $TimerB=$Window.FindName("TimerB")
 $MenuMain=$Window.FindName("Menu")
 $MenuMain.Add_MouseEnter({
-	$MenuMain.Background="#CCCCCC"
-	$MenuMain.Foreground="#111111"
+	$MenuMain.Background='#222222'
+	$MenuMain.Foreground='#CCCCCC'
 })
 $MenuMain.Add_MouseLeave({
-	$MenuMain.Background="#111111"
-	$MenuMain.Foreground="#CCCCCC"
+	$MenuMain.Background='#111111'
+	$MenuMain.Foreground='#CCCCCC'
 })
 $MenuMain.Add_Click({
 	dropDownMenu
 })
 $MenuFile=$Window.FindName("File")
 $MenuFile.Add_MouseEnter({
-	$MenuFile.Background="#CCCCCC"
-	$MenuFile.Foreground="#111111"
+	$MenuFile.Background='#222222'
+	$MenuFile.Foreground='#CCCCCC'
 })
 $MenuFile.Add_MouseLeave({
-	$MenuFile.Background="#111111"
-	$MenuFile.Foreground="#CCCCCC"
+	$MenuFile.Background='#111111'
+	$MenuFile.Foreground='#CCCCCC'
 })
 $MenuFile.Add_Click({
 	dropDownMenu
@@ -249,12 +262,12 @@ $MenuFile.Add_Click({
 })
 $MenuFolder=$Window.FindName("Folder")
 $MenuFolder.Add_MouseEnter({
-	$MenuFolder.Background="#CCCCCC"
-	$MenuFolder.Foreground="#111111"
+	$MenuFolder.Background='#222222'
+	$MenuFolder.Foreground='#CCCCCC'
 })
 $MenuFolder.Add_MouseLeave({
-	$MenuFolder.Background="#111111"
-	$MenuFolder.Foreground="#CCCCCC"
+	$MenuFolder.Background='#111111'
+	$MenuFolder.Foreground='#CCCCCC'
 })
 $MenuFolder.Add_Click({
 	dropDownMenu
@@ -297,24 +310,24 @@ $MenuFolder.Add_Click({
 })
 $MenuExit=$Window.FindName("Exit")
 $MenuExit.Add_MouseEnter({
-	$MenuExit.Background="#CCCCCC"
-	$MenuExit.Foreground="#111111"
+	$MenuExit.Background='#222222'
+	$MenuExit.Foreground='#CCCCCC'
 })
 $MenuExit.Add_MouseLeave({
-	$MenuExit.Background="#111111"
-	$MenuExit.Foreground="#CCCCCC"
+	$MenuExit.Background='#111111'
+	$MenuExit.Foreground='#CCCCCC'
 })
 $MenuExit.Add_Click({
 	Exit
 })
 $minWin=$Window.FindName("minWin")
 $minWin.Add_MouseEnter({
-	$minWin.Background="#CCCCCC"
-	$minWin.Foreground="#111111"
+	$minWin.Background='#222222'
+	$minWin.Foreground='#CCCCCC'
 })
 $minWin.Add_MouseLeave({
-	$minWin.Background="#111111"
-	$minWin.Foreground="#CCCCCC"
+	$minWin.Background='#111111'
+	$minWin.Foreground='#CCCCCC'
 })
 $minWin.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
@@ -324,12 +337,12 @@ $minWin.Add_Click({
 })
 $Xbutton=$Window.FindName("X")
 $Xbutton.Add_MouseEnter({
-	$Xbutton.Background="#CCCCCC"
-	$Xbutton.Foreground="#ff0000"
+	$Xbutton.Background='#ff0000'
+	$Xbutton.Foreground='#CCCCCC'
 })
 $Xbutton.Add_MouseLeave({
-	$Xbutton.Background="#111111"
-	$Xbutton.Foreground="#CCCCCC"
+	$Xbutton.Background='#111111'
+	$Xbutton.Foreground='#CCCCCC'
 })
 $Xbutton.Add_Click({
 	Exit
@@ -337,6 +350,14 @@ $Xbutton.Add_Click({
 $Prev=$Window.FindName("Prev")
 $PrevImage=$Window.FindName("PrevButton")
 $PrevImage.Source='.\resources\Prev.png'
+$Prev.Add_MouseEnter({
+	$Prev.Background='#6495ED'
+	$Prev.Opacity='1'
+})
+$Prev.Add_MouseLeave({
+	$Prev.Background='#728FCE'
+	$Prev.Opacity='0.85'
+})
 $Prev.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
@@ -365,6 +386,14 @@ $Prev.Add_Click({
 $Play=$Window.FindName("Play")
 $PlayImage=$Window.FindName("PlayButton")
 $PlayImage.Source='.\resources\Play.png'
+$Play.Add_MouseEnter({
+	$Play.Background='#6495ED'
+	$Play.Opacity='1'
+})
+$Play.Add_MouseLeave({
+	$Play.Background='#728FCE'
+	$Play.Opacity='0.85'
+})
 $Play.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
@@ -374,6 +403,14 @@ $Play.Add_Click({
 $Next=$Window.FindName("Next")
 $NextImage=$Window.FindName("NextButton")
 $NextImage.Source='.\resources\Next.png'
+$Next.Add_MouseEnter({
+	$Next.Background='#6495ED'
+	$Next.Opacity='1'
+})
+$Next.Add_MouseLeave({
+	$Next.Background='#728FCE'
+	$Next.Opacity='0.85'
+})
 $Next.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
