@@ -1,3 +1,27 @@
+Write-Host Please Wait...
+$resourcepath=$env:ProgramData + '\PowerPlayer\'
+if(!(Test-Path -Path $resourcepath)){
+	if(Test-Path -Path '.\resources'){
+		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+		Copy-Item -Path '.\resources\bg.gif' -Destination $resourcepath -Force 
+		Copy-Item -Path '.\resources\Next.png' -Destination $resourcepath -Force
+		Copy-Item -Path '.\resources\Pause.png' -Destination $resourcepath -Force
+		Copy-Item -Path '.\resources\Play.png' -Destination $resourcepath -Force
+		Copy-Item -Path '.\resources\Prev.png' -Destination $resourcepath -Force
+	} else {
+		$FirstRun=New-Object -ComObject Wscript.Shell;$FirstRun.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons >$null 2>&1
+		if($GetButtons -eq 1){
+			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+			$ProgressPreference='SilentlyContinue'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/bg.gif -o $resourcepath'bg.gif'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Next.png -o $resourcepath'Next.png'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Pause.png -o $resourcepath'Pause.png'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Play.png -o $resourcepath'Play.png'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Prev.png -o $resourcepath'Prev.png'
+			$ProgressPreference='Continue'
+		}
+	}
+}
 $SW_HIDE, $SW_SHOW = 0, 5
 $TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
 Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
@@ -29,14 +53,14 @@ function TogglePlayButton(){
 	if($files -ne $null){
 		Switch($global:Playing){
 			0{
-				$PlayImage.Source='.\resources\Pause.png'
+				$PlayImage.Source=$resourcepath + 'Pause.png'
 				$mediaPlayer.Play()
 				$global:Playing=1
 				$StatusInfo.Text="Now Playing:"
 				$BG.Play()
 			}
 			1{
-				$PlayImage.Source='.\resources\Play.png'
+				$PlayImage.Source=$resourcepath + 'Play.png'
 				$mediaPlayer.Pause()
 				$global:Playing=0
 				$StatusInfo.Text="Paused:"
@@ -166,7 +190,7 @@ $mediaPlayer.Add_MediaEnded({
 	$mediaPlayer.Stop()
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
-	$PlayImage.Source='.\resources\Play.png'
+	$PlayImage.Source=$resourcepath + 'Play.png'
 	$CurrentTrack.Text='No Media Loaded'
 	$BG.Stop()
 	$global:Playing=0
@@ -196,8 +220,7 @@ $PositionSlider.Add_PreviewMouseDown({
 	$global:tracking=1
 })
 $BG=$Window.FindName("BG")
-$FullBGPath=[IO.Path]::GetFullPath(".\resources\bg.gif")
-$BG.Source=$FullBGPath
+$BG.Source=$resourcepath + 'bg.gif'
 $BG.Add_MediaEnded({
 	$BG.Stop()
 	$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
@@ -349,7 +372,7 @@ $Xbutton.Add_Click({
 })
 $Prev=$Window.FindName("Prev")
 $PrevImage=$Window.FindName("PrevButton")
-$PrevImage.Source='.\resources\Prev.png'
+$PrevImage.Source=$resourcepath + 'Prev.png'
 $Prev.Add_MouseEnter({
 	$Prev.Background='#6495ED'
 	$Prev.Opacity='1'
@@ -385,7 +408,7 @@ $Prev.Add_Click({
 })
 $Play=$Window.FindName("Play")
 $PlayImage=$Window.FindName("PlayButton")
-$PlayImage.Source='.\resources\Play.png'
+$PlayImage.Source=$resourcepath + 'Play.png'
 $Play.Add_MouseEnter({
 	$Play.Background='#6495ED'
 	$Play.Opacity='1'
@@ -402,7 +425,7 @@ $Play.Add_Click({
 })
 $Next=$Window.FindName("Next")
 $NextImage=$Window.FindName("NextButton")
-$NextImage.Source='.\resources\Next.png'
+$NextImage.Source=$resourcepath + 'Next.png'
 $Next.Add_MouseEnter({
 	$Next.Background='#6495ED'
 	$Next.Opacity='1'
