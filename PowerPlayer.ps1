@@ -1,4 +1,7 @@
-Write-Host Please Wait...
+$TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
+Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
+$hWnd=(Get-Process -Id $PID).MainWindowHandle
+$Null=[Win32.Functions]::ShowWindow($hWnd,0)
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
 if(!(Test-Path -Path $resourcepath)){
 	if(Test-Path -Path '.\resources'){
@@ -9,7 +12,7 @@ if(!(Test-Path -Path $resourcepath)){
 		Copy-Item -Path '.\resources\Play.png' -Destination $resourcepath -Force
 		Copy-Item -Path '.\resources\Prev.png' -Destination $resourcepath -Force
 	} else {
-		$FirstRun=New-Object -ComObject Wscript.Shell;$FirstRun.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons >$null 2>&1
+		$FirstRun=New-Object -ComObject Wscript.Shell;$FirstRun.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons
 		if($GetButtons -eq 1){
 			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 			$ProgressPreference='SilentlyContinue'
@@ -22,11 +25,6 @@ if(!(Test-Path -Path $resourcepath)){
 		}
 	}
 }
-$SW_HIDE, $SW_SHOW = 0, 5
-$TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
-Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
-$hWnd=(Get-Process -Id $PID).MainWindowHandle
-$Null=[Win32.Functions]::ShowWindow($hWnd,$SW_HIDE)
 $global:Playing=0
 $global:tracking=0
 $global:icurrent=-1
@@ -455,6 +453,7 @@ $Next.Add_Click({
 })
 $BG.Play()
 $window.Show()
+$window.Activate()
 $BG.Pause()
 $appContext=New-Object System.Windows.Forms.ApplicationContext
 [void][System.Windows.Forms.Application]::Run($appContext)
