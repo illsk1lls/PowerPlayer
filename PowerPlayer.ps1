@@ -225,16 +225,18 @@ $MenuFile.Add_Click({
 		Title='Select a MP3 file...'
 		Filter='MP3 (*.mp3)|*.mp3'
 	}
-	$null=$getFile.ShowDialog()
+	$filePicker=$getFile.ShowDialog()
 	$file=$getFile.Filename
-	$path = Split-Path $file -Parent
-	$path = $path+'\'
-	$files=@()
-	$files+=Split-Path $file -leaf
-	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-	TogglePlayButton
-	NextTrack
+	if($filePicker -ne [System.Windows.Forms.DialogResult]::Cancel){
+		$path = Split-Path $file -Parent
+		$path = $path+'\'
+		$files=@()
+		$files+=Split-Path $file -leaf
+		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+		$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
+		TogglePlayButton
+		NextTrack
+	}
 })
 $MenuFolder=$Window.FindName("Folder")
 $MenuFolder.Add_MouseEnter({
@@ -249,15 +251,17 @@ $MenuFolder.Add_Click({
 	dropDownMenu
 	$folder = New-Object System.Windows.Forms.FolderBrowserDialog
 	$folder.SelectedPath = "$env:UserProfile\Music"
-	$null = $folder.ShowDialog()
+	$folderPicker = $folder.ShowDialog()
 	$path = $folder.SelectedPath
-	$files=@()
-	Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
-		$files+=$_
-	}
-	TogglePlayButton
-	while(([ref] $script:icurrent).Value -lt $files.Length - 1){
-		NextTrack
+	if($folderPicker -ne [System.Windows.Forms.DialogResult]::Cancel){
+		$files=@()
+		Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
+			$files+=$_
+		}
+		TogglePlayButton
+		while(([ref] $script:icurrent).Value -lt $files.Length - 1){
+			NextTrack
+		}
 	}
 })
 $MenuExit=$Window.FindName("Exit")
