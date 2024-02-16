@@ -87,7 +87,6 @@ function PlayTrack(){
 	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
 	$mediaPlayer.Play()
 	trackLength
-	Update-Gui
 	WaitForSong	
 }
 Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, WindowsFormsIntegration, presentationCore
@@ -302,10 +301,23 @@ $PrevImage.Source='.\resources\Prev.png'
 $Prev.Add_Click({
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
-	if($checkposition -le 2){
-		PrevTrack
-	} else {
-		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+		if($global:Playing -eq 0){
+			if($icurrent -ge 1){
+			$global:icurrent--
+			$file = $files[$icurrent]
+			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+			$FullName="$path\$file"
+			$mediaPlayer.open($FullName)
+			$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
+			trackLength
+			WaitForSong	
+			}			
+		} else {
+		if($checkposition -le 2){
+			PrevTrack
+		} else {
+			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+		}
 	}
 })
 $Play=$Window.FindName("Play")
@@ -318,7 +330,20 @@ $Next=$Window.FindName("Next")
 $NextImage=$Window.FindName("NextButton")
 $NextImage.Source='.\resources\Next.png'
 $Next.Add_Click({
-	NextTrack
+	if($global:Playing -eq 0){
+		if($icurrent -lt $files.Length - 1){
+		$global:icurrent++
+		$file = $files[$icurrent]
+		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+		$FullName="$path\$file"
+		$mediaPlayer.open($FullName)
+		$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
+		trackLength
+		WaitForSong	
+		}
+	} else {
+		NextTrack
+	}
 })
 $BG.Play()
 $window.Show()
