@@ -7,7 +7,7 @@ $global:Playing=0
 $global:tracking=0
 $global:icurrent=-1
 function Update-Gui{
-$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
+	$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
 }
 function dropDownMenu(){
 	Switch($MenuFile.Visibility){
