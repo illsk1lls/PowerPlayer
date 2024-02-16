@@ -33,12 +33,14 @@ function TogglePlayButton(){
 				$mediaPlayer.Play()
 				$global:Playing=1
 				$StatusInfo.Text="Now Playing:"
+				$BG.Play()
 			}
 			1{
 				$PlayImage.Source='.\resources\Play.png'
 				$mediaPlayer.Pause()
 				$global:Playing=0
 				$StatusInfo.Text="Paused:"
+				$BG.Pause()
 			}
 		}
 	}
@@ -95,13 +97,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="PowerPlayer" Height="180" Width="300" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
-            <Grid.Background>
-                <VisualBrush>
-                    <VisualBrush.Visual>
-                        <Image Name="BGimage"/>
-                    </VisualBrush.Visual>
-                </VisualBrush>
-            </Grid.Background>
+			<MediaElement Name="BG" Height="160" Width="280" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
             <Canvas>
                 <TextBlock Canvas.Left="32" Canvas.Top="40" Foreground="#CCCCCC">
 					<TextBlock.Inlines>
@@ -180,8 +176,14 @@ $PositionSlider.Add_PreviewMouseUp({
 $PositionSlider.Add_PreviewMouseDown({
 	$global:tracking=1
 })
-$BG=$Window.FindName("BGimage")
-$BG.Source='.\resources\bg.png'
+$BG=$Window.FindName("BG")
+$FullBGPath=[IO.Path]::GetFullPath(".\resources\bg.gif")
+$BG.Source=$FullBGPath
+$BG.Add_MediaEnded({
+	$BG.Stop()
+	$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
+	$BG.Play()
+})
 $bitmap=New-Object System.Windows.Media.Imaging.BitmapImage
 $bitmap=$BG.Source
 $window.Icon=$bitmap
@@ -318,6 +320,8 @@ $NextImage.Source='.\resources\Next.png'
 $Next.Add_Click({
 	NextTrack
 })
+$BG.Play()
 $window.Show()
+$BG.Pause()
 $appContext=New-Object System.Windows.Forms.ApplicationContext
 [void][System.Windows.Forms.Application]::Run($appContext)
