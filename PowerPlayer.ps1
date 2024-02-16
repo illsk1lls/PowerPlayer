@@ -110,7 +110,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open File</Button>
                 <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Open Folder</Button>
                 <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#CCCCCC" Foreground="#CCCCCC" Background="#111111" Height="18" Width="90" Visibility="Collapsed">Exit</Button>
-                <Button Name="Prev" Canvas.Left="39" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Prev" Canvas.Left="39" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -118,7 +118,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PrevButton" Height="23" Width="40"></Image>
                 </Button>
-                <Button Name="Play" Canvas.Left="116" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Play" Canvas.Left="116" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -126,7 +126,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PlayButton" Height="23" Width="50"></Image>
                 </Button>
-                <Button Name="Next" Canvas.Left="199" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9">
+                <Button Name="Next" Canvas.Left="199" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="10"/>
@@ -134,8 +134,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="NextButton" Height="23" Width="40"></Image>
                 </Button>
-                <Slider Name="Volume" Canvas.Left="179" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.9" />
-                <Slider Name="Position" Canvas.Left="54" Canvas.Top="100" Height="6" Width="173" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.9" />
+                <Slider Name="Volume" Canvas.Left="179" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85" />
+                <Slider Name="Position" Canvas.Left="54" Canvas.Top="100" Height="6" Width="173" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85" />
                 <TextBlock Name="TimerA" Canvas.Left="18" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="233" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
             </Canvas>
@@ -166,6 +166,9 @@ $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pi
 $VolumeSlider=$Window.FindName("Volume")
 $VolumeSlider.Value=$mediaPlayer.Volume
 $VolumeSlider.Add_PreviewMouseUp({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	$mediaPlayer.Volume=$VolumeSlider.Value
 })
 $PositionSlider=$Window.FindName("Position")
@@ -174,6 +177,9 @@ $PositionSlider.Add_PreviewMouseUp({
 	$global:tracking=0
 })
 $PositionSlider.Add_PreviewMouseDown({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	$global:tracking=1
 })
 $BG=$Window.FindName("BG")
@@ -190,6 +196,9 @@ $window.Icon=$bitmap
 $window.TaskbarItemInfo.Overlay=$bitmap
 $window.TaskbarItemInfo.Description=$window.Title
 $window.add_MouseLeftButtonDown({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}	
 $window.DragMove()
 })
 $StatusInfo=$Window.FindName("Status")
@@ -308,6 +317,9 @@ $minWin.Add_MouseLeave({
 	$minWin.Foreground="#CCCCCC"
 })
 $minWin.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	$Window.WindowState='Minimized'
 })
 $Xbutton=$Window.FindName("X")
@@ -326,6 +338,9 @@ $Prev=$Window.FindName("Prev")
 $PrevImage=$Window.FindName("PrevButton")
 $PrevImage.Source='.\resources\Prev.png'
 $Prev.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
 		if($global:Playing -eq 0){
@@ -351,12 +366,18 @@ $Play=$Window.FindName("Play")
 $PlayImage=$Window.FindName("PlayButton")
 $PlayImage.Source='.\resources\Play.png'
 $Play.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	TogglePlayButton
 })
 $Next=$Window.FindName("Next")
 $NextImage=$Window.FindName("NextButton")
 $NextImage.Source='.\resources\Next.png'
 $Next.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	if($global:Playing -eq 0){
 		if($icurrent -lt $files.Length - 1){
 		$global:icurrent++
