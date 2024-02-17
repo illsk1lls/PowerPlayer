@@ -56,7 +56,7 @@ public static extern short GetAsyncKeyState(int virtualKeyCode);
 			. $PSCommandPath
 			Exit
 		} else {
-			$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No update was performed.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons
+			$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons
 		}
 	}	
 }
