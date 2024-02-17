@@ -6,26 +6,38 @@ $resourcepath=$env:ProgramData + '\PowerPlayer\'
 if(!(Test-Path -Path $resourcepath)){
 	if(Test-Path -Path '.\resources'){
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
-		Copy-Item -Path '.\resources\bg.gif' -Destination $resourcepath -Force 
+		Copy-Item -Path '.\resources\bg.gif' -Destination $resourcepath -Force
+		Copy-Item -Path '.\resources\Muted.png' -Destination $resourcepath -Force
 		Copy-Item -Path '.\resources\Next.png' -Destination $resourcepath -Force
 		Copy-Item -Path '.\resources\Pause.png' -Destination $resourcepath -Force
 		Copy-Item -Path '.\resources\Play.png' -Destination $resourcepath -Force
 		Copy-Item -Path '.\resources\Prev.png' -Destination $resourcepath -Force
+		Copy-Item -Path '.\resources\RepeatAll.png' -Destination $resourcepath -Force 
+		Copy-Item -Path '.\resources\RepeatOne.png' -Destination $resourcepath -Force
+		Copy-Item -Path '.\resources\Shuffle.png' -Destination $resourcepath -Force
+		Copy-Item -Path '.\resources\UnMuted.png' -Destination $resourcepath -Force
 	} else {
 		$FirstRun=New-Object -ComObject Wscript.Shell;$FirstRun.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons
 		if($GetButtons -eq 1){
 			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 			$ProgressPreference='SilentlyContinue'
 			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/bg.gif -o $resourcepath'bg.gif'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Muted.png -o $resourcepath'Muted.png'
 			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Next.png -o $resourcepath'Next.png'
 			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Pause.png -o $resourcepath'Pause.png'
 			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Play.png -o $resourcepath'Play.png'
 			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Prev.png -o $resourcepath'Prev.png'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatAll.png -o $resourcepath'RepeatAll.png'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatOne.png -o $resourcepath'RepeatOne.png'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Shuffle.png -o $resourcepath'Shuffle.png'
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/UnMuted.png -o $resourcepath'UnMuted.png'
 			$ProgressPreference='Continue'
 		}
 	}
 }
 $global:Playing=0
+$global:Repeating=0
+$global:ShuffleOn=0
 $global:tracking=0
 $global:icurrent=-1
 function Update-Gui{
@@ -69,16 +81,48 @@ function TogglePlayButton(){
 }
 function NextTrack(){
 	if($icurrent -lt $files.Length - 1){
-	$global:icurrent++
-	$file = $files[$icurrent]
-	PlayTrack
+		if(!($global:Repeating -eq 1)){
+			$global:icurrent++
+		}
+		if($global:ShuffleOn -eq 0){
+			$file = $files[$icurrent]
+		} else {
+			$file = $filesShuffled[$icurrent]
+		}
+		PlayTrack	
+	} else {
+		if($global:Repeating -eq 2){
+			$global:icurrent=0
+			if($global:ShuffleOn -eq 0){
+				$file = $files[$icurrent]
+			} else {
+				$file = $filesShuffled[$icurrent]
+			}
+			PlayTrack	
+		}
 	}
 }
 function PrevTrack(){
 	if($icurrent -ge 1){
-	$global:icurrent--
-	$file = $files[$icurrent]
-	PlayTrack
+		if(!($global:Repeating -eq 1)){
+			$global:icurrent--
+		}
+		if($global:ShuffleOn -eq 0){
+			$file = $files[$icurrent]
+		} else {
+			$file = $filesShuffled[$icurrent]
+		}		
+		PlayTrack
+	} else {
+		if($global:Repeating -eq 2){
+			$global:icurrent=$files.Length - 1
+			if($global:ShuffleOn -eq 0){
+				$file = $files[$icurrent]
+			} else {
+				$file = $filesShuffled[$icurrent]
+			}
+			PlayTrack	
+		}
 	}
 }
 function trackLength(){
@@ -145,6 +189,22 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;File</Button>
                 <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;Folder</Button>
                 <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;Exit</Button>
+                <Button Name="Mute" Canvas.Left="286" Canvas.Top="76" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                    </Button.Resources>
+                    <Image Name="MuteButton" Height="12" Width="16"></Image>
+                </Button>
+                <Button Name="Shuffle" Canvas.Left="85" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                    </Button.Resources>
+                    <Image Name="ShuffleButton" Height="15" Width="20"></Image>
+                </Button>
                 <Button Name="Prev" Canvas.Left="125" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -169,10 +229,19 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="NextButton" Height="27" Width="55"></Image>
                 </Button>
-                <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="80" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
+                <Button Name="Repeat" Canvas.Left="390" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                    </Button.Resources>
+                    <Image Name="RepeatButton" Height="15" Width="20"></Image>
+                </Button>
+				<Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
                 <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85"/>
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
+                <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
             </Canvas>
         </Grid>
     </Border>
@@ -185,19 +254,58 @@ $window=[Windows.Markup.XamlReader]::Load($reader)
 $window.Title='PowerPlayer'
 $mediaPlayer=New-Object system.windows.media.mediaplayer
 $mediaPlayer.Add_MediaEnded({
-	$mediaPlayer.Stop()
+	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+	$mediaPlayer.Stop()
 	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 	$PlayImage.Source=$resourcepath + 'Play.png'
 	$CurrentTrack.Text='No Media Loaded'
 	$BG.Stop()
 	$global:Playing=0
-	$global:icurrent=-1
 	$StatusInfo.Text=''
 	$TimerA.Text=''
-	$TimerB.Text=''	
+	$TimerB.Text=''
 })
 $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pid})
+$Mute=$Window.FindName("Mute")
+$MuteImage=$Window.FindName("MuteButton")
+$Mute.Add_MouseEnter({
+	$Mute.Background='#6495ED'
+	$Mute.Opacity='1'
+})
+$Mute.Add_MouseLeave({
+	$Mute.Background='#728FCE'
+	$Mute.Opacity='0.85'
+})
+$Mute.Add_Click({
+	Switch($global:Muted){
+		0{
+			$MuteImage.Source=$resourcepath + 'Muted.png'
+			$global:UnMutedVolume=$mediaPlayer.Volume
+			$mediaPlayer.Volume=0
+			$global:Muted=1
+			$VolumeSlider.Value=$mediaPlayer.Volume
+			$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
+		}
+		1{
+			if($global:UnMutedVolume -eq $null){
+				$global:UnMutedVolume=0.5
+			}
+			$MuteImage.Source=$resourcepath + 'UnMuted.png'
+			$mediaPlayer.Volume=$global:UnMutedVolume
+			$global:Muted=0
+			$VolumeSlider.Value=$mediaPlayer.Volume
+			$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
+		}
+	}
+})
+if(!($mediaPlayer.IsMuted)){
+	$MuteImage.Source=$resourcepath + 'UnMuted.png'
+	$global:Muted=0
+} else {
+	$MuteImage.Source=$resourcepath + 'Muted.png'
+	$global:Muted=1
+}
 $VolumeSlider=$Window.FindName("Volume")
 $VolumeSlider.Value=$mediaPlayer.Volume
 $VolumeSlider.Add_PreviewMouseUp({
@@ -205,6 +313,7 @@ $VolumeSlider.Add_PreviewMouseUp({
 		dropDownMenu
 	}
 	$mediaPlayer.Volume=$VolumeSlider.Value
+	$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
 })
 $PositionSlider=$Window.FindName("Position")
 $PositionSlider.Add_PreviewMouseUp({
@@ -240,6 +349,8 @@ $StatusInfo.Text=''
 $CurrentTrack=$Window.FindName("CurrentTrack")
 $TimerA=$Window.FindName("TimerA")
 $TimerB=$Window.FindName("TimerB")
+$VolumePercent=$Window.FindName("VolumePercent")
+$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
 $MenuMain=$Window.FindName("Menu")
 $MenuMain.Add_MouseEnter({
 	$MenuMain.Background='#222222'
@@ -317,14 +428,22 @@ $MenuFolder.Add_Click({
 	$Result = $FileDialogInterfaceType.GetMethod('Show',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,[System.IntPtr]::Zero)
 	$FileDialogInterfaceType.GetMethod('Unadvise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdviceCookie)
 	if ($Result -ne [System.Windows.Forms.DialogResult]::Cancel) {
-		$FileDialogInterfaceType.GetMethod('GetResult',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$null)
+		$FileDialogInterfaceType.GetMethod('GetResult',@('NonPublic','Public','Static','Instance'))
 		$path = $OpenFileDialog.FileName+'\'
 		$files=@()
 		Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
 			$files+=$_
 		}
 		TogglePlayButton
-		while(([ref] $script:icurrent).Value -lt $files.Length - 1){
+		while(([ref] $script:icurrent).Value -lt $files.Length - 1 -or $global:Repeating -eq 2){
+			if($global:Repeating -eq 2){
+				if(([ref] $script:icurrent).Value -eq $files.Length - 1){
+					$global:icurrent=-1
+					if($global:ShuffleOn -eq 1) {
+						$global:filesShuffled=$files | Sort-Object {Get-Random}
+					}
+				}
+			}
 			NextTrack
 		}
 	}
@@ -367,6 +486,30 @@ $Xbutton.Add_MouseLeave({
 })
 $Xbutton.Add_Click({
 	Exit
+})
+$Shuffle=$Window.FindName("Shuffle")
+$ShuffleImage=$Window.FindName("ShuffleButton")
+$ShuffleImage.Source=$resourcepath + 'Shuffle.png'
+$Shuffle.Add_MouseEnter({
+	$Shuffle.Background='#6495ED'
+	$Shuffle.Opacity='1'
+})
+$Shuffle.Add_MouseLeave({
+	$Shuffle.Background='#728FCE'
+	$Shuffle.Opacity='0.85'
+})
+$Shuffle.Add_Click({
+	Switch($global:ShuffleOn){
+		0{
+			$Shuffle.BorderBrush='#5D3FD3'
+			$global:ShuffleOn=1
+			$global:filesShuffled=$files | Sort-Object {Get-Random}
+		}
+		1{
+			$Shuffle.BorderBrush='#728FCE'
+			$global:ShuffleOn=0
+		}
+	}
 })
 $Prev=$Window.FindName("Prev")
 $PrevImage=$Window.FindName("PrevButton")
@@ -449,6 +592,36 @@ $Next.Add_Click({
 		}
 	} else {
 		NextTrack
+	}
+})
+$Repeat=$Window.FindName("Repeat")
+$RepeatImage=$Window.FindName("RepeatButton")
+$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
+$Repeat.Add_MouseEnter({
+	$Repeat.Background='#6495ED'
+	$Repeat.Opacity='1'
+})
+$Repeat.Add_MouseLeave({
+	$Repeat.Background='#728FCE'
+	$Repeat.Opacity='0.85'
+})
+$Repeat.Add_Click({
+	Switch($global:Repeating){
+		0{
+			$RepeatImage.Source=$resourcepath + 'RepeatOne.png'
+			$Repeat.BorderBrush='#5D3FD3'
+			$global:Repeating=1
+		}
+		1{
+			$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
+			$Repeat.BorderBrush='#5D3FD3'
+			$global:Repeating=2
+		}
+		2{
+			$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
+			$Repeat.BorderBrush='#728FCE'
+			$global:Repeating=0
+		}
 	}
 })
 $BG.Play()
