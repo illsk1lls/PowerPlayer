@@ -1,47 +1,56 @@
-$TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
-Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
-$hWnd=(Get-Process -Id $PID).MainWindowHandle
-$Null=[Win32.Functions]::ShowWindow($hWnd,0)
+#$TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
+#Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
+#$hWnd=(Get-Process -Id $PID).MainWindowHandle
+#$Null=[Win32.Functions]::ShowWindow($hWnd,0)
+$localResources='.\resources'
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
+$resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','UnMuted.png'
 function updateResources(){
 	$ProgressPreference='SilentlyContinue'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/bg.gif -o $resourcepath'bg.gif'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Muted.png -o $resourcepath'Muted.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Next.png -o $resourcepath'Next.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Pause.png -o $resourcepath'Pause.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Play.png -o $resourcepath'Play.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Prev.png -o $resourcepath'Prev.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatAll.png -o $resourcepath'RepeatAll.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatOne.png -o $resourcepath'RepeatOne.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Shuffle.png -o $resourcepath'Shuffle.png'
-	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/UnMuted.png -o $resourcepath'UnMuted.png'
+		foreach($item in $resourcecheck) {
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/$item -o $resourcepath$item
+		}
 	$ProgressPreference='Continue'
 }
-if(!(Test-Path -Path $resourcepath)){
-	if(Test-Path -Path '.\resources'){
-		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
-		Copy-Item -Path '.\resources\bg.gif' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\Muted.png' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\Next.png' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\Pause.png' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\Play.png' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\Prev.png' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\RepeatAll.png' -Destination $resourcepath -Force 
-		Copy-Item -Path '.\resources\RepeatOne.png' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\Shuffle.png' -Destination $resourcepath -Force
-		Copy-Item -Path '.\resources\UnMuted.png' -Destination $resourcepath -Force
-	} else {
-		$ResourcesMissing=New-Object -ComObject Wscript.Shell;$ResourcesMissing.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons
-		if($GetButtons -eq 1){
-			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
-			updateResources
-		} else {
-			Exit
+function missingResources() {
+	$resourcesMissing=New-Object -ComObject Wscript.Shell;$resourcesMissing.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons
+	if($GetButtons -eq 1){
+		if (Test-Path -Path $resourcepath) {
+			Remove-Item -Path $resourcepath -Recurse -Force | out-null
 		}
+		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+		updateResources
+	} else {
+		Exit
+	}	
+}
+if(!(Test-Path -Path $resourcepath)){
+	if(Test-Path -Path $localResources){
+		foreach ($item in $resourcecheck){
+			if(![System.IO.File]::Exists($resourcepath + $item)){
+				$missing++
+			}
+		}
+	if($missing -eq 0){
+		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+		foreach($item in $resourcecheck) {
+			Copy-Item -Path .\resources\$item -Destination $resourcepath -Force
+		}
+	} else {
+		missingResources
+	}
 	}
 } else {
-$ctrlkey = '0x11'
-$CheckCtrlHeldAtLaunch=@'
+	foreach ($item in $resourcecheck){
+		if(![System.IO.File]::Exists($resourcepath + $item)){
+			$missing++
+		}
+	}
+	if($missing -ne 0){
+		missingResources
+	}
+	$ctrlkey = '0x11'
+	$CheckCtrlHeldAtLaunch=@'
 [DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
 public static extern short GetAsyncKeyState(int virtualKeyCode); 
 '@
@@ -58,7 +67,7 @@ public static extern short GetAsyncKeyState(int virtualKeyCode);
 		} else {
 			$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons
 		}
-	}	
+	}
 }
 $global:Playing=0
 $global:Repeating=0
