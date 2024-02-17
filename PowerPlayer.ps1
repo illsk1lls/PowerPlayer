@@ -91,15 +91,13 @@ function NextTrack(){
 		}
 		PlayTrack	
 	} else {
-		if($global:Repeating -eq 2){
-			$global:icurrent=0
-			if($global:ShuffleOn -eq 0){
-				$file = $files[$icurrent]
-			} else {
-				$file = $filesShuffled[$icurrent]
-			}
-			PlayTrack	
+		$global:icurrent=0
+		if($global:ShuffleOn -eq 0){
+			$file = $files[$icurrent]
+		} else {
+			$file = $filesShuffled[$icurrent]
 		}
+		PlayTrack	
 	}
 }
 function PrevTrack(){
@@ -403,6 +401,10 @@ $MenuFile.Add_Click({
 			TogglePlayButton
 		}
 		NextTrack
+		while(([ref] $script:Repeating).Value -ge 1){
+			$global:icurrent=-1
+			NextTrack
+		}
 	}
 })
 $MenuFolder=$Window.FindName("Folder")
