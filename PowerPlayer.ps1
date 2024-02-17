@@ -278,6 +278,9 @@ $Mute.Add_MouseLeave({
 	$Mute.Opacity='0.85'
 })
 $Mute.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	Switch($global:Muted){
 		0{
 			$MuteImage.Source=$resourcepath + 'Muted.png'
@@ -446,8 +449,16 @@ $MenuFolder.Add_Click({
 		Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
 			$files+=$_
 		}
+		if($global:ShuffleOn -eq 1){
+			$global:filesShuffled=$files | Sort-Object {Get-Random}
+		}
+		if($global:Repeating -eq 1){
+			$global:icurrent=0			
+		}
 		if($global:Playing -eq 0){
 			TogglePlayButton
+		} else {
+			$global:icurrent--
 		}
 		while(([ref] $script:icurrent).Value -lt $files.Length - 1 -or $global:Repeating -eq 2 -and $global:singlefilemode -ne 1){
 			if($global:Repeating -eq 2){
@@ -513,6 +524,9 @@ $Shuffle.Add_MouseLeave({
 	$Shuffle.Opacity='0.85'
 })
 $Shuffle.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	Switch($global:ShuffleOn){
 		0{
 			$Shuffle.BorderBrush='#5D3FD3'
@@ -620,6 +634,9 @@ $Repeat.Add_MouseLeave({
 	$Repeat.Opacity='0.85'
 })
 $Repeat.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
 	Switch($global:Repeating){
 		0{
 			$RepeatImage.Source=$resourcepath + 'RepeatOne.png'
