@@ -35,6 +35,8 @@ if(!(Test-Path -Path $resourcepath)){
 		if($GetButtons -eq 1){
 			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 			updateResources
+		} else {
+			Exit
 		}
 	}
 } else {
