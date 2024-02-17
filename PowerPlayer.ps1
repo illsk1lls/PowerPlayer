@@ -382,13 +382,23 @@ $MenuFile.Add_Click({
 	$filePicker=$getFile.ShowDialog()
 	$file=$getFile.Filename
 	if($filePicker -ne [System.Windows.Forms.DialogResult]::Cancel){
+		$global:singlefilemode=1
+		$global:icurrent=-1
+		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+		$mediaPlayer.Stop()
+		$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
+		$PlayImage.Source=$resourcepath + 'Play.png'
+		$global:Playing=0
 		$path = Split-Path $file -Parent
 		$path = $path+'\'
+		$files=$null
 		$files=@()
 		$files+=Split-Path $file -leaf
 		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 		$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-		TogglePlayButton
+		if($global:Playing -eq 0){
+			TogglePlayButton
+		}
 		NextTrack
 	}
 })
@@ -428,14 +438,18 @@ $MenuFolder.Add_Click({
 	$Result = $FileDialogInterfaceType.GetMethod('Show',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,[System.IntPtr]::Zero)
 	$FileDialogInterfaceType.GetMethod('Unadvise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdviceCookie)
 	if ($Result -ne [System.Windows.Forms.DialogResult]::Cancel) {
+		$global:singlefilemode=0
 		$FileDialogInterfaceType.GetMethod('GetResult',@('NonPublic','Public','Static','Instance'))
 		$path = $OpenFileDialog.FileName+'\'
+		$files=$null
 		$files=@()
 		Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
 			$files+=$_
 		}
-		TogglePlayButton
-		while(([ref] $script:icurrent).Value -lt $files.Length - 1 -or $global:Repeating -eq 2){
+		if($global:Playing -eq 0){
+			TogglePlayButton
+		}
+		while(([ref] $script:icurrent).Value -lt $files.Length - 1 -or $global:Repeating -eq 2 -and $global:singlefilemode -ne 1){
 			if($global:Repeating -eq 2){
 				if(([ref] $script:icurrent).Value -eq $files.Length - 1){
 					$global:icurrent=-1
