@@ -49,7 +49,7 @@ public static extern short GetAsyncKeyState(int virtualKeyCode);
 	if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){ 
 		$FirstRun=New-Object -ComObject Wscript.Shell;$FirstRun.Popup("Would you like to retrieve the latest PowerPlayer resources from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable GetButtons
 		if($GetButtons -eq 1){
-			Remove-Item -Path $resourcepath -Recurse -Force
+			Remove-Item -Path $resourcepath -Recurse -Force | out-null
 			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 			updateResources
 			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o '.\PowerPlayer.ps1'
