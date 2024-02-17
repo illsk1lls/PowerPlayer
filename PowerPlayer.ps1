@@ -17,7 +17,7 @@ function updateResources(){
 	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/UnMuted.png -o $resourcepath'UnMuted.png'
 	$ProgressPreference='Continue'
 }
-if(!(Test-Path -Path $resourcepath)){
+if(!(Test-Path -Path $resourcepath -and Test-Path -Path $resourcepath + 'bg.gif' -and Test-Path -Path $resourcepath + 'Muted.png' -and Test-Path -Path $resourcepath + 'Next.png' -and Test-Path -Path $resourcepath + 'Pause.png' -and Test-Path -Path $resourcepath + 'Play.png' -and Test-Path -Path $resourcepath + 'Prev.png' -and Test-Path -Path $resourcepath + 'RepeatAll.png' -and Test-Path -Path $resourcepath + 'RepeatOne.png' -and Test-Path -Path $resourcepath + 'Shuffle.png' -and Test-Path -Path $resourcepath + 'UnMuted.png')){
 	if(Test-Path -Path '.\resources' -and Test-Path -Path '.\resources\bg.gif' -and Test-Path -Path '.\resources\Muted.png' -and Test-Path -Path '.\resources\Next.png' -and Test-Path -Path '.\resources\Pause.png' -and Test-Path -Path '.\resources\Play.png' -and Test-Path -Path '.\resources\Prev.png' -and Test-Path -Path '.\resources\RepeatAll.png' -and Test-Path -Path '.\resources\RepeatOne.png' -and Test-Path -Path '.\resources\Shuffle.png' -and Test-Path -Path '.\resources\UnMuted.png'){
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 		Copy-Item -Path '.\resources\bg.gif' -Destination $resourcepath -Force
