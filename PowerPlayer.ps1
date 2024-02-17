@@ -115,7 +115,7 @@ Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.For
 [xml]$xaml='
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		Title="PowerPlayer" Height="180" Width="300" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+		Title="PowerPlayer" Height="300" Width="500" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 	<Window.Resources>
 		<ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
 			<Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
@@ -131,48 +131,48 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	</Window.Resources>
     <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
-			<MediaElement Name="BG" Height="160" Width="280" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
+			<MediaElement Name="BG" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
             <Canvas>
-                <TextBlock Canvas.Left="32" Canvas.Top="40" Foreground="#CCCCCC">
+                <TextBlock Canvas.Left="90" Canvas.Top="74" Foreground="#CCCCCC">
 					<TextBlock.Inlines>
 						<Run Name="Status" FontStyle="Italic"/>
 					</TextBlock.Inlines>
 				</TextBlock>
-                <TextBlock Name="CurrentTrack" Canvas.Top="69" Foreground="#CCCCCC" FontSize="12" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="280"/>
+                <TextBlock Name="CurrentTrack" Canvas.Top="135" Foreground="#CCCCCC" FontSize="16" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="490"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
-                <Button Name="minWin" Canvas.Left="236" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
-                <Button Name="X" Canvas.Left="258" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
+                <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
+                <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;File</Button>
                 <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;Folder</Button>
                 <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;Exit</Button>
-                <Button Name="Prev" Canvas.Left="39" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Prev" Canvas.Left="125" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="10"/>
+                            <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="PrevButton" Height="23" Width="40"></Image>
+                    <Image Name="PrevButton" Height="27" Width="55"></Image>
                 </Button>
-                <Button Name="Play" Canvas.Left="116" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Play" Canvas.Left="215" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="10"/>
+                            <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="PlayButton" Height="23" Width="50"></Image>
+                    <Image Name="PlayButton" Height="27" Width="65"></Image>
                 </Button>
-                <Button Name="Next" Canvas.Left="199" Canvas.Top="119" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Next" Canvas.Left="315" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="10"/>
+                            <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="NextButton" Height="23" Width="40"></Image>
+                    <Image Name="NextButton" Height="27" Width="55"></Image>
                 </Button>
-                <Slider Name="Volume" Canvas.Left="179" Canvas.Top="45" Height="6" Width="60" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
-                <Slider Name="Position" Canvas.Left="54" Canvas.Top="100" Height="6" Width="173" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85"/>
-                <TextBlock Name="TimerA" Canvas.Left="18" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
-                <TextBlock Name="TimerB" Canvas.Left="233" Canvas.Top="95" Foreground="#CCCCCC" FontWeight="Bold"/>
+                <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="80" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
+                <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85"/>
+                <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
+                <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
             </Canvas>
         </Grid>
     </Border>
