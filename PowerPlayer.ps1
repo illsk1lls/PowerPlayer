@@ -3,6 +3,20 @@ Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
 $hWnd=(Get-Process -Id $PID).MainWindowHandle
 $Null=[Win32.Functions]::ShowWindow($hWnd,0)
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
+function updateResources(){
+	$ProgressPreference='SilentlyContinue'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/bg.gif -o $resourcepath'bg.gif'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Muted.png -o $resourcepath'Muted.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Next.png -o $resourcepath'Next.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Pause.png -o $resourcepath'Pause.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Play.png -o $resourcepath'Play.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Prev.png -o $resourcepath'Prev.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatAll.png -o $resourcepath'RepeatAll.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatOne.png -o $resourcepath'RepeatOne.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Shuffle.png -o $resourcepath'Shuffle.png'
+	irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/UnMuted.png -o $resourcepath'UnMuted.png'
+	$ProgressPreference='Continue'
+}
 if(!(Test-Path -Path $resourcepath)){
 	if(Test-Path -Path '.\resources'){
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
@@ -20,20 +34,26 @@ if(!(Test-Path -Path $resourcepath)){
 		$FirstRun=New-Object -ComObject Wscript.Shell;$FirstRun.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons
 		if($GetButtons -eq 1){
 			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
-			$ProgressPreference='SilentlyContinue'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/bg.gif -o $resourcepath'bg.gif'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Muted.png -o $resourcepath'Muted.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Next.png -o $resourcepath'Next.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Pause.png -o $resourcepath'Pause.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Play.png -o $resourcepath'Play.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Prev.png -o $resourcepath'Prev.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatAll.png -o $resourcepath'RepeatAll.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/RepeatOne.png -o $resourcepath'RepeatOne.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/Shuffle.png -o $resourcepath'Shuffle.png'
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/UnMuted.png -o $resourcepath'UnMuted.png'
-			$ProgressPreference='Continue'
+			updateResources
 		}
 	}
+} else {
+$ctrlkey = '0x11'
+$CheckCtrlHeldAtLaunch=@'
+[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
+public static extern short GetAsyncKeyState(int virtualKeyCode); 
+'@
+	Add-Type -MemberDefinition $CheckCtrlHeldAtLaunch -Name Keyboard -Namespace PsOneApi
+	if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){ 
+		$FirstRun=New-Object -ComObject Wscript.Shell;$FirstRun.Popup("Would you like to retrieve the latest PowerPlayer resources from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable GetButtons
+		if($GetButtons -eq 1){
+			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+			updateResources
+			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o '.\PowerPlayer.ps1'
+			. $PSCommandPath
+			Exit
+		}
+	}	
 }
 $global:Playing=0
 $global:Repeating=0
@@ -571,7 +591,11 @@ $Prev.Add_Click({
 			}			
 		} else {
 		if($checkposition -le 2){
-			PrevTrack
+			if($global:singlefilemode -eq 1 -or ([ref] $script:icurrent).Value -lt 1){
+				$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+			} else {
+				PrevTrack
+			}
 		} else {
 			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 		}
@@ -621,6 +645,11 @@ $Next.Add_Click({
 		WaitForSong	
 		}
 	} else {
+		if($global:singlefilemode -eq 0){
+			if($icurrent -eq $files.Length - 1){
+				$global:icurrent--
+			}
+		}
 		NextTrack
 	}
 })
