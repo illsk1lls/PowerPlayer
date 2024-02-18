@@ -354,7 +354,6 @@ $mediaPlayer.Add_MediaEnded({
 				$global:filesShuffled=$files | Sort-Object {Get-Random}
 			}
 		}
-	NextTrack
 	} else {
 	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
