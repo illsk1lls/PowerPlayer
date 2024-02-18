@@ -236,8 +236,8 @@ function FileIdle(){
 }
 function FolderIdle(){
 	while(([ref] $script:icurrent).Value -lt $files.Length -1 -or $global:Repeating -eq 2 -and $global:singlefilemode -ne 1){
-		if($global:Repeating -eq 2){
-			if(([ref] $script:icurrent).Value -eq $files.Length - 1){
+		if($global:Repeating -ne 0){
+			if($icurrent -eq $files.Length - 1){
 				$global:icurrent=-1
 				if($global:ShuffleOn -eq 1) {
 					$global:filesShuffled=$files | Sort-Object {Get-Random}
@@ -247,6 +247,7 @@ function FolderIdle(){
 		NextTrack
 	}	
 }
+
 Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, WindowsFormsIntegration, presentationCore
 [xml]$xaml='
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
