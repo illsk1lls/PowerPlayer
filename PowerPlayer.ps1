@@ -60,7 +60,7 @@ if(!(Test-Path -Path $resourcepath)){
 			missingResources
 		}
 	} else {
-			missingResources
+		missingResources
 	}
 } else {
 	foreach ($item in $resourcecheck){
@@ -83,7 +83,7 @@ if(!(Test-Path -Path $resourcepath)){
 					Copy-Item -Path .\resources\$item -Destination $resourcepath -Force
 				}
 			} else {
-			missingResources
+				missingResources
 			}
 		} else {
 			missingResources
