@@ -2,9 +2,10 @@
 #Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
 #$hWnd=(Get-Process -Id $PID).MainWindowHandle
 #$Null=[Win32.Functions]::ShowWindow($hWnd,0)
-$localResources='.\resources'
+$localResources=([IO.Path]::GetFullPath('.\resources\'))
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
 $resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','UnMuted.png'
+$missing=0
 function updateResources(){
 	$ProgressPreference='SilentlyContinue'
 		foreach($item in $resourcecheck) {
@@ -27,18 +28,20 @@ function missingResources() {
 if(!(Test-Path -Path $resourcepath)){
 	if(Test-Path -Path $localResources){
 		foreach ($item in $resourcecheck){
-			if(![System.IO.File]::Exists($resourcepath + $item)){
+			if(![System.IO.File]::Exists($localResources + $item)){
 				$missing++
 			}
 		}
-	if($missing -eq 0){
-		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
-		foreach($item in $resourcecheck) {
-			Copy-Item -Path .\resources\$item -Destination $resourcepath -Force
+		if($missing -eq 0){
+			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+			foreach($item in $resourcecheck) {
+				Copy-Item -Path .\resources\$item -Destination $resourcepath -Force
+			}
+		} else {
+			missingResources
 		}
 	} else {
-		missingResources
-	}
+			missingResources
 	}
 } else {
 	foreach ($item in $resourcecheck){
@@ -47,7 +50,25 @@ if(!(Test-Path -Path $resourcepath)){
 		}
 	}
 	if($missing -ne 0){
-		missingResources
+		if(Test-Path -Path $localResources){
+			$missing=0
+			foreach ($item in $resourcecheck){
+				if(![System.IO.File]::Exists($localResources + $item)){
+					$missing++
+				}
+			}
+			if($missing -eq 0){
+				Remove-Item -Path $resourcepath -Recurse -Force | out-null
+				New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+				foreach($item in $resourcecheck) {
+					Copy-Item -Path .\resources\$item -Destination $resourcepath -Force
+				}
+			} else {
+			missingResources
+			}
+		} else {
+			missingResources
+		}
 	}
 	$ctrlkey = '0x11'
 	$CheckCtrlHeldAtLaunch=@'
