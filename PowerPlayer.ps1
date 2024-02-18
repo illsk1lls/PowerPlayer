@@ -8,15 +8,15 @@ $resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png'
 $missing=0
 function updateResources(){
 	$ProgressPreference='SilentlyContinue'
-		foreach($item in $resourcecheck) {
+		foreach($item in $resourcecheck){
 			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/resources/$item -o $resourcepath$item
 		}
 	$ProgressPreference='Continue'
 }
-function missingResources() {
+function missingResources(){
 	$resourcesMissing=New-Object -ComObject Wscript.Shell;$resourcesMissing.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons
 	if($GetButtons -eq 1){
-		if (Test-Path -Path $resourcepath) {
+		if(Test-Path -Path $resourcepath){
 			Remove-Item -Path $resourcepath -Recurse -Force | out-null
 		}
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
@@ -63,7 +63,7 @@ if(!(Test-Path -Path $resourcepath)){
 		missingResources
 	}
 } else {
-	foreach ($item in $resourcecheck){
+	foreach($item in $resourcecheck){
 		if(![System.IO.File]::Exists($resourcepath + $item)){
 			$missing++
 		}
@@ -71,7 +71,7 @@ if(!(Test-Path -Path $resourcepath)){
 	if($missing -ne 0){
 		if(Test-Path -Path $localResources){
 			$missing=0
-			foreach ($item in $resourcecheck){
+			foreach($item in $resourcecheck){
 				if(![System.IO.File]::Exists($localResources + $item)){
 					$missing++
 				}
@@ -79,7 +79,7 @@ if(!(Test-Path -Path $resourcepath)){
 			if($missing -eq 0){
 				Remove-Item -Path $resourcepath -Recurse -Force | out-null
 				New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
-				foreach($item in $resourcecheck) {
+				foreach($item in $resourcecheck){
 					Copy-Item -Path .\resources\$item -Destination $resourcepath -Force
 				}
 			} else {
@@ -95,7 +95,7 @@ $global:Repeating=0
 $global:ShuffleOn=0
 $global:tracking=0
 $global:icurrent=-1
-function Update-Gui{
+function Update-Gui(){
 	$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
 }
 function dropDownMenu(){
@@ -239,7 +239,7 @@ function FolderIdle(){
 		if($global:Repeating -ne 0){
 			if($icurrent -eq $files.Length - 1){
 				$global:icurrent=-1
-				if($global:ShuffleOn -eq 1) {
+				if($global:ShuffleOn -eq 1){
 					$global:filesShuffled=$files | Sort-Object {Get-Random}
 				}
 			}
@@ -350,7 +350,7 @@ $mediaPlayer.Add_MediaEnded({
 	if($global:Repeating -ne 0){
 		if($icurrent -eq $files.Length - 1){
 			$global:icurrent=-1
-			if($global:ShuffleOn -eq 1) {
+			if($global:ShuffleOn -eq 1){
 				$global:filesShuffled=$files | Sort-Object {Get-Random}
 			}
 		}
@@ -540,7 +540,7 @@ $MenuFolder.Add_Click({
 	$AdviceCookie = $AdvisoryParameters[1]
 	$Result = $FileDialogInterfaceType.GetMethod('Show',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,[System.IntPtr]::Zero)
 	$FileDialogInterfaceType.GetMethod('Unadvise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdviceCookie)
-	if ($Result -ne [System.Windows.Forms.DialogResult]::Cancel) {
+	if($Result -ne [System.Windows.Forms.DialogResult]::Cancel) {
 		$global:singlefilemode=0
 		$FileDialogInterfaceType.GetMethod('GetResult',@('NonPublic','Public','Static','Instance'))
 		$path = $OpenFileDialog.FileName+'\'
@@ -558,7 +558,7 @@ $MenuFolder.Add_Click({
 		if($global:Playing -eq 0){
 			TogglePlayButton
 		} else {
-			$global:icurrent--
+			$global:icurrent=-1
 		}
 		FolderIdle
 	}
