@@ -1,7 +1,7 @@
-#$TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
-#Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
-#$hWnd=(Get-Process -Id $PID).MainWindowHandle
-#$Null=[Win32.Functions]::ShowWindow($hWnd,0)
+$TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
+Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
+$hWnd=(Get-Process -Id $PID).MainWindowHandle
+$Null=[Win32.Functions]::ShowWindow($hWnd,0)
 $localResources=([IO.Path]::GetFullPath('.\resources\'))
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
 $resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','UnMuted.png'
