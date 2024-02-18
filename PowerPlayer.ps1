@@ -228,6 +228,25 @@ function PlayTrack(){
 	trackLength
 	WaitForSong	
 }
+function FileIdle(){
+	while(([ref] $script:Repeating).Value -ge 1){
+		$global:icurrent=-1
+		NextTrack
+	}	
+}
+function FolderIdle(){
+	while(([ref] $script:icurrent).Value -lt $files.Length -1 -or $global:Repeating -eq 2 -and $global:singlefilemode -ne 1){
+		if($global:Repeating -eq 2){
+			if(([ref] $script:icurrent).Value -eq $files.Length - 1){
+				$global:icurrent=-1
+				if($global:ShuffleOn -eq 1) {
+					$global:filesShuffled=$files | Sort-Object {Get-Random}
+				}
+			}
+		}
+		NextTrack
+	}	
+}
 Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, WindowsFormsIntegration, presentationCore
 [xml]$xaml='
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -460,26 +479,17 @@ $MenuFile.Add_Click({
 	if($filePicker -ne [System.Windows.Forms.DialogResult]::Cancel){
 		$global:singlefilemode=1
 		$global:icurrent=-1
-		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-		$mediaPlayer.Stop()
-		$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
-		$PlayImage.Source=$resourcepath + 'Play.png'
 		$global:Playing=0
 		$path = Split-Path $file -Parent
 		$path = $path+'\'
 		$files=$null
 		$files=@()
 		$files+=Split-Path $file -leaf
-		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-		$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
 		if($global:Playing -eq 0){
 			TogglePlayButton
 		}
 		NextTrack
-		while(([ref] $script:Repeating).Value -ge 1){
-			$global:icurrent=-1
-			NextTrack
-		}
+		FileIdle
 	}
 })
 $MenuFolder=$Window.FindName("Folder")
@@ -537,17 +547,7 @@ $MenuFolder.Add_Click({
 		} else {
 			$global:icurrent--
 		}
-		while(([ref] $script:icurrent).Value -lt $files.Length - 1 -or $global:Repeating -eq 2 -and $global:singlefilemode -ne 1){
-			if($global:Repeating -eq 2){
-				if(([ref] $script:icurrent).Value -eq $files.Length - 1){
-					$global:icurrent=-1
-					if($global:ShuffleOn -eq 1) {
-						$global:filesShuffled=$files | Sort-Object {Get-Random}
-					}
-				}
-			}
-			NextTrack
-		}
+		FolderIdle
 	}
 })
 $MenuExit=$Window.FindName("Exit")
