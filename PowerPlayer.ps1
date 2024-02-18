@@ -142,16 +142,24 @@ function NextTrack(){
 		if($global:ShuffleOn -eq 0){
 			$file = $files[$icurrent]
 		} else {
-			$file = $filesShuffled[$icurrent]
+			if($global:singlefilemode -eq 1){
+				$file = $files[$icurrent]				
+			} else {
+				$file = $filesShuffled[$icurrent]				
+			}
 		}
 		PlayTrack	
 	} else {
 		if($global:Repeating -eq 2){
-		$global:icurrent=0
+			$global:icurrent=0
 			if($global:ShuffleOn -eq 0){
 				$file = $files[$icurrent]
 			} else {
-				$file = $filesShuffled[$icurrent]
+				if($global:singlefilemode -eq 1){
+					$file = $files[$icurrent]				
+				} else {
+					$file = $filesShuffled[$icurrent]
+				}
 			}
 		}
 		PlayTrack	
@@ -165,7 +173,11 @@ function PrevTrack(){
 		if($global:ShuffleOn -eq 0){
 			$file = $files[$icurrent]
 		} else {
-			$file = $filesShuffled[$icurrent]
+			if($global:singlefilemode -eq 1){
+				$file = $files[$icurrent]				
+			} else {
+				$file = $filesShuffled[$icurrent]				
+			}
 		}		
 		PlayTrack
 	} else {
@@ -174,7 +186,11 @@ function PrevTrack(){
 			if($global:ShuffleOn -eq 0){
 				$file = $files[$icurrent]
 			} else {
-				$file = $filesShuffled[$icurrent]
+				if($global:singlefilemode -eq 1){
+					$file = $files[$icurrent]					
+				} else {
+					$file = $filesShuffled[$icurrent]					
+				}
 			}
 			PlayTrack	
 		}
@@ -627,10 +643,15 @@ $Prev.Add_Click({
 			WaitForSong	
 			}			
 		} else {
+			
 		if($checkposition -le 2){
-			PrevTrack
+			if($global:singlefilemode -eq 1){
+				$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+			} else {
+				PrevTrack
+			}
 		} else {
-			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)			
 		}
 	}
 })
