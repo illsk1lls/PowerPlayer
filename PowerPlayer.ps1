@@ -347,6 +347,15 @@ $window=[Windows.Markup.XamlReader]::Load($reader)
 $window.Title='PowerPlayer'
 $mediaPlayer=New-Object system.windows.media.mediaplayer
 $mediaPlayer.Add_MediaEnded({
+	if($global:Repeating -ne 0){
+		if($icurrent -eq $files.Length - 1){
+			$global:icurrent=-1
+			if($global:ShuffleOn -eq 1) {
+				$global:filesShuffled=$files | Sort-Object {Get-Random}
+			}
+		}
+	NextTrack
+	} else {
 	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$mediaPlayer.Stop()
@@ -358,6 +367,7 @@ $mediaPlayer.Add_MediaEnded({
 	$StatusInfo.Text=''
 	$TimerA.Text=''
 	$TimerB.Text=''
+	}
 })
 $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pid})
 $Mute=$Window.FindName("Mute")
