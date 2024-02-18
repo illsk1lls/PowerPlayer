@@ -641,9 +641,8 @@ $Prev.Add_Click({
 			$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
 			trackLength
 			WaitForSong	
-			}			
-		} else {
-			
+		}			
+	} else {
 		if($checkposition -le 2){
 			if($global:singlefilemode -eq 1){
 				$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
