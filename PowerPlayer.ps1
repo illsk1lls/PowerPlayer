@@ -432,11 +432,14 @@ $PositionSlider.Add_PreviewMouseDown({
 	$global:tracking=1
 })
 $BG=$Window.FindName("BG")
+$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
 $BG.Source=$resourcepath + 'bg.gif'
 $BG.Add_MediaEnded({
 	$BG.Stop()
-	$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
-	$BG.Play()
+	if($global:Playing -eq 1){
+		$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
+		$BG.Play()		
+	}
 })
 $bitmap=New-Object System.Windows.Media.Imaging.BitmapImage
 $bitmap=$BG.Source
@@ -690,7 +693,9 @@ $Next.Add_Click({
 		dropDownMenu
 	}
 	if($global:Playing -eq 0){
-		NextTrack
+		if($CurrentTrack.Text -ne 'No Media Loaded'){
+			NextTrack		
+		}
 	} else {
 		if($global:singlefilemode -eq 1){
 			if($icurrent -eq $files.Length - 1){
