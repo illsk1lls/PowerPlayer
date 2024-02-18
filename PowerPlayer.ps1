@@ -222,7 +222,9 @@ function PlayTrack(){
 	$FullName="$path\$file"
 	$mediaPlayer.open($FullName)
 	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-	$mediaPlayer.Play()
+	if($global:Playing -eq 1){
+		$mediaPlayer.Play()		
+	}
 	trackLength
 	WaitForSong	
 }
@@ -632,16 +634,7 @@ $Prev.Add_Click({
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
 	if($global:Playing -eq 0){
-		if($icurrent -ge 1){
-			$global:icurrent--
-			$file = $files[$icurrent]
-			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-			$FullName="$path\$file"
-			$mediaPlayer.open($FullName)
-			$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-			trackLength
-			WaitForSong	
-		}			
+		PrevTrack
 	} else {
 		if($checkposition -le 2){
 			if($global:singlefilemode -eq 1){
@@ -687,16 +680,7 @@ $Next.Add_Click({
 		dropDownMenu
 	}
 	if($global:Playing -eq 0){
-		if($icurrent -lt $files.Length - 1){
-		$global:icurrent++
-		$file = $files[$icurrent]
-		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-		$FullName="$path\$file"
-		$mediaPlayer.open($FullName)
-		$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-		trackLength
-		WaitForSong	
-		}
+		NextTrack
 	} else {
 		if($global:singlefilemode -eq 1){
 			if($icurrent -eq $files.Length - 1){
