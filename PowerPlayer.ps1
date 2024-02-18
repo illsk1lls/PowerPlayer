@@ -146,11 +146,13 @@ function NextTrack(){
 		}
 		PlayTrack	
 	} else {
+		if($global:Repeating -eq 2){
 		$global:icurrent=0
-		if($global:ShuffleOn -eq 0){
-			$file = $files[$icurrent]
-		} else {
-			$file = $filesShuffled[$icurrent]
+			if($global:ShuffleOn -eq 0){
+				$file = $files[$icurrent]
+			} else {
+				$file = $filesShuffled[$icurrent]
+			}
 		}
 		PlayTrack	
 	}
@@ -613,8 +615,8 @@ $Prev.Add_Click({
 	}
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
-		if($global:Playing -eq 0){
-			if($icurrent -ge 1){
+	if($global:Playing -eq 0){
+		if($icurrent -ge 1){
 			$global:icurrent--
 			$file = $files[$icurrent]
 			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
@@ -626,11 +628,7 @@ $Prev.Add_Click({
 			}			
 		} else {
 		if($checkposition -le 2){
-			if($global:singlefilemode -eq 1 -or ([ref] $script:icurrent).Value -lt 1){
-				$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-			} else {
-				PrevTrack
-			}
+			PrevTrack
 		} else {
 			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 		}
@@ -680,9 +678,15 @@ $Next.Add_Click({
 		WaitForSong	
 		}
 	} else {
-		if($global:singlefilemode -eq 0){
+		if($global:singlefilemode -eq 1){
 			if($icurrent -eq $files.Length - 1){
 				$global:icurrent--
+			}
+		} else {
+			if($global:Repeating -ne 0){
+				if($icurrent -eq $files.Length - 1){
+					$global:icurrent=-1
+				}
 			}
 		}
 		NextTrack
