@@ -213,28 +213,28 @@ Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.For
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="PowerPlayer" Height="300" Width="500" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-	<Window.Resources>
-		<ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
-			<Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-				<ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-			</Border>
-			<ControlTemplate.Triggers>
-				<Trigger Property="IsEnabled" Value="False">
-					<Setter Property="Background" Value="{x:Static SystemColors.ControlLightBrush}"/>
-					<Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}"/>
-				</Trigger>
-			</ControlTemplate.Triggers>
-		</ControlTemplate>
-	</Window.Resources>
+    <Window.Resources>
+        <ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
+            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{x:Static SystemColors.ControlLightBrush}"/>
+                    <Setter Property="Foreground" Value="{x:Static SystemColors.GrayTextBrush}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Window.Resources>
     <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
-			<MediaElement Name="BG" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
+            <MediaElement Name="BG" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
             <Canvas>
                 <TextBlock Canvas.Left="90" Canvas.Top="74" Foreground="#CCCCCC">
-					<TextBlock.Inlines>
-						<Run Name="Status" FontStyle="Italic"/>
-					</TextBlock.Inlines>
-				</TextBlock>
+                    <TextBlock.Inlines>
+                        <Run Name="Status" FontStyle="Italic"/>
+                    </TextBlock.Inlines>
+                </TextBlock>
                 <TextBlock Name="CurrentTrack" Canvas.Top="135" Foreground="#CCCCCC" FontSize="16" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="490"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
                 <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
@@ -290,7 +290,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="RepeatButton" Height="15" Width="20"></Image>
                 </Button>
-				<Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
+                <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
                 <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85"/>
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
