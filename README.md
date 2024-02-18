@@ -3,4 +3,3 @@
 <p align="center">
   <img src="https://github.com/illsk1lls/PowerPlayer/blob/main/.readme/player-screenshot.png?raw=true">
 </p>
-![alt text](https://github.com/illsk1lls/PowerPlayer/blob/main/.readme/player-screenshot.png?raw=true)
