@@ -25,6 +25,25 @@ function missingResources() {
 		Exit
 	}	
 }
+$ctrlkey = '0x11'
+$CheckCtrlHeldAtLaunch=@'
+[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
+public static extern short GetAsyncKeyState(int virtualKeyCode); 
+'@
+Add-Type -MemberDefinition $CheckCtrlHeldAtLaunch -Name Keyboard -Namespace PsOneApi
+if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){ 
+	$Updater=New-Object -ComObject Wscript.Shell;$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable GetButtons
+	if($GetButtons -eq 1){
+		Remove-Item -Path $resourcepath -Recurse -Force | out-null
+		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
+		updateResources
+		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o '.\PowerPlayer.ps1'
+		. $PSCommandPath
+		Exit
+	} else {
+		$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons
+	}
+}
 if(!(Test-Path -Path $resourcepath)){
 	if(Test-Path -Path $localResources){
 		foreach ($item in $resourcecheck){
@@ -68,25 +87,6 @@ if(!(Test-Path -Path $resourcepath)){
 			}
 		} else {
 			missingResources
-		}
-	}
-	$ctrlkey = '0x11'
-	$CheckCtrlHeldAtLaunch=@'
-[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
-public static extern short GetAsyncKeyState(int virtualKeyCode); 
-'@
-	Add-Type -MemberDefinition $CheckCtrlHeldAtLaunch -Name Keyboard -Namespace PsOneApi
-	if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){ 
-		$Updater=New-Object -ComObject Wscript.Shell;$Updater.Popup("Would you like to retrieve the latest PowerPlayer resources from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable GetButtons
-		if($GetButtons -eq 1){
-			Remove-Item -Path $resourcepath -Recurse -Force | out-null
-			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
-			updateResources
-			irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o '.\PowerPlayer.ps1'
-			. $PSCommandPath
-			Exit
-		} else {
-			$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons
 		}
 	}
 }
