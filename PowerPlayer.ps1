@@ -25,6 +25,7 @@ function missingResources(){
 		Exit
 	}	
 }
+if($PSCommandPath -eq $null){function GetPSCommandPath(){return $MyInvocation.PSCommandPath;}$PSCommandPath=GetPSCommandPath}
 $ctrlkey = '0x11'
 $CheckCtrlHeldAtLaunch=@'
 [DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
@@ -37,7 +38,7 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){
 		Remove-Item -Path $resourcepath -Recurse -Force | out-null
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 		updateResources
-		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o '.\PowerPlayer.ps1'
+		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o $PSCommandPath
 		. $PSCommandPath
 		Exit
 	} else {
