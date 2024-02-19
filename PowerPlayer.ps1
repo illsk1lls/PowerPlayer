@@ -46,7 +46,7 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){
 	}
 }
 if(!((Get-WmiObject Win32_OperatingSystem).Caption -Match "Windows 11")){
-	$OnlyWin11=New-Object -ComObject Wscript.Shell;$OnlyWin11.Popup("Windows 11 is the only supported system at this time.",0,'Unsupported System',0x0) | Tee-Object -Variable GetButtons
+	$OnlyWin11=New-Object -ComObject Wscript.Shell;$OnlyWin11.Popup("Only Windows 11 is supported at this time.",0,'Unsupported System',0x0) | Tee-Object -Variable GetButtons
 	Exit
 }
 if(!(Test-Path -Path $resourcepath)){
