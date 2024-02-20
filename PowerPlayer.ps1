@@ -14,7 +14,7 @@ function updateResources(){
 	$ProgressPreference='Continue'
 }
 function missingResources(){
-	$resourcesMissing=New-Object -ComObject Wscript.Shell;$resourcesMissing.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons
+	$resourcesMissing=New-Object -ComObject Wscript.Shell;$resourcesMissing.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons | Out-Null
 	if($GetButtons -eq 1){
 		if(Test-Path -Path $resourcepath){
 			Remove-Item -Path $resourcepath -Recurse -Force | out-null
@@ -33,7 +33,7 @@ public static extern short GetAsyncKeyState(int virtualKeyCode);
 '@
 Add-Type -MemberDefinition $CheckCtrlHeldAtLaunch -Name Keyboard -Namespace PsOneApi
 if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){ 
-	$Updater=New-Object -ComObject Wscript.Shell;$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable GetButtons
+	$Updater=New-Object -ComObject Wscript.Shell;$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable GetButtons | Out-Null
 	if($GetButtons -eq 1){
 		Remove-Item -Path $resourcepath -Recurse -Force | out-null
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
@@ -42,7 +42,7 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){
 		. $PSCommandPath
 		Exit
 	} else {
-		$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons
+		$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons | Out-Null
 	}
 }
 if(!(Test-Path -Path $resourcepath)){
@@ -750,7 +750,7 @@ $Repeat.Add_Click({
 })
 $BG.Play()
 $window.Show()
-$window.Activate()
+$window.Activate() | Out-Null
 $BG.Pause()
 $appContext=New-Object System.Windows.Forms.ApplicationContext
 [void][System.Windows.Forms.Application]::Run($appContext)
