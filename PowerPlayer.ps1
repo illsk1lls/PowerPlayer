@@ -45,10 +45,6 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){
 		$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons
 	}
 }
-if(!((Get-WmiObject Win32_OperatingSystem).Caption -Match "Windows 11")){
-	$OnlyWin11=New-Object -ComObject Wscript.Shell;$OnlyWin11.Popup("Only Windows 11 is supported at this time.",0,'Unsupported System',0x0) | Tee-Object -Variable GetButtons
-	Exit
-}
 if(!(Test-Path -Path $resourcepath)){
 	if(Test-Path -Path $localResources){
 		foreach ($item in $resourcecheck){
@@ -121,7 +117,7 @@ function dropDownMenu(){
 }
 function TogglePlayButton(){
 	if($files -ne $null){
-		Switch($global:Playing){
+		Switch($Playing){
 			0{
 				$PlayImage.Source=$resourcepath + 'Pause.png'
 				$mediaPlayer.Play()
@@ -141,13 +137,13 @@ function TogglePlayButton(){
 }
 function NextTrack(){
 	if($icurrent -lt $files.Length - 1){
-		if(!($global:Repeating -eq 1)){
+		if(!($Repeating -eq 1)){
 			$global:icurrent++
 		}
-		if($global:ShuffleOn -eq 0){
+		if($ShuffleOn -eq 0){
 			$file = $files[$icurrent]
 		} else {
-			if($global:singlefilemode -eq 1){
+			if($singlefilemode -eq 1){
 				$file = $files[$icurrent]				
 			} else {
 				$file = $filesShuffled[$icurrent]				
@@ -155,12 +151,13 @@ function NextTrack(){
 		}
 		PlayTrack	
 	} else {
-		if($global:Repeating -eq 2){
+		if($Repeating -eq 2){
 			$global:icurrent=0
-			if($global:ShuffleOn -eq 0){
+			if($ShuffleOn -eq 0){
 				$file = $files[$icurrent]
 			} else {
-				if($global:singlefilemode -eq 1){
+				$global:icurrent=0
+				if($singlefilemode -eq 1){
 					$file = $files[$icurrent]				
 				} else {
 					$file = $filesShuffled[$icurrent]
@@ -172,13 +169,13 @@ function NextTrack(){
 }
 function PrevTrack(){
 	if($icurrent -ge 1){
-		if(!($global:Repeating -eq 1)){
+		if(!($Repeating -eq 1)){
 			$global:icurrent--
 		}
-		if($global:ShuffleOn -eq 0){
+		if($ShuffleOn -eq 0){
 			$file = $files[$icurrent]
 		} else {
-			if($global:singlefilemode -eq 1){
+			if($singlefilemode -eq 1){
 				$file = $files[$icurrent]				
 			} else {
 				$file = $filesShuffled[$icurrent]				
@@ -186,12 +183,12 @@ function PrevTrack(){
 		}		
 		PlayTrack
 	} else {
-		if($global:Repeating -eq 2){
+		if($Repeating -eq 2){
 			$global:icurrent=$files.Length - 1
-			if($global:ShuffleOn -eq 0){
+			if($ShuffleOn -eq 0){
 				$file = $files[$icurrent]
 			} else {
-				if($global:singlefilemode -eq 1){
+				if($script:singlefilemode -eq 1){
 					$file = $files[$icurrent]					
 				} else {
 					$file = $filesShuffled[$icurrent]					
@@ -209,11 +206,11 @@ function trackLength(){
 	$global:totaltime=$h*60*60 + $m*60 +$s
 	$ReadableTotal=[timespan]::fromseconds($totaltime - 2)
 	$TimerB.Text=("{0:mm\:ss}" -f $ReadableTotal)
-	$global:PositionSlider.Maximum=$totaltime
+	$PositionSlider.Maximum=$totaltime
 }
 function WaitForSong(){
-	while(([Math]::Ceiling(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)) -lt ([ref] $script:totaltime).Value){
-		if(([ref] $script:tracking).Value -eq 0){
+	while(([Math]::Ceiling(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)) -lt ([ref] $totaltime).Value){
+		if(([ref] $tracking).Value -eq 0){
 			$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 			$TimePassed=[timespan]::fromseconds(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)
 			$TimerA.Text=("{0:mm\:ss}" -f $TimePassed)
@@ -227,24 +224,24 @@ function PlayTrack(){
 	$FullName="$path\$file"
 	$mediaPlayer.open($FullName)
 	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-	if($global:Playing -eq 1){
+	if($Playing -eq 1){
 		$mediaPlayer.Play()		
 	}
 	trackLength
 	WaitForSong	
 }
 function FileIdle(){
-	while(([ref] $script:Repeating).Value -ge 1){
+	while(([ref] $Repeating).Value -ge 1){
 		$global:icurrent=-1
 		NextTrack
 	}	
 }
 function FolderIdle(){
-	while(([ref] $script:icurrent).Value -lt $files.Length -1 -or $global:Repeating -eq 2 -and $global:singlefilemode -ne 1){
-		if($global:Repeating -ne 0){
+	while(([ref] $icurrent).Value -lt $files.Length -1 -or $script:Repeating -eq 2 -and $script:singlefilemode -ne 1){
+		if($Repeating -ne 0){
 			if($icurrent -eq $files.Length - 1){
 				$global:icurrent=-1
-				if($global:ShuffleOn -eq 1){
+				if($ShuffleOn -eq 1){
 					$global:filesShuffled=$files | Sort-Object {Get-Random}
 				}
 			}
@@ -352,10 +349,10 @@ $window=[Windows.Markup.XamlReader]::Load($reader)
 $window.Title='PowerPlayer'
 $mediaPlayer=New-Object system.windows.media.mediaplayer
 $mediaPlayer.Add_MediaEnded({
-	if($global:Repeating -ne 0){
+	if($Repeating -ne 0){
 		if($icurrent -eq $files.Length - 1){
 			$global:icurrent=-1
-			if($global:ShuffleOn -eq 1){
+			if($ShuffleOn -eq 1){
 				$global:filesShuffled=$files | Sort-Object {Get-Random}
 			}
 		}
@@ -388,7 +385,7 @@ $Mute.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	Switch($global:Muted){
+	Switch($Muted){
 		0{
 			$MuteImage.Source=$resourcepath + 'Muted.png'
 			$global:UnMutedVolume=$mediaPlayer.Volume
@@ -398,7 +395,7 @@ $Mute.Add_Click({
 			$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
 		}
 		1{
-			if($global:UnMutedVolume -eq $null){
+			if($UnMutedVolume -eq $null){
 				$global:UnMutedVolume=0.5
 			}
 			$MuteImage.Source=$resourcepath + 'UnMuted.png'
@@ -441,7 +438,7 @@ $BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
 $BG.Source=$resourcepath + 'bg.gif'
 $BG.Add_MediaEnded({
 	$BG.Stop()
-	if($global:Playing -eq 1){
+	if($Playing -eq 1){
 		$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
 		$BG.Play()		
 	}
@@ -503,7 +500,7 @@ $MenuFile.Add_Click({
 		$files=$null
 		$files=@()
 		$files+=Split-Path $file -leaf
-		if($global:Playing -eq 0){
+		if($Playing -eq 0){
 			TogglePlayButton
 		}
 		NextTrack
@@ -554,13 +551,13 @@ $MenuFolder.Add_Click({
 		Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
 			$files+=$_
 		}
-		if($global:ShuffleOn -eq 1){
-			$global:filesShuffled=$files | Sort-Object {Get-Random}
+		if($ShuffleOn -eq 1){
+		$filesShuffled=$files | Sort-Object {Get-Random}			
 		}
-		if($global:Repeating -eq 1){
+		if($Repeating -eq 1){
 			$global:icurrent=0			
 		}
-		if($global:Playing -eq 0){
+		if($Playing -eq 0){
 			TogglePlayButton
 		} else {
 			$global:icurrent=-1
@@ -578,6 +575,7 @@ $MenuExit.Add_MouseLeave({
 	$MenuExit.Foreground='#CCCCCC'
 })
 $MenuExit.Add_Click({
+	$window.Close()
 	Exit
 })
 $minWin=$Window.FindName("minWin")
@@ -605,6 +603,7 @@ $Xbutton.Add_MouseLeave({
 	$Xbutton.Foreground='#CCCCCC'
 })
 $Xbutton.Add_Click({
+	$window.Close()
 	Exit
 })
 $Shuffle=$Window.FindName("Shuffle")
@@ -622,7 +621,7 @@ $Shuffle.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	Switch($global:ShuffleOn){
+	Switch($ShuffleOn){
 		0{
 			$Shuffle.BorderBrush='#5D3FD3'
 			$global:ShuffleOn=1
@@ -651,11 +650,11 @@ $Prev.Add_Click({
 	}
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
-	if($global:Playing -eq 0){
+	if($Playing -eq 0){
 		PrevTrack
 	} else {
 		if($checkposition -le 2){
-			if($global:singlefilemode -eq 1){
+			if($singlefilemode -eq 1){
 				$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 			} else {
 				PrevTrack
@@ -697,17 +696,17 @@ $Next.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	if($global:Playing -eq 0){
+	if($Playing -eq 0){
 		if($CurrentTrack.Text -ne 'No Media Loaded'){
 			NextTrack		
 		}
 	} else {
-		if($global:singlefilemode -eq 1){
+		if($singlefilemode -eq 1){
 			if($icurrent -eq $files.Length - 1){
 				$global:icurrent--
 			}
 		} else {
-			if($global:Repeating -ne 0){
+			if($Repeating -ne 0){
 				if($icurrent -eq $files.Length - 1){
 					$global:icurrent=-1
 				}
@@ -731,7 +730,7 @@ $Repeat.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	Switch($global:Repeating){
+	Switch($Repeating){
 		0{
 			$RepeatImage.Source=$resourcepath + 'RepeatOne.png'
 			$Repeat.BorderBrush='#5D3FD3'
