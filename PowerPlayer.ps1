@@ -123,14 +123,14 @@ function TogglePlayButton(){
 				$mediaPlayer.Play()
 				$global:Playing=1
 				$StatusInfo.Text="Now Playing:"
-				$BG.Play()
+				$background.Play()
 			}
 			1{
 				$PlayImage.Source=$resourcepath + 'Play.png'
 				$mediaPlayer.Pause()
 				$global:Playing=0
 				$StatusInfo.Text="Paused:"
-				$BG.Pause()
+				$background.Pause()
 			}
 		}
 	}
@@ -269,7 +269,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     </Window.Resources>
     <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
-            <MediaElement Name="BG" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
+            <MediaElement Name="Background" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
             <Canvas>
                 <TextBlock Canvas.Left="90" Canvas.Top="74" Foreground="#CCCCCC">
                     <TextBlock.Inlines>
@@ -362,7 +362,7 @@ $mediaPlayer.Add_MediaEnded({
 	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 	$PlayImage.Source=$resourcepath + 'Play.png'
 	$CurrentTrack.Text='No Media Loaded'
-	$BG.Stop()
+	$background.Stop()
 	$global:Playing=0
 	$StatusInfo.Text=''
 	$TimerA.Text=''
@@ -432,18 +432,16 @@ $PositionSlider.Add_PreviewMouseDown({
 	}
 	$global:tracking=1
 })
-$BG=$Window.FindName("BG")
-$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
-$BG.Source=$resourcepath + 'bg.gif'
-$BG.Add_MediaEnded({
-	$BG.Stop()
+$background=$Window.FindName("Background")
+$background.Source=$resourcepath + 'bg.gif'
+$background.Position=New-Object System.TimeSpan(0, 0, 0, 1, 0)
+$background.Add_MediaEnded({
 	if($Playing -eq 1){
-		$BG.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
-		$BG.Play()		
+		$background.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
 	}
 })
 $bitmap=New-Object System.Windows.Media.Imaging.BitmapImage
-$bitmap=$BG.Source
+$bitmap=$background.Source
 $window.Icon=$bitmap
 $window.TaskbarItemInfo.Overlay=$bitmap
 $window.TaskbarItemInfo.Description=$window.Title
@@ -747,9 +745,9 @@ $Repeat.Add_Click({
 		}
 	}
 })
-$BG.Play()
+$background.Play()
 $window.Show()
 $window.Activate() | Out-Null
-$BG.Pause()
+$background.Pause()
 $appContext=New-Object System.Windows.Forms.ApplicationContext
 [void][System.Windows.Forms.Application]::Run($appContext)
