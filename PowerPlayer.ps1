@@ -150,6 +150,7 @@ function NextTrack(){
 				$file = $filesShuffled[$icurrent]				
 			}
 		}
+		$Playlist.SelectedIndex=$icurrent
 		PlayTrack	
 	} else {
 		if($Repeating -eq 2){
@@ -165,6 +166,7 @@ function NextTrack(){
 				}
 			}
 		}
+		$Playlist.SelectedIndex=$icurrent
 		PlayTrack	
 	}
 }
@@ -181,7 +183,8 @@ function PrevTrack(){
 			} else {
 				$file = $filesShuffled[$icurrent]				
 			}
-		}		
+		}
+		$Playlist.SelectedIndex=$icurrent
 		PlayTrack
 	} else {
 		if($Repeating -eq 2){
@@ -195,6 +198,7 @@ function PrevTrack(){
 					$file = $filesShuffled[$icurrent]					
 				}
 			}
+			$Playlist.SelectedIndex=$icurrent
 			PlayTrack	
 		}
 	}
@@ -413,6 +417,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 </TextBlock>
                 <TextBlock Name="CurrentTrack" Canvas.Top="135" Foreground="#CCCCCC" FontSize="16" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="490"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
+                <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
                 <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
                 <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;File</Button>
@@ -471,7 +476,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
-				<ListBox Canvas.Left="80" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="280" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
+				<ListBox Canvas.Left="80" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="250" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
     </Border>
@@ -492,6 +497,7 @@ $mediaPlayer.Add_MediaEnded({
 			}
 		}
 	} else {
+	$MenuPlaylist.Visibility="Hidden"
 	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$mediaPlayer.Stop()
@@ -620,6 +626,30 @@ $MenuMain.Add_Click({
 	}
 	dropDownMenu
 })
+$MenuPlaylist=$Window.FindName("MenuPlaylist")
+$MenuPlaylist.Add_MouseEnter({
+	$MenuPlaylist.Background='#222222'
+	$MenuPlaylist.Foreground='#CCCCCC'
+})
+$MenuPlaylist.Add_MouseLeave({
+	$MenuPlaylist.Background='#111111'
+	$MenuPlaylist.Foreground='#CCCCCC'
+})
+$MenuPlaylist.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
+	Switch($ShowPlaylist){
+		0{
+			$Playlist.Visibility="Visible"
+			$global:ShowPlaylist=1
+		}
+		1{
+			$Playlist.Visibility="Hidden"
+			$global:ShowPlaylist=0
+		}
+	}
+})
 $MenuFile=$Window.FindName("File")
 $MenuFile.Add_MouseEnter({
 	$MenuFile.Background='#222222'
@@ -651,6 +681,7 @@ $MenuFile.Add_Click({
 			TogglePlayButton
 		}
 		$Playlist.ItemsSource=$files
+		$MenuPlaylist.Visibility="Visible"
 		NextTrack
 		FileIdle
 	}
@@ -710,6 +741,7 @@ $MenuFolder.Add_Click({
 			$global:icurrent=-1
 		}
 		$Playlist.ItemsSource=$files
+		$MenuPlaylist.Visibility="Visible"
 		FolderIdle
 	}
 })
@@ -910,18 +942,6 @@ $Repeat.Add_Click({
 			$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
 			$Repeat.BorderBrush='#728FCE'
 			$global:Repeating=0
-		}
-	}
-})
-$window.Add_MouseDoubleClick({
-	Switch($ShowPlaylist){
-		0{
-			$Playlist.Visibility="Visible"
-			$global:ShowPlaylist=1
-		}
-		1{
-			$Playlist.Visibility="Hidden"
-			$global:ShowPlaylist=0
 		}
 	}
 })
