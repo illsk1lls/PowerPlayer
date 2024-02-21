@@ -476,7 +476,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
-				<ListBox Canvas.Left="80" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="250" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
+				<ListBox Canvas.Left="80" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="250" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
     </Border>
