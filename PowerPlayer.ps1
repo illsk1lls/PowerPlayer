@@ -1,11 +1,9 @@
-$TypeDef='[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);'
-Add-Type -MemberDefinition $TypeDef -Namespace Win32 -Name Functions
-$hWnd=(Get-Process -Id $PID).MainWindowHandle
-$Null=[Win32.Functions]::ShowWindow($hWnd,0)
+Add-Type -MemberDefinition '[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Namespace Win32 -Name Functions
+$closeConsoleUseGUI=[Win32.Functions]::ShowWindow((Get-Process -Id $PID).MainWindowHandle,0)
 $localResources=([IO.Path]::GetFullPath('.\resources\'))
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
 $resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','UnMuted.png'
-$missing=0
+$isMissing=0
 function updateResources(){
 	$ProgressPreference='SilentlyContinue'
 		foreach($item in $resourcecheck){
@@ -14,8 +12,8 @@ function updateResources(){
 	$ProgressPreference='Continue'
 }
 function missingResources(){
-	$resourcesMissing=New-Object -ComObject Wscript.Shell;$resourcesMissing.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable GetButtons | Out-Null
-	if($GetButtons -eq 1){
+	$resourcesMissing=New-Object -ComObject Wscript.Shell;$resourcesMissing.Popup("Click OK to download ~2mb of resources from the projects resources folder on GitHub. They will be stored in:`n`n" + $resourcepath + "`n`nOr press Cancel to Quit",0,'GUI Resources are missing!',0x1) | Tee-Object -Variable DoResources | Out-Null
+	if($DoResources -eq 1){
 		if(Test-Path -Path $resourcepath){
 			Remove-Item -Path $resourcepath -Recurse -Force | out-null
 		}
@@ -26,33 +24,35 @@ function missingResources(){
 	}	
 }
 if($PSCommandPath -eq $null){function GetPSCommandPath(){return $MyInvocation.PSCommandPath;}$PSCommandPath=GetPSCommandPath}
-$ctrlkey = '0x11'
-$CheckCtrlHeldAtLaunch=@'
-[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
-public static extern short GetAsyncKeyState(int virtualKeyCode); 
-'@
+$CtrlKey = '0x11'
+$CheckCtrlHeldAtLaunch='[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]public static extern short GetAsyncKeyState(int virtualKeyCode);'
 Add-Type -MemberDefinition $CheckCtrlHeldAtLaunch -Name Keyboard -Namespace PsOneApi
-if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($ctrlkey) -eq -32767)){ 
-	$Updater=New-Object -ComObject Wscript.Shell;$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable GetButtons | Out-Null
-	if($GetButtons -eq 1){
+if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){ 
+	$Updater=New-Object -ComObject Wscript.Shell;$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable DoFullUpdate | Out-Null
+	if($DoFullUpdate -eq 1){
 		Remove-Item -Path $resourcepath -Recurse -Force | out-null
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 		updateResources
 		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o $PSCommandPath
-		. $PSCommandPath
-		Exit
+		$ReLauncher=New-Object -ComObject Wscript.Shell;$ReLauncher.Popup("Re-Launch PowerPlayer now?",0,'Update Mode Completed!',0x1) | Tee-Object -Variable DoRelaunch | Out-Null
+		if($DoRelaunch -eq 1){
+			. $PSCommandPath
+			Exit
+		} else {
+			Exit
+		}
 	} else {
-		$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Tee-Object -Variable GetButtons | Out-Null
+		$NoUpdate=New-Object -ComObject Wscript.Shell;$NoUpdate.Popup("No changes were made.",0,'Update Mode Aborted',0x0) | Out-Null
 	}
 }
 if(!(Test-Path -Path $resourcepath)){
 	if(Test-Path -Path $localResources){
 		foreach ($item in $resourcecheck){
 			if(![System.IO.File]::Exists($localResources + $item)){
-				$missing++
+				$isMissing++
 			}
 		}
-		if($missing -eq 0){
+		if($isMissing -eq 0){
 			New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 			foreach($item in $resourcecheck) {
 				Copy-Item -Path .\resources\$item -Destination $resourcepath -Force
@@ -66,18 +66,18 @@ if(!(Test-Path -Path $resourcepath)){
 } else {
 	foreach($item in $resourcecheck){
 		if(![System.IO.File]::Exists($resourcepath + $item)){
-			$missing++
+			$isMissing++
 		}
 	}
-	if($missing -ne 0){
+	if($isMissing -ne 0){
 		if(Test-Path -Path $localResources){
-			$missing=0
+			$isMissing=0
 			foreach($item in $resourcecheck){
 				if(![System.IO.File]::Exists($localResources + $item)){
-					$missing++
+					$isMissing++
 				}
 			}
-			if($missing -eq 0){
+			if($isMissing -eq 0){
 				Remove-Item -Path $resourcepath -Recurse -Force | out-null
 				New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 				foreach($item in $resourcecheck){
@@ -249,7 +249,6 @@ function FolderIdle(){
 		NextTrack
 	}	
 }
-
 Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.Forms, WindowsFormsIntegration, presentationCore
 [xml]$xaml='
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
