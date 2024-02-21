@@ -647,6 +647,7 @@ $MenuPlaylist.Add_Click({
 		1{
 			$Playlist.Visibility="Hidden"
 			$global:ShowPlaylist=0
+			$Playlist.SelectedIndex=$icurrent
 		}
 	}
 })
@@ -730,7 +731,10 @@ $MenuFolder.Add_Click({
 			$files+=$_
 		}
 		if($ShuffleOn -eq 1){
-		$filesShuffled=$files | Sort-Object {Get-Random}			
+			$filesShuffled=$files | Sort-Object {Get-Random}			
+			$Playlist.ItemsSource=$filesShuffled
+		} else {
+			$Playlist.ItemsSource=$files
 		}
 		if($Repeating -eq 1){
 			$global:icurrent=0			
@@ -740,7 +744,6 @@ $MenuFolder.Add_Click({
 		} else {
 			$global:icurrent=-1
 		}
-		$Playlist.ItemsSource=$files
 		$MenuPlaylist.Visibility="Visible"
 		FolderIdle
 	}
