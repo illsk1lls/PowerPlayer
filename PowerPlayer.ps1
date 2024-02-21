@@ -541,7 +541,6 @@ $MenuFolder.Add_Click({
 	$FileDialogInterfaceType.GetMethod('Unadvise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdviceCookie)
 	if($Result -ne [System.Windows.Forms.DialogResult]::Cancel) {
 		$global:singlefilemode=0
-		$FileDialogInterfaceType.GetMethod('GetResult',@('NonPublic','Public','Static','Instance'))
 		$path = $OpenFileDialog.FileName+'\'
 		$files=$null
 		$files=@()
