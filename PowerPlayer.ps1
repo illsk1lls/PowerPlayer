@@ -582,6 +582,8 @@ $PositionSlider.Add_PreviewMouseDown({
 	}
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	$global:tracking=1
 })
@@ -601,6 +603,11 @@ $window.TaskbarItemInfo.Description=$window.Title
 $window.add_MouseLeftButtonDown({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
+	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent		
 	}
 	$window.DragMove()
 })
@@ -623,6 +630,8 @@ $MenuMain.Add_MouseLeave({
 $MenuMain.Add_Click({
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	dropDownMenu
 })
@@ -668,8 +677,8 @@ $MenuFile.Add_Click({
 		Filter='MP3 (*.mp3)|*.mp3'
 	}
 	$filePicker=$getFile.ShowDialog()
-	$file=$getFile.Filename
-	if($filePicker -ne [System.Windows.Forms.DialogResult]::Cancel){
+	if($getFile.Filename -ne ""){
+		$file=$getFile.Filename
 		$global:singlefilemode=1
 		$global:icurrent=-1
 		$global:Playing=0
@@ -682,7 +691,9 @@ $MenuFile.Add_Click({
 			TogglePlayButton
 		}
 		$Playlist.ItemsSource=$files
+		if($files -ne ""){
 		$MenuPlaylist.Visibility="Visible"
+		}
 		NextTrack
 		FileIdle
 	}
@@ -722,7 +733,7 @@ $MenuFolder.Add_Click({
 	$AdviceCookie = $AdvisoryParameters[1]
 	$Result = $FileDialogInterfaceType.GetMethod('Show',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,[System.IntPtr]::Zero)
 	$FileDialogInterfaceType.GetMethod('Unadvise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdviceCookie)
-	if($Result -ne [System.Windows.Forms.DialogResult]::Cancel) {
+	if($OpenFileDialog.FileName -ne ""){
 		$global:singlefilemode=0
 		$path = $OpenFileDialog.FileName+'\'
 		$files=$null
@@ -744,7 +755,9 @@ $MenuFolder.Add_Click({
 		} else {
 			$global:icurrent=-1
 		}
+		if($files -ne ""){
 		$MenuPlaylist.Visibility="Visible"
+		}
 		FolderIdle
 	}
 })
@@ -806,6 +819,8 @@ $Shuffle.Add_Click({
 	}
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	Switch($ShuffleOn){
 		0{
@@ -838,6 +853,8 @@ $Prev.Add_Click({
 	}
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
@@ -872,6 +889,8 @@ $Play.Add_Click({
 	}
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	TogglePlayButton
 })
@@ -892,6 +911,8 @@ $Next.Add_Click({
 	}
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	if($Playing -eq 0){
 		if($CurrentTrack.Text -ne 'No Media Loaded'){
@@ -929,6 +950,8 @@ $Repeat.Add_Click({
 	}
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	Switch($Repeating){
 		0{
