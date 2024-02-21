@@ -94,6 +94,7 @@ if(!(Test-Path -Path $resourcepath)){
 $global:Playing=0
 $global:Repeating=0
 $global:ShuffleOn=0
+$global:ShowPlaylist=0
 $global:tracking=0
 $global:icurrent=-1
 function Update-Gui(){
@@ -266,6 +267,140 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
+		<Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Thumb}">
+						<Grid x:Name="Grid">
+							<Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" Fill="Transparent"/>
+							<Border x:Name="Rectangle1" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" Background="{TemplateBinding Background}"/>
+						</Grid>
+						<ControlTemplate.Triggers>
+							<Trigger Property="Tag" Value="Horizontal">
+								<Setter TargetName="Rectangle1" Property="Width" Value="Auto"/>
+								<Setter TargetName="Rectangle1" Property="Height" Value="7"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style x:Key="ScrollBarStyle" TargetType="{x:Type ScrollBar}">
+			<Setter Property="Foreground" Value="#728FCE"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Width" Value="8"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ScrollBar}">
+						<Grid x:Name="GridRoot" Width="8" Background="{TemplateBinding Background}">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="0.00001*"/>
+							</Grid.RowDefinitions>
+							<Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="false">
+								<Track.Thumb>
+									<Thumb x:Name="Thumb" Background="{TemplateBinding Foreground}" Style="{StaticResource ScrollThumbs}"/>
+								</Track.Thumb>
+								<Track.IncreaseRepeatButton>
+									<RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="false"/>
+								</Track.IncreaseRepeatButton>
+								<Track.DecreaseRepeatButton>
+									<RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="false"/>
+								</Track.DecreaseRepeatButton>
+							</Track>
+						</Grid>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsEnabled" Value="false">
+								<Setter TargetName="Thumb" Property="Visibility" Value="Collapsed"/>
+							</Trigger>
+							<Trigger Property="Orientation" Value="Horizontal">
+								<Setter TargetName="GridRoot" Property="LayoutTransform">
+									<Setter.Value>
+										<RotateTransform Angle="-90"/>
+									</Setter.Value>
+								</Setter>
+								<Setter TargetName="PART_Track" Property="LayoutTransform">
+									<Setter.Value>
+										<RotateTransform Angle="-90"/>
+									</Setter.Value>
+								</Setter>
+								<Setter Property="Width" Value="Auto"/>
+								<Setter Property="Height" Value="8"/>
+								<Setter TargetName="Thumb" Property="Tag" Value="Horizontal"/>
+								<Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand"/>
+								<Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style x:Key="ScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+			<Setter Property="OverridesDefaultStyle" Value="True"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ScrollViewer}">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="16"/>
+								<ColumnDefinition />
+								<ColumnDefinition Width="16"/>
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition />
+							</Grid.RowDefinitions>
+							<ScrollContentPresenter Grid.ColumnSpan="3" />
+							<ScrollBar x:Name="PART_VerticalScrollBar" Grid.Column="2" Value="{TemplateBinding VerticalOffset}" Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}" Style="{DynamicResource ScrollBarStyle}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style x:Key="lbStyle" TargetType="{x:Type ListBox}">
+			<Setter Property="Background" Value="#111111"/>
+			<Setter Property="BorderBrush" Value="#000000"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+			<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
+			<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+			<Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+			<Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+			<Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ListBox}">
+						<Border x:Name="Border1" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="True">
+							<ScrollViewer Style="{StaticResource ScrollViewerStyle}" Focusable="False" Padding="{TemplateBinding Padding}">
+								<ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+							</ScrollViewer>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Background" TargetName="Border1" Value="#111111"/>
+								<Setter Property="BorderBrush" TargetName="Border1" Value="#333333"/>
+							</Trigger>
+							<MultiTrigger>
+								<MultiTrigger.Conditions>
+									<Condition Property="IsGrouping" Value="True"/>
+									<Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="False"/>
+								</MultiTrigger.Conditions>
+								<Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
+							</MultiTrigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+			<Style x:Key="AlternatingRowStyle" TargetType="{x:Type Control}" >
+			<Setter Property="Background" Value="#222222"/>
+			<Setter Property="Foreground" Value="#CCCCCC"/>
+			<Style.Triggers>
+				<Trigger Property="ItemsControl.AlternationIndex" Value="1">                            
+					<Setter Property="Background" Value="#111111"/>
+					<Setter Property="Foreground" Value="#CCCCCC"/>                                
+				</Trigger>                            
+			</Style.Triggers>
+		</Style>
     </Window.Resources>
     <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
@@ -336,6 +471,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
+				<ListBox Canvas.Left="80" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="280" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
     </Border>
@@ -412,11 +548,19 @@ if(!($mediaPlayer.IsMuted)){
 	$MuteImage.Source=$resourcepath + 'Muted.png'
 	$global:Muted=1
 }
+$Playlist=$Window.FindName('Playlist')
+$Playlist.Add_MouseDoubleClick({
+	$global:icurrent=$Playlist.SelectedIndex - 1
+	NextTrack
+})
 $VolumeSlider=$Window.FindName("Volume")
 $VolumeSlider.Value=$mediaPlayer.Volume
 $VolumeSlider.Add_PreviewMouseUp({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
+	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
 	}
 	$mediaPlayer.Volume=$VolumeSlider.Value
 	$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
@@ -429,6 +573,9 @@ $PositionSlider.Add_PreviewMouseUp({
 $PositionSlider.Add_PreviewMouseDown({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
+	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
 	}
 	$global:tracking=1
 })
@@ -448,8 +595,8 @@ $window.TaskbarItemInfo.Description=$window.Title
 $window.add_MouseLeftButtonDown({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
-	}	
-$window.DragMove()
+	}
+	$window.DragMove()
 })
 $StatusInfo=$Window.FindName("Status")
 $StatusInfo.Text=''
@@ -468,6 +615,9 @@ $MenuMain.Add_MouseLeave({
 	$MenuMain.Foreground='#CCCCCC'
 })
 $MenuMain.Add_Click({
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
+	}
 	dropDownMenu
 })
 $MenuFile=$Window.FindName("File")
@@ -500,6 +650,7 @@ $MenuFile.Add_Click({
 		if($Playing -eq 0){
 			TogglePlayButton
 		}
+		$Playlist.ItemsSource=$files
 		NextTrack
 		FileIdle
 	}
@@ -558,6 +709,7 @@ $MenuFolder.Add_Click({
 		} else {
 			$global:icurrent=-1
 		}
+		$Playlist.ItemsSource=$files
 		FolderIdle
 	}
 })
@@ -617,15 +769,20 @@ $Shuffle.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
+	}
 	Switch($ShuffleOn){
 		0{
 			$Shuffle.BorderBrush='#5D3FD3'
 			$global:ShuffleOn=1
 			$global:filesShuffled=$files | Sort-Object {Get-Random}
+			$Playlist.ItemsSource=$filesShuffled
 		}
 		1{
 			$Shuffle.BorderBrush='#728FCE'
 			$global:ShuffleOn=0
+			$Playlist.ItemsSource=$files
 		}
 	}
 })
@@ -643,6 +800,9 @@ $Prev.Add_MouseLeave({
 $Prev.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
+	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
 	}
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
@@ -675,6 +835,9 @@ $Play.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
+	}
 	TogglePlayButton
 })
 $Next=$Window.FindName("Next")
@@ -691,6 +854,9 @@ $Next.Add_MouseLeave({
 $Next.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
+	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
 	}
 	if($Playing -eq 0){
 		if($CurrentTrack.Text -ne 'No Media Loaded'){
@@ -726,6 +892,9 @@ $Repeat.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
+	}
 	Switch($Repeating){
 		0{
 			$RepeatImage.Source=$resourcepath + 'RepeatOne.png'
@@ -741,6 +910,18 @@ $Repeat.Add_Click({
 			$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
 			$Repeat.BorderBrush='#728FCE'
 			$global:Repeating=0
+		}
+	}
+})
+$window.Add_MouseDoubleClick({
+	Switch($ShowPlaylist){
+		0{
+			$Playlist.Visibility="Visible"
+			$global:ShowPlaylist=1
+		}
+		1{
+			$Playlist.Visibility="Hidden"
+			$global:ShowPlaylist=0
 		}
 	}
 })
