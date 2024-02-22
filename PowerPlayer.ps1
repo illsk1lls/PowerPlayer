@@ -971,9 +971,9 @@ $Repeat.Add_Click({
 		}
 	}
 })
-$background.Play()
 $window.Show()
 $window.Activate() | Out-Null
+$background.Play()
 $background.Pause()
 $appContext=New-Object System.Windows.Forms.ApplicationContext
 [void][System.Windows.Forms.Application]::Run($appContext)
