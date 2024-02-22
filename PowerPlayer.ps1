@@ -360,8 +360,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			</Setter>
 		</Style>
 		<Style x:Key="lbStyle" TargetType="{x:Type ListBox}">
-			<Setter Property="Background" Value="#111111"/>
-			<Setter Property="BorderBrush" Value="#000000"/>
+			<Setter Property="Background" Value="#222222"/>
+			<Setter Property="BorderBrush" Value="#111111"/>
 			<Setter Property="BorderThickness" Value="1"/>
 			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
 			<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
@@ -476,7 +476,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
-				<ListBox Canvas.Left="80" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="250" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
+				<ListBox Canvas.Left="80" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="245" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
     </Border>
@@ -567,6 +567,8 @@ $VolumeSlider.Add_PreviewMouseUp({
 	}
 	if($Playlist.Visibility -eq 'Visible'){
 		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
 	}
 	$mediaPlayer.Volume=$VolumeSlider.Value
 	$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
@@ -690,7 +692,7 @@ $MenuFile.Add_Click({
 		if($Playing -eq 0){
 			TogglePlayButton
 		}
-		$Playlist.ItemsSource=$files
+		$Playlist.ItemsSource=$files -ireplace '.mp3$',''
 		if($files -ne ""){
 		$MenuPlaylist.Visibility="Visible"
 		}
@@ -745,7 +747,7 @@ $MenuFolder.Add_Click({
 			$filesShuffled=$files | Sort-Object {Get-Random}			
 			$Playlist.ItemsSource=$filesShuffled
 		} else {
-			$Playlist.ItemsSource=$files
+			$Playlist.ItemsSource=$files -ireplace '.mp3$',''
 		}
 		if($Repeating -eq 1){
 			$global:icurrent=0			
@@ -827,12 +829,12 @@ $Shuffle.Add_Click({
 			$Shuffle.BorderBrush='#5D3FD3'
 			$global:ShuffleOn=1
 			$global:filesShuffled=$files | Sort-Object {Get-Random}
-			$Playlist.ItemsSource=$filesShuffled
+			$Playlist.ItemsSource=$filesShuffled -ireplace '.mp3$',''
 		}
 		1{
 			$Shuffle.BorderBrush='#728FCE'
 			$global:ShuffleOn=0
-			$Playlist.ItemsSource=$files
+			$Playlist.ItemsSource=$files -ireplace '.mp3$',''
 		}
 	}
 })
