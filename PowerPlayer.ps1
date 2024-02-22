@@ -498,6 +498,7 @@ $mediaPlayer.Add_MediaEnded({
 		}
 	} else {
 	$MenuPlaylist.Visibility="Hidden"
+	$global:ShowPlaylist=0
 	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$mediaPlayer.Stop()
