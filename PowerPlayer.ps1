@@ -242,7 +242,7 @@ function FileIdle(){
 	}	
 }
 function FolderIdle(){
-	while(([ref] $icurrent).Value -lt $files.Length -1 -or $script:Repeating -eq 2 -and $script:singlefilemode -ne 1){
+	while(([ref] $icurrent).Value -lt $files.Length -1 -or ([ref] $Repeating).Value -eq 2 -and ([ref] $singlefilemode).Value -ne 1){
 		if($Repeating -ne 0){
 			if($icurrent -eq $files.Length - 1){
 				$global:icurrent=-1
