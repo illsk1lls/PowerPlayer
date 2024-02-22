@@ -116,6 +116,16 @@ function dropDownMenu(){
 		}
 	}
 }
+function closeMenus(){
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
+	}
+	if($Playlist.Visibility -eq 'Visible'){
+		$Playlist.Visibility="Hidden"
+		$global:ShowPlaylist=0
+		$Playlist.SelectedIndex=$icurrent
+	}
+}
 function TogglePlayButton(){
 	if($files -ne $null){
 		Switch($Playing){
@@ -524,9 +534,7 @@ $Mute.Add_MouseLeave({
 	$Mute.Opacity='0.85'
 })
 $Mute.Add_Click({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
+	closeMenus
 	Switch($Muted){
 		0{
 			$MuteImage.Source=$resourcepath + 'Muted.png'
@@ -548,12 +556,12 @@ $Mute.Add_Click({
 		}
 	}
 })
-if(!($mediaPlayer.IsMuted)){
+if($mediaPlayer.IsMuted){
+	$MuteImage.Source=$resourcepath + 'Muted.png'
+	$global:Muted=1	
+} else {
 	$MuteImage.Source=$resourcepath + 'UnMuted.png'
 	$global:Muted=0
-} else {
-	$MuteImage.Source=$resourcepath + 'Muted.png'
-	$global:Muted=1
 }
 $Playlist=$Window.FindName('Playlist')
 $Playlist.Add_MouseDoubleClick({
@@ -567,14 +575,7 @@ $Playlist.Add_MouseDoubleClick({
 $VolumeSlider=$Window.FindName("Volume")
 $VolumeSlider.Value=$mediaPlayer.Volume
 $VolumeSlider.Add_PreviewMouseUp({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent
-	}
+	closeMenus
 	$mediaPlayer.Volume=$VolumeSlider.Value
 	$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
 })
@@ -584,14 +585,7 @@ $PositionSlider.Add_PreviewMouseUp({
 	$global:tracking=0
 })
 $PositionSlider.Add_PreviewMouseDown({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent
-	}
+	closeMenus
 	$global:tracking=1
 })
 $background=$Window.FindName("Background")
@@ -608,14 +602,7 @@ $window.Icon=$bitmap
 $window.TaskbarItemInfo.Overlay=$bitmap
 $window.TaskbarItemInfo.Description=$window.Title
 $window.add_MouseLeftButtonDown({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent		
-	}
+	closeMenus
 	$window.DragMove()
 })
 $StatusInfo=$Window.FindName("Status")
@@ -821,14 +808,7 @@ $Shuffle.Add_MouseLeave({
 	$Shuffle.Opacity='0.85'
 })
 $Shuffle.Add_Click({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent
-	}
+	closeMenus
 	Switch($ShuffleOn){
 		0{
 			$Shuffle.BorderBrush='#5D3FD3'
@@ -855,14 +835,7 @@ $Prev.Add_MouseLeave({
 	$Prev.Opacity='0.85'
 })
 $Prev.Add_Click({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent
-	}
+	closeMenus
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
 	if($Playing -eq 0){
@@ -891,14 +864,7 @@ $Play.Add_MouseLeave({
 	$Play.Opacity='0.85'
 })
 $Play.Add_Click({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent
-	}
+	closeMenus
 	TogglePlayButton
 })
 $Next=$Window.FindName("Next")
@@ -913,14 +879,7 @@ $Next.Add_MouseLeave({
 	$Next.Opacity='0.85'
 })
 $Next.Add_Click({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent
-	}
+	closeMenus
 	if($Playing -eq 0){
 		if($CurrentTrack.Text -ne 'No Media Loaded'){
 			NextTrack		
@@ -952,14 +911,7 @@ $Repeat.Add_MouseLeave({
 	$Repeat.Opacity='0.85'
 })
 $Repeat.Add_Click({
-	if($MenuFile.Visibility -eq 'Visible'){
-		dropDownMenu
-	}
-	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
-		$Playlist.SelectedIndex=$icurrent
-	}
+	closeMenus
 	Switch($Repeating){
 		0{
 			$RepeatImage.Source=$resourcepath + 'RepeatOne.png'
