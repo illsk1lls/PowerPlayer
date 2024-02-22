@@ -395,7 +395,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 				</Setter.Value>
 			</Setter>
 		</Style>
-			<Style x:Key="AlternatingRowStyle" TargetType="{x:Type Control}" >
+		<Style x:Key="AlternatingRowStyle" TargetType="{x:Type Control}" >
 			<Setter Property="Background" Value="#222222"/>
 			<Setter Property="Foreground" Value="#CCCCCC"/>
 			<Style.Triggers>
@@ -431,7 +431,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="MuteButton" Height="12" Width="16"></Image>
                 </Button>
-                <Button Name="Shuffle" Canvas.Left="85" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Shuffle" Canvas.Left="80" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
@@ -439,7 +439,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="ShuffleButton" Height="15" Width="20"></Image>
                 </Button>
-                <Button Name="Prev" Canvas.Left="125" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Prev" Canvas.Left="122" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -447,7 +447,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PrevButton" Height="27" Width="55"></Image>
                 </Button>
-                <Button Name="Play" Canvas.Left="215" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Play" Canvas.Left="211" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -455,7 +455,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="PlayButton" Height="27" Width="65"></Image>
                 </Button>
-                <Button Name="Next" Canvas.Left="315" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Next" Canvas.Left="312" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -463,7 +463,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     </Button.Resources>
                     <Image Name="NextButton" Height="27" Width="55"></Image>
                 </Button>
-                <Button Name="Repeat" Canvas.Left="390" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Repeat" Canvas.Left="386" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
@@ -476,7 +476,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
-				<ListBox Canvas.Left="80" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="245" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
+				<ListBox Canvas.Left="85" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="245" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
     </Border>
