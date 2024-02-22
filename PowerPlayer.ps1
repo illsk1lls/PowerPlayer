@@ -557,7 +557,11 @@ if(!($mediaPlayer.IsMuted)){
 }
 $Playlist=$Window.FindName('Playlist')
 $Playlist.Add_MouseDoubleClick({
-	$global:icurrent=$Playlist.SelectedIndex - 1
+	if($Repeating -eq 1){
+		$global:icurrent=$Playlist.SelectedIndex
+	} else {
+		$global:icurrent=$Playlist.SelectedIndex - 1
+	}
 	NextTrack
 })
 $VolumeSlider=$Window.FindName("Volume")
