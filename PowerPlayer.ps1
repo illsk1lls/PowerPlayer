@@ -45,7 +45,7 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){
 		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o $PSCommandPath
 		$ReLauncher=New-Object -ComObject Wscript.Shell;$ReLauncher.Popup("Re-Launch PowerPlayer now?",0,'Update Mode Completed!',0x1) | Tee-Object -Variable DoRelaunch | Out-Null
 		if($DoRelaunch -eq 1){
-			. $PSCommandPath Relaunching
+			. $PSCommandPath 'Relaunching'
 			Exit
 		} else {
 			Exit
