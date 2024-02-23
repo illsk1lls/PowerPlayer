@@ -1,10 +1,13 @@
 Add-Type -MemberDefinition '[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Namespace Win32 -Name Functions
 $closeConsoleUseGUI=[Win32.Functions]::ShowWindow((Get-Process -Id $PID).MainWindowHandle,0)
+$ReLaunchInProgress=$args[0]
 $AppId='PowerPlayer';$oneInstance=$false
 $script:SingleInstanceEvent=New-Object Threading.EventWaitHandle $true,([Threading.EventResetMode]::ManualReset),"Global\PowerPlayer",([ref] $oneInstance)
-if( -not $oneInstance){
-	$alreadyRunning=New-Object -ComObject Wscript.Shell;$alreadyRunning.Popup("PowerPlayer is already running!",0,'ERROR:',0x0) | Out-Null
-	Exit
+if($ReLaunchInProgress -ne 'Relaunching'){
+	if( -not $oneInstance){
+		$alreadyRunning=New-Object -ComObject Wscript.Shell;$alreadyRunning.Popup("PowerPlayer is already running!",0,'ERROR:',0x0) | Out-Null
+		Exit
+	}
 }
 $localResources=([IO.Path]::GetFullPath('.\resources\'))
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
@@ -42,7 +45,7 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){
 		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o $PSCommandPath
 		$ReLauncher=New-Object -ComObject Wscript.Shell;$ReLauncher.Popup("Re-Launch PowerPlayer now?",0,'Update Mode Completed!',0x1) | Tee-Object -Variable DoRelaunch | Out-Null
 		if($DoRelaunch -eq 1){
-			. $PSCommandPath
+			. $PSCommandPath Relaunching
 			Exit
 		} else {
 			Exit
