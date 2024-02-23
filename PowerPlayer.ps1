@@ -2,10 +2,10 @@ Add-Type -MemberDefinition '[DllImport("User32.dll")]public static extern bool S
 $closeConsoleUseGUI=[Win32.Functions]::ShowWindow((Get-Process -Id $PID).MainWindowHandle,0)
 $AppId='PowerPlayer';$oneInstance=$false
 $script:SingleInstanceEvent=New-Object Threading.EventWaitHandle $true,([Threading.EventResetMode]::ManualReset),"Global\PowerPlayer",([ref] $oneInstance)
-if( -not $oneInstance){
-	$alreadyRunning=New-Object -ComObject Wscript.Shell;$alreadyRunning.Popup("PowerPlayer is already running!",0,'ERROR:',0x0) | Out-Null
-	Exit
-}
+#if( -not $oneInstance){
+#	$alreadyRunning=New-Object -ComObject Wscript.Shell;$alreadyRunning.Popup("PowerPlayer is already running!",0,'ERROR:',0x0) | Out-Null
+#	Exit
+#}
 $localResources=([IO.Path]::GetFullPath('.\resources\'))
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
 $resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','UnMuted.png'
@@ -103,6 +103,7 @@ $global:ShuffleOn=0
 $global:ShowPlaylist=0
 $global:tracking=0
 $global:icurrent=-1
+$global:AnimationStarted=0
 function Update-Gui(){
 	$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
 }
@@ -141,6 +142,11 @@ function TogglePlayButton(){
 				$global:Playing=1
 				$StatusInfo.Text="Now Playing:"
 				$background.Play()
+				if($AnimationStarted -eq 0){
+					$AnimationStarted=1
+					$background.Opacity="1"
+					$backgroundstatic.Opacity="0"
+				}
 			}
 			1{
 				$PlayImage.ImageSource=$resourcepath + 'Play.png'
@@ -429,7 +435,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     </Window.Resources>
     <Border CornerRadius="5" BorderBrush="#111111" BorderThickness="10" Background="#111111">
         <Grid Name="MainWindow">
-            <MediaElement Name="Background" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True"/>
+			<Image Name="BackgroundStatic" Height="300" Width="500" Stretch="Fill"/>
+            <MediaElement Name="Background" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True" Opacity="0"/>
             <Canvas>
                 <TextBlock Canvas.Left="90" Canvas.Top="74" Foreground="#CCCCCC">
                     <TextBlock.Inlines>
@@ -795,6 +802,8 @@ $background.Add_MediaEnded({
 		$background.Position=New-Object System.TimeSpan(0, 0, 0, 0, 1)
 	}
 })
+$backgroundstatic=$Window.FindName("BackgroundStatic")
+$backgroundstatic.Source=$resourcepath + 'bg.gif'
 $bitmap=New-Object System.Windows.Media.Imaging.BitmapImage
 $bitmap=$background.Source
 $window.Icon=$bitmap
