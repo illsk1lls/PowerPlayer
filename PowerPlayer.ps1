@@ -370,7 +370,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			</Setter>
 		</Style>
 		<Style x:Key="lbStyle" TargetType="{x:Type ListBox}">
-			<Setter Property="Background" Value="#222222"/>
+			<Setter Property="Background" Value="#333333"/>
 			<Setter Property="BorderBrush" Value="#111111"/>
 			<Setter Property="BorderThickness" Value="1"/>
 			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
