@@ -136,14 +136,14 @@ function TogglePlayButton(){
 	if($files -ne $null){
 		Switch($Playing){
 			0{
-				$PlayImage.Source=$resourcepath + 'Pause.png'
+				$PlayImage.ImageSource=$resourcepath + 'Pause.png'
 				$mediaPlayer.Play()
 				$global:Playing=1
 				$StatusInfo.Text="Now Playing:"
 				$background.Play()
 			}
 			1{
-				$PlayImage.Source=$resourcepath + 'Play.png'
+				$PlayImage.ImageSource=$resourcepath + 'Play.png'
 				$mediaPlayer.Pause()
 				$global:Playing=0
 				$StatusInfo.Text="Paused:"
@@ -436,63 +436,243 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
                 <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
                 <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
-                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;File</Button>
-                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;Folder</Button>
-                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.85">&#160;&#160;&#160;Exit</Button>
-                <Button Name="Mute" Canvas.Left="286" Canvas.Top="76" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
+                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Folder</Button>
+                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Exit</Button>
+                <Button Name="Mute" Canvas.Left="286" Canvas.Top="76" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="MuteButton" Height="12" Width="16"></Image>
+					<Border CornerRadius="5" Height="12" Width="16">
+						<Border.Background>
+							<ImageBrush x:Name="MuteButton" Stretch="Uniform"/>
+						</Border.Background>
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="10" ShadowDepth="5" Direction="315"/>
+						</Border.Effect>
+						<Border.BorderBrush>
+							<LinearGradientBrush EndPoint="0.811,0.2" StartPoint="0.246,1.023">
+								<GradientStop Color="#FF7C9FC8" Offset="0"/>
+								<GradientStop Color="#FF7C9FC8" Offset="1"/>
+								<GradientStop Color="#FF353535" Offset="0.491"/>
+							</LinearGradientBrush>
+						</Border.BorderBrush>
+						<Border BorderThickness="0"  CornerRadius="0" Margin="0" >
+							<Border.Background>
+								<RadialGradientBrush GradientOrigin="0.7,-0.6" RadiusY="0.5" RadiusX="1.001">
+									<RadialGradientBrush.RelativeTransform>
+										<TransformGroup>
+											<ScaleTransform CenterY="0.5" CenterX="0.5" ScaleY="1" ScaleX="1"/>
+											<SkewTransform AngleY="0" AngleX="0" CenterY="0.5" CenterX="0.5"/>
+											<RotateTransform Angle="-29.285" CenterY="0.5" CenterX="0.5"/>
+											<TranslateTransform/>
+										</TransformGroup>
+									</RadialGradientBrush.RelativeTransform>
+									<GradientStop Color="#B6FFFFFF"/>
+									<GradientStop Color="#0BFFFFFF" Offset="0.478"/>
+								</RadialGradientBrush>
+							</Border.Background>
+						</Border>
+					</Border>
                 </Button>
-                <Button Name="Shuffle" Canvas.Left="80" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Shuffle" Canvas.Left="80" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="ShuffleButton" Height="15" Width="20"></Image>
+					<Border CornerRadius="5" Height="15" Width="20">
+						<Border.Background>
+							<ImageBrush x:Name="ShuffleButton" Stretch="Uniform"/>
+						</Border.Background>
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="10" ShadowDepth="5" Direction="315"/>
+						</Border.Effect>
+						<Border.BorderBrush>
+							<LinearGradientBrush EndPoint="0.811,0.2" StartPoint="0.246,1.023">
+								<GradientStop Color="#FF7C9FC8" Offset="0"/>
+								<GradientStop Color="#FF7C9FC8" Offset="1"/>
+								<GradientStop Color="#FF353535" Offset="0.491"/>
+							</LinearGradientBrush>
+						</Border.BorderBrush>
+						<Border BorderThickness="0"  CornerRadius="0" Margin="0" >
+							<Border.Background>
+								<RadialGradientBrush GradientOrigin="0.7,-0.6" RadiusY="0.5" RadiusX="1.001">
+									<RadialGradientBrush.RelativeTransform>
+										<TransformGroup>
+											<ScaleTransform CenterY="0.5" CenterX="0.5" ScaleY="1" ScaleX="1"/>
+											<SkewTransform AngleY="0" AngleX="0" CenterY="0.5" CenterX="0.5"/>
+											<RotateTransform Angle="-29.285" CenterY="0.5" CenterX="0.5"/>
+											<TranslateTransform/>
+										</TransformGroup>
+									</RadialGradientBrush.RelativeTransform>
+									<GradientStop Color="#B6FFFFFF"/>
+									<GradientStop Color="#0BFFFFFF" Offset="0.478"/>
+								</RadialGradientBrush>
+							</Border.Background>
+						</Border>
+					</Border>
                 </Button>
-                <Button Name="Prev" Canvas.Left="122" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Prev" Canvas.Left="122" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="PrevButton" Height="27" Width="55"></Image>
+					<Border CornerRadius="5" Height="27" Width="55" Margin="2,2,2,2">
+						<Border.Background>
+							<ImageBrush x:Name="PrevButton" Stretch="Uniform"/>
+						</Border.Background>
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="10" ShadowDepth="5" Direction="315"/>
+						</Border.Effect>
+						<Border.BorderBrush>
+							<LinearGradientBrush EndPoint="0.811,0.2" StartPoint="0.246,1.023">
+								<GradientStop Color="#FF7C9FC8" Offset="0"/>
+								<GradientStop Color="#FF7C9FC8" Offset="1"/>
+								<GradientStop Color="#FF353535" Offset="0.491"/>
+							</LinearGradientBrush>
+						</Border.BorderBrush>
+						<Border BorderThickness="0"  CornerRadius="0" Margin="0" >
+							<Border.Background>
+								<RadialGradientBrush GradientOrigin="0.7,-0.6" RadiusY="0.5" RadiusX="1.001">
+									<RadialGradientBrush.RelativeTransform>
+										<TransformGroup>
+											<ScaleTransform CenterY="0.5" CenterX="0.5" ScaleY="1" ScaleX="1"/>
+											<SkewTransform AngleY="0" AngleX="0" CenterY="0.5" CenterX="0.5"/>
+											<RotateTransform Angle="-29.285" CenterY="0.5" CenterX="0.5"/>
+											<TranslateTransform/>
+										</TransformGroup>
+									</RadialGradientBrush.RelativeTransform>
+									<GradientStop Color="#B6FFFFFF"/>
+									<GradientStop Color="#0BFFFFFF" Offset="0.478"/>
+								</RadialGradientBrush>
+							</Border.Background>
+						</Border>
+					</Border>
                 </Button>
-                <Button Name="Play" Canvas.Left="211" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Play" Canvas.Left="211" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="PlayButton" Height="27" Width="65"></Image>
+					<Border CornerRadius="5" Height="27" Width="65" Margin="2,2,2,2">
+						<Border.Background>
+							<ImageBrush x:Name="PlayButton" Stretch="Uniform"/>
+						</Border.Background>
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="10" ShadowDepth="5" Direction="315"/>
+						</Border.Effect>
+						<Border.BorderBrush>
+							<LinearGradientBrush EndPoint="0.811,0.2" StartPoint="0.246,1.023">
+								<GradientStop Color="#FF7C9FC8" Offset="0"/>
+								<GradientStop Color="#FF7C9FC8" Offset="1"/>
+								<GradientStop Color="#FF353535" Offset="0.491"/>
+							</LinearGradientBrush>
+						</Border.BorderBrush>
+						<Border CornerRadius="0" Margin="0">
+							<Border.Background>
+								<RadialGradientBrush GradientOrigin="0.7,-0.6" RadiusY="0.5" RadiusX="1.001">
+									<RadialGradientBrush.RelativeTransform>
+										<TransformGroup>
+											<ScaleTransform CenterY="0.5" CenterX="0.5" ScaleY="1" ScaleX="1"/>
+											<SkewTransform AngleY="0" AngleX="0" CenterY="0.5" CenterX="0.5"/>
+											<RotateTransform Angle="-29.285" CenterY="0.5" CenterX="0.5"/>
+											<TranslateTransform/>
+										</TransformGroup>
+									</RadialGradientBrush.RelativeTransform>
+									<GradientStop Color="#B6FFFFFF"/>
+									<GradientStop Color="#0BFFFFFF" Offset="0.478"/>
+								</RadialGradientBrush>
+							</Border.Background>
+						</Border>
+					</Border>
                 </Button>
-                <Button Name="Next" Canvas.Left="312" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Next" Canvas.Left="312" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="NextButton" Height="27" Width="55"></Image>
+					<Border CornerRadius="5" Height="27" Width="55" Margin="2,2,2,2">
+						<Border.Background>
+							<ImageBrush x:Name="NextButton" Stretch="Uniform"/>
+						</Border.Background>
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="10" ShadowDepth="5" Direction="315"/>
+						</Border.Effect>
+						<Border.BorderBrush>
+							<LinearGradientBrush EndPoint="0.811,0.2" StartPoint="0.246,1.023">
+								<GradientStop Color="#FF7C9FC8" Offset="0"/>
+								<GradientStop Color="#FF7C9FC8" Offset="1"/>
+								<GradientStop Color="#FF353535" Offset="0.491"/>
+							</LinearGradientBrush>
+						</Border.BorderBrush>
+						<Border CornerRadius="0" Margin="0">
+							<Border.Background>
+								<RadialGradientBrush GradientOrigin="0.7,-0.6" RadiusY="0.5" RadiusX="1.001">
+									<RadialGradientBrush.RelativeTransform>
+										<TransformGroup>
+											<ScaleTransform CenterY="0.5" CenterX="0.5" ScaleY="1" ScaleX="1"/>
+											<SkewTransform AngleY="0" AngleX="0" CenterY="0.5" CenterX="0.5"/>
+											<RotateTransform Angle="-29.285" CenterY="0.5" CenterX="0.5"/>
+											<TranslateTransform/>
+										</TransformGroup>
+									</RadialGradientBrush.RelativeTransform>
+									<GradientStop Color="#B6FFFFFF"/>
+									<GradientStop Color="#0BFFFFFF" Offset="0.478"/>
+								</RadialGradientBrush>
+							</Border.Background>
+						</Border>
+					</Border>
                 </Button>
-                <Button Name="Repeat" Canvas.Left="386" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Repeat" Canvas.Left="386" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
                         </Style>
                     </Button.Resources>
-                    <Image Name="RepeatButton" Height="15" Width="20"></Image>
+					<Border CornerRadius="5" Height="15" Width="20">
+						<Border.Background>
+							<ImageBrush x:Name="RepeatButton" Stretch="Uniform"/>
+						</Border.Background>
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="10" ShadowDepth="5" Direction="315"/>
+						</Border.Effect>
+						<Border.BorderBrush>
+							<LinearGradientBrush EndPoint="0.811,0.2" StartPoint="0.246,1.023">
+								<GradientStop Color="#FF7C9FC8" Offset="0"/>
+								<GradientStop Color="#FF7C9FC8" Offset="1"/>
+								<GradientStop Color="#FF353535" Offset="0.491"/>
+							</LinearGradientBrush>
+						</Border.BorderBrush>
+						<Border CornerRadius="0" Margin="0" >
+							<Border.Background>
+								<RadialGradientBrush GradientOrigin="0.7,-0.6" RadiusY="0.5" RadiusX="1.001">
+									<RadialGradientBrush.RelativeTransform>
+										<TransformGroup>
+											<ScaleTransform CenterY="0.5" CenterX="0.5" ScaleY="1" ScaleX="1"/>
+											<SkewTransform AngleY="0" AngleX="0" CenterY="0.5" CenterX="0.5"/>
+											<RotateTransform Angle="-29.285" CenterY="0.5" CenterX="0.5"/>
+											<TranslateTransform/>
+										</TransformGroup>
+									</RadialGradientBrush.RelativeTransform>
+									<GradientStop Color="#B6FFFFFF"/>
+									<GradientStop Color="#0BFFFFFF" Offset="0.478"/>
+								</RadialGradientBrush>
+							</Border.Background>
+						</Border>
+					</Border>
                 </Button>
                 <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
-                <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Minimum="0" Maximum="1" Background="#728FCE" Opacity="0.85"/>
+                <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Background="#728FCE" Opacity="0.85"/>
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
-				<ListBox Canvas.Left="85" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Foreground="#DDDDDD" Width="320" Height="245" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
+				<ListBox Canvas.Left="85" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Width="320" Height="245" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
     </Border>
@@ -519,7 +699,7 @@ $mediaPlayer.Add_MediaEnded({
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$mediaPlayer.Stop()
 	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
-	$PlayImage.Source=$resourcepath + 'Play.png'
+	$PlayImage.ImageSource=$resourcepath + 'Play.png'
 	$CurrentTrack.Text='No Media Loaded'
 	$background.Stop()
 	$global:Playing=0
@@ -537,13 +717,13 @@ $Mute.Add_MouseEnter({
 })
 $Mute.Add_MouseLeave({
 	$Mute.Background='#728FCE'
-	$Mute.Opacity='0.85'
+	$Mute.Opacity='0.9'
 })
 $Mute.Add_Click({
 	closeMenus
 	Switch($Muted){
 		0{
-			$MuteImage.Source=$resourcepath + 'Muted.png'
+			$MuteImage.ImageSource=$resourcepath + 'Muted.png'
 			$global:UnMutedVolume=$mediaPlayer.Volume
 			$mediaPlayer.Volume=0
 			$global:Muted=1
@@ -554,7 +734,7 @@ $Mute.Add_Click({
 			if($UnMutedVolume -eq $null){
 				$global:UnMutedVolume=0.5
 			}
-			$MuteImage.Source=$resourcepath + 'UnMuted.png'
+			$MuteImage.ImageSource=$resourcepath + 'UnMuted.png'
 			$mediaPlayer.Volume=$global:UnMutedVolume
 			$global:Muted=0
 			$VolumeSlider.Value=$mediaPlayer.Volume
@@ -563,10 +743,10 @@ $Mute.Add_Click({
 	}
 })
 if($mediaPlayer.IsMuted){
-	$MuteImage.Source=$resourcepath + 'Muted.png'
+	$MuteImage.ImageSource=$resourcepath + 'Muted.png'
 	$global:Muted=1	
 } else {
-	$MuteImage.Source=$resourcepath + 'UnMuted.png'
+	$MuteImage.ImageSource=$resourcepath + 'UnMuted.png'
 	$global:Muted=0
 }
 $Playlist=$Window.FindName('Playlist')
@@ -804,14 +984,14 @@ $Xbutton.Add_Click({
 })
 $Shuffle=$Window.FindName("Shuffle")
 $ShuffleImage=$Window.FindName("ShuffleButton")
-$ShuffleImage.Source=$resourcepath + 'Shuffle.png'
+$ShuffleImage.ImageSource=$resourcepath + 'Shuffle.png'
 $Shuffle.Add_MouseEnter({
 	$Shuffle.Background='#6495ED'
 	$Shuffle.Opacity='1'
 })
 $Shuffle.Add_MouseLeave({
 	$Shuffle.Background='#728FCE'
-	$Shuffle.Opacity='0.85'
+	$Shuffle.Opacity='0.9'
 })
 $Shuffle.Add_Click({
 	closeMenus
@@ -831,14 +1011,14 @@ $Shuffle.Add_Click({
 })
 $Prev=$Window.FindName("Prev")
 $PrevImage=$Window.FindName("PrevButton")
-$PrevImage.Source=$resourcepath + 'Prev.png'
+$PrevImage.ImageSource=$resourcepath + 'Prev.png'
 $Prev.Add_MouseEnter({
 	$Prev.Background='#6495ED'
 	$Prev.Opacity='1'
 })
 $Prev.Add_MouseLeave({
 	$Prev.Background='#728FCE'
-	$Prev.Opacity='0.85'
+	$Prev.Opacity='0.9'
 })
 $Prev.Add_Click({
 	closeMenus
@@ -860,14 +1040,14 @@ $Prev.Add_Click({
 })
 $Play=$Window.FindName("Play")
 $PlayImage=$Window.FindName("PlayButton")
-$PlayImage.Source=$resourcepath + 'Play.png'
+$PlayImage.ImageSource=$resourcepath + 'Play.png'
 $Play.Add_MouseEnter({
 	$Play.Background='#6495ED'
 	$Play.Opacity='1'
 })
 $Play.Add_MouseLeave({
 	$Play.Background='#728FCE'
-	$Play.Opacity='0.85'
+	$Play.Opacity='0.9'
 })
 $Play.Add_Click({
 	closeMenus
@@ -875,14 +1055,14 @@ $Play.Add_Click({
 })
 $Next=$Window.FindName("Next")
 $NextImage=$Window.FindName("NextButton")
-$NextImage.Source=$resourcepath + 'Next.png'
+$NextImage.ImageSource=$resourcepath + 'Next.png'
 $Next.Add_MouseEnter({
 	$Next.Background='#6495ED'
 	$Next.Opacity='1'
 })
 $Next.Add_MouseLeave({
 	$Next.Background='#728FCE'
-	$Next.Opacity='0.85'
+	$Next.Opacity='0.9'
 })
 $Next.Add_Click({
 	closeMenus
@@ -907,30 +1087,30 @@ $Next.Add_Click({
 })
 $Repeat=$Window.FindName("Repeat")
 $RepeatImage=$Window.FindName("RepeatButton")
-$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
+$RepeatImage.ImageSource=$resourcepath + 'RepeatAll.png'
 $Repeat.Add_MouseEnter({
 	$Repeat.Background='#6495ED'
 	$Repeat.Opacity='1'
 })
 $Repeat.Add_MouseLeave({
 	$Repeat.Background='#728FCE'
-	$Repeat.Opacity='0.85'
+	$Repeat.Opacity='0.9'
 })
 $Repeat.Add_Click({
 	closeMenus
 	Switch($Repeating){
 		0{
-			$RepeatImage.Source=$resourcepath + 'RepeatOne.png'
+			$RepeatImage.ImageSource=$resourcepath + 'RepeatOne.png'
 			$Repeat.BorderBrush='#5D3FD3'
 			$global:Repeating=1
 		}
 		1{
-			$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
+			$RepeatImage.ImageSource=$resourcepath + 'RepeatAll.png'
 			$Repeat.BorderBrush='#5D3FD3'
 			$global:Repeating=2
 		}
 		2{
-			$RepeatImage.Source=$resourcepath + 'RepeatAll.png'
+			$RepeatImage.ImageSource=$resourcepath + 'RepeatAll.png'
 			$Repeat.BorderBrush='#728FCE'
 			$global:Repeating=0
 		}
