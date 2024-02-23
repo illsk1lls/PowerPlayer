@@ -726,7 +726,7 @@ $Mute=$Window.FindName("Mute")
 $MuteImage=$Window.FindName("MuteButton")
 $Mute.Add_MouseEnter({
 	$Mute.Background='#6c9bf0'
-	$Mute.Opacity='0.9'
+	$Mute.Opacity='0.95'
 })
 $Mute.Add_MouseLeave({
 	$Mute.Background='#6495ED'
@@ -1004,7 +1004,7 @@ $ShuffleImage=$Window.FindName("ShuffleButton")
 $ShuffleImage.ImageSource=$resourcepath + 'Shuffle.png'
 $Shuffle.Add_MouseEnter({
 	$Shuffle.Background='#6c9bf0'
-	$Shuffle.Opacity='0.9'
+	$Shuffle.Opacity='0.95'
 })
 $Shuffle.Add_MouseLeave({
 	$Shuffle.Background='#6495ED'
@@ -1031,7 +1031,7 @@ $PrevImage=$Window.FindName("PrevButton")
 $PrevImage.ImageSource=$resourcepath + 'Prev.png'
 $Prev.Add_MouseEnter({
 	$Prev.Background='#6c9bf0'
-	$Prev.Opacity='0.9'
+	$Prev.Opacity='0.95'
 })
 $Prev.Add_MouseLeave({
 	$Prev.Background='#6495ED'
@@ -1060,7 +1060,7 @@ $PlayImage=$Window.FindName("PlayButton")
 $PlayImage.ImageSource=$resourcepath + 'Play.png'
 $Play.Add_MouseEnter({
 	$Play.Background='#6c9bf0'
-	$Play.Opacity='0.9'
+	$Play.Opacity='0.95'
 })
 $Play.Add_MouseLeave({
 	$Play.Background='#6495ED'
@@ -1075,7 +1075,7 @@ $NextImage=$Window.FindName("NextButton")
 $NextImage.ImageSource=$resourcepath + 'Next.png'
 $Next.Add_MouseEnter({
 	$Next.Background='#6c9bf0'
-	$Next.Opacity='0.9'
+	$Next.Opacity='0.95'
 })
 $Next.Add_MouseLeave({
 	$Next.Background='#6495ED'
@@ -1107,7 +1107,7 @@ $RepeatImage=$Window.FindName("RepeatButton")
 $RepeatImage.ImageSource=$resourcepath + 'RepeatAll.png'
 $Repeat.Add_MouseEnter({
 	$Repeat.Background='#6c9bf0'
-	$Repeat.Opacity='0.9'
+	$Repeat.Opacity='0.95'
 })
 $Repeat.Add_MouseLeave({
 	$Repeat.Background='#6495ED'
@@ -1128,7 +1128,7 @@ $Repeat.Add_Click({
 		}
 		2{
 			$RepeatImage.ImageSource=$resourcepath + 'RepeatAll.png'
-			$Repeat.BorderBrush='#728FCE'
+			$Repeat.BorderBrush='#6495ED'
 			$global:Repeating=0
 		}
 	}
