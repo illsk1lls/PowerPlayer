@@ -310,9 +310,10 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			</Setter>
 		</Style>
 		<Style x:Key="ScrollBarStyle" TargetType="{x:Type ScrollBar}">
-			<Setter Property="Foreground" Value="#728FCE"/>
+			<Setter Property="Foreground" Value="#6495ED"/>
 			<Setter Property="Background" Value="Transparent"/>
 			<Setter Property="Width" Value="8"/>
+			<Setter Property="Opacity" Value="0.85"/>
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type ScrollBar}">
@@ -675,8 +676,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Border>
 					</Border>
                 </Button>
-                <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
-                <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Background="#728FCE" Opacity="0.85"/>
+                <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#6495ED" Opacity="0.7"/>
+                <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Background="#6495ED" Opacity="0.7"/>
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
