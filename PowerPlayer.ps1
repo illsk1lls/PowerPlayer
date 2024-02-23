@@ -244,7 +244,11 @@ function PlayTrack(){
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$FullName="$path\$file"
 	$mediaPlayer.open($FullName)
-	$CurrentTrack.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
+	$CurrentTrack1.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
+	$CurrentTrack2.Text=$CurrentTrack1.Text
+	$CurrentTrack3.Text=$CurrentTrack1.Text
+	$CurrentTrack4.Text=$CurrentTrack1.Text
+	$CurrentTrack5.Text=$CurrentTrack1.Text
 	if($Playing -eq 1){
 		$mediaPlayer.Play()		
 	}
@@ -431,7 +435,11 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                         <Run Name="Status" FontStyle="Italic"/>
                     </TextBlock.Inlines>
                 </TextBlock>
-                <TextBlock Name="CurrentTrack" Canvas.Top="135" Foreground="#CCCCCC" FontSize="16" FontWeight="Bold" Text="No Media Loaded" TextAlignment="Center" Width="490"/>
+				<TextBlock Name="CurrentTrack5" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="Purple" Margin="-1,-1"/>
+				<TextBlock Name="CurrentTrack4" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="MediumPurple" Margin="-1,1"/>
+				<TextBlock Name="CurrentTrack3" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="RoyalBlue" Margin="1,-1"/>
+				<TextBlock Name="CurrentTrack2" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
+				<TextBlock Name="CurrentTrack1" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
                 <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
                 <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
@@ -439,7 +447,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
                 <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Folder</Button>
                 <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Exit</Button>
-                <Button Name="Mute" Canvas.Left="286" Canvas.Top="76" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Mute" Canvas.Left="286" Canvas.Top="76" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.8" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
@@ -477,7 +485,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Border>
 					</Border>
                 </Button>
-                <Button Name="Shuffle" Canvas.Left="80" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Shuffle" Canvas.Left="80" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.8" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
@@ -515,13 +523,13 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Border>
 					</Border>
                 </Button>
-                <Button Name="Prev" Canvas.Left="122" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Prev" Canvas.Left="122" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.8" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-					<Border CornerRadius="5" Height="27" Width="55" Margin="2,2,2,2">
+					<Border CornerRadius="5" Height="27" Width="55">
 						<Border.Background>
 							<ImageBrush x:Name="PrevButton" Stretch="Uniform"/>
 						</Border.Background>
@@ -553,13 +561,13 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Border>
 					</Border>
                 </Button>
-                <Button Name="Play" Canvas.Left="211" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Play" Canvas.Left="211" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.8" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-					<Border CornerRadius="5" Height="27" Width="65" Margin="2,2,2,2">
+					<Border CornerRadius="5" Height="27" Width="65">
 						<Border.Background>
 							<ImageBrush x:Name="PlayButton" Stretch="Uniform"/>
 						</Border.Background>
@@ -591,13 +599,13 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Border>
 					</Border>
                 </Button>
-                <Button Name="Next" Canvas.Left="312" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Next" Canvas.Left="312" Canvas.Top="215" BorderBrush="#2F539B" Background="#728FCE" Opacity="0.8" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
-					<Border CornerRadius="5" Height="27" Width="55" Margin="2,2,2,2">
+					<Border CornerRadius="5" Height="27" Width="55">
 						<Border.Background>
 							<ImageBrush x:Name="NextButton" Stretch="Uniform"/>
 						</Border.Background>
@@ -629,7 +637,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Border>
 					</Border>
                 </Button>
-                <Button Name="Repeat" Canvas.Left="386" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.9" Template="{StaticResource NoMouseOverButtonTemplate}">
+                <Button Name="Repeat" Canvas.Left="386" Canvas.Top="220" BorderThickness="2" BorderBrush="#728FCE" Background="#728FCE" Opacity="0.8" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="3"/>
@@ -667,8 +675,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Border>
 					</Border>
                 </Button>
-                <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.85"/>
-                <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Background="#728FCE" Opacity="0.85"/>
+                <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#728FCE" Opacity="0.8"/>
+                <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Background="#728FCE" Opacity="0.8"/>
                 <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
                 <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
@@ -700,7 +708,11 @@ $mediaPlayer.Add_MediaEnded({
 	$mediaPlayer.Stop()
 	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 	$PlayImage.ImageSource=$resourcepath + 'Play.png'
-	$CurrentTrack.Text='No Media Loaded'
+	$CurrentTrack1.Text='No Media Loaded'
+	$CurrentTrack2.Text='No Media Loaded'
+	$CurrentTrack3.Text='No Media Loaded'
+	$CurrentTrack4.Text='No Media Loaded'
+	$CurrentTrack5.Text='No Media Loaded'
 	$background.Stop()
 	$global:Playing=0
 	$StatusInfo.Text=''
@@ -713,11 +725,11 @@ $Mute=$Window.FindName("Mute")
 $MuteImage=$Window.FindName("MuteButton")
 $Mute.Add_MouseEnter({
 	$Mute.Background='#6495ED'
-	$Mute.Opacity='1'
+	$Mute.Opacity='0.9'
 })
 $Mute.Add_MouseLeave({
 	$Mute.Background='#728FCE'
-	$Mute.Opacity='0.9'
+	$Mute.Opacity='0.8'
 })
 $Mute.Add_Click({
 	closeMenus
@@ -793,7 +805,11 @@ $window.add_MouseLeftButtonDown({
 })
 $StatusInfo=$Window.FindName("Status")
 $StatusInfo.Text=''
-$CurrentTrack=$Window.FindName("CurrentTrack")
+$CurrentTrack1=$Window.FindName("CurrentTrack1")
+$CurrentTrack2=$Window.FindName("CurrentTrack2")
+$CurrentTrack3=$Window.FindName("CurrentTrack3")
+$CurrentTrack4=$Window.FindName("CurrentTrack4")
+$CurrentTrack5=$Window.FindName("CurrentTrack5")
 $TimerA=$Window.FindName("TimerA")
 $TimerB=$Window.FindName("TimerB")
 $VolumePercent=$Window.FindName("VolumePercent")
@@ -987,11 +1003,11 @@ $ShuffleImage=$Window.FindName("ShuffleButton")
 $ShuffleImage.ImageSource=$resourcepath + 'Shuffle.png'
 $Shuffle.Add_MouseEnter({
 	$Shuffle.Background='#6495ED'
-	$Shuffle.Opacity='1'
+	$Shuffle.Opacity='0.9'
 })
 $Shuffle.Add_MouseLeave({
 	$Shuffle.Background='#728FCE'
-	$Shuffle.Opacity='0.9'
+	$Shuffle.Opacity='0.8'
 })
 $Shuffle.Add_Click({
 	closeMenus
@@ -1014,11 +1030,11 @@ $PrevImage=$Window.FindName("PrevButton")
 $PrevImage.ImageSource=$resourcepath + 'Prev.png'
 $Prev.Add_MouseEnter({
 	$Prev.Background='#6495ED'
-	$Prev.Opacity='1'
+	$Prev.Opacity='0.9'
 })
 $Prev.Add_MouseLeave({
 	$Prev.Background='#728FCE'
-	$Prev.Opacity='0.9'
+	$Prev.Opacity='0.8'
 })
 $Prev.Add_Click({
 	closeMenus
@@ -1043,11 +1059,11 @@ $PlayImage=$Window.FindName("PlayButton")
 $PlayImage.ImageSource=$resourcepath + 'Play.png'
 $Play.Add_MouseEnter({
 	$Play.Background='#6495ED'
-	$Play.Opacity='1'
+	$Play.Opacity='0.9'
 })
 $Play.Add_MouseLeave({
 	$Play.Background='#728FCE'
-	$Play.Opacity='0.9'
+	$Play.Opacity='0.8'
 })
 $Play.Add_Click({
 	closeMenus
@@ -1058,16 +1074,16 @@ $NextImage=$Window.FindName("NextButton")
 $NextImage.ImageSource=$resourcepath + 'Next.png'
 $Next.Add_MouseEnter({
 	$Next.Background='#6495ED'
-	$Next.Opacity='1'
+	$Next.Opacity='0.9'
 })
 $Next.Add_MouseLeave({
 	$Next.Background='#728FCE'
-	$Next.Opacity='0.9'
+	$Next.Opacity='0.8'
 })
 $Next.Add_Click({
 	closeMenus
 	if($Playing -eq 0){
-		if($CurrentTrack.Text -ne 'No Media Loaded'){
+		if($CurrentTrack1.Text -ne 'No Media Loaded'){
 			NextTrack		
 		}
 	} else {
@@ -1090,11 +1106,11 @@ $RepeatImage=$Window.FindName("RepeatButton")
 $RepeatImage.ImageSource=$resourcepath + 'RepeatAll.png'
 $Repeat.Add_MouseEnter({
 	$Repeat.Background='#6495ED'
-	$Repeat.Opacity='1'
+	$Repeat.Opacity='0.9'
 })
 $Repeat.Add_MouseLeave({
 	$Repeat.Background='#728FCE'
-	$Repeat.Opacity='0.9'
+	$Repeat.Opacity='0.8'
 })
 $Repeat.Add_Click({
 	closeMenus
