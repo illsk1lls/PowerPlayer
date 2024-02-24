@@ -143,7 +143,11 @@ function TogglePlayButton(){
 				$PlayImage.ImageSource=$resourcepath + 'Pause.png'
 				$mediaPlayer.Play()
 				$global:Playing=1
-				$StatusInfo.Text="Now Playing:"
+				$StatusInfo1.Text="Now Playing"
+				$StatusInfo2.Text=$StatusInfo1.Text
+				$StatusInfo3.Text=$StatusInfo1.Text
+				$StatusInfo4.Text=$StatusInfo1.Text
+				$StatusInfo5.Text=$StatusInfo1.Text
 				$background.Play()
 				if($AnimationStarted -eq 0){
 					$AnimationStarted=1
@@ -155,7 +159,11 @@ function TogglePlayButton(){
 				$PlayImage.ImageSource=$resourcepath + 'Play.png'
 				$mediaPlayer.Pause()
 				$global:Playing=0
-				$StatusInfo.Text="Paused:"
+				$StatusInfo1.Text="Paused"
+				$StatusInfo2.Text=$StatusInfo1.Text
+				$StatusInfo3.Text=$StatusInfo1.Text
+				$StatusInfo4.Text=$StatusInfo1.Text
+				$StatusInfo5.Text=$StatusInfo1.Text
 				$background.Pause()
 			}
 		}
@@ -235,7 +243,11 @@ function trackLength(){
 	[int]$h, [int]$m, [int]$s = ($FolderL.GetDetailsOf($FileL, 27)).split(":")
 	$global:totaltime=$h*60*60 + $m*60 +$s
 	$ReadableTotal=[timespan]::fromseconds($totaltime - 2)
-	$TimerB.Text=("{0:mm\:ss}" -f $ReadableTotal)
+	$TimerB1.Text=("{0:mm\:ss}" -f $ReadableTotal)
+	$TimerB2.Text=$TimerB1.Text
+	$TimerB3.Text=$TimerB1.Text
+	$TimerB4.Text=$TimerB1.Text
+	$TimerB5.Text=$TimerB1.Text
 	$PositionSlider.Maximum=$totaltime
 }
 function WaitForSong(){
@@ -243,7 +255,11 @@ function WaitForSong(){
 		if(([ref] $tracking).Value -eq 0){
 			$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 			$TimePassed=[timespan]::fromseconds(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)
-			$TimerA.Text=("{0:mm\:ss}" -f $TimePassed)
+			$TimerA1.Text=("{0:mm\:ss}" -f $TimePassed)
+			$TimerA2.Text=$TimerA1.Text
+			$TimerA3.Text=$TimerA1.Text
+			$TimerA4.Text=$TimerA1.Text
+			$TimerA5.Text=$TimerA1.Text
 		}
 		Update-Gui
 		Start-Sleep -milliseconds 50
@@ -427,11 +443,11 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		</Style>
 		<Style x:Key="AlternatingRowStyle" TargetType="{x:Type Control}" >
 			<Setter Property="Background" Value="#222222"/>
-			<Setter Property="Foreground" Value="#CCCCCC"/>
+			<Setter Property="Foreground" Value="#DDDDDD"/>
 			<Style.Triggers>
 				<Trigger Property="ItemsControl.AlternationIndex" Value="1">                            
 					<Setter Property="Background" Value="#111111"/>
-					<Setter Property="Foreground" Value="#CCCCCC"/>                                
+					<Setter Property="Foreground" Value="#DDDDDD"/>                                
 				</Trigger>                            
 			</Style.Triggers>
 		</Style>
@@ -441,23 +457,23 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			<Image Name="BackgroundStatic" Height="300" Width="500" Stretch="Fill"/>
             <MediaElement Name="Background" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True" Opacity="0"/>
             <Canvas>
-                <TextBlock Canvas.Left="90" Canvas.Top="74" Foreground="#CCCCCC">
-                    <TextBlock.Inlines>
-                        <Run Name="Status" FontStyle="Italic"/>
-                    </TextBlock.Inlines>
-                </TextBlock>
-				<TextBlock Name="CurrentTrack5" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="Purple" Margin="-1,-1"/>
-				<TextBlock Name="CurrentTrack4" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="MediumPurple" Margin="-1,1"/>
-				<TextBlock Name="CurrentTrack3" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="RoyalBlue" Margin="1,-1"/>
-				<TextBlock Name="CurrentTrack2" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
-				<TextBlock Name="CurrentTrack1" Canvas.Top="135" FontSize="16" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
-                <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
-                <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
-                <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
-                <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="#CCCCCC" Background="#111111" Height="18" Width="22" FontWeight="Bold" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
-                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
-                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Folder</Button>
-                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="#CCCCCC" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Exit</Button>
+                <TextBlock Name="Status5" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="Purple" Margin="-1,-1"/>
+                <TextBlock Name="Status4" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="MediumPurple" Margin="-1,1"/>
+                <TextBlock Name="Status3" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="RoyalBlue" Margin="1,-1"/>
+                <TextBlock Name="Status2" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="LightBlue" Margin="1,1"/>
+                <TextBlock Name="Status1" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="LightGray"/>
+				<TextBlock Name="CurrentTrack5" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="Purple" Margin="-1,-1"/>
+				<TextBlock Name="CurrentTrack4" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="MediumPurple" Margin="-1,1"/>
+				<TextBlock Name="CurrentTrack3" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="RoyalBlue" Margin="1,-1"/>
+				<TextBlock Name="CurrentTrack2" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
+				<TextBlock Name="CurrentTrack1" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
+                <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="White" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
+                <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="10" BorderBrush="#111111" Foreground="White" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
+                <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="White" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
+                <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="White" Background="#111111" Height="18" Width="22" FontWeight="Bold" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
+                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="10" BorderBrush="#333333" Foreground="White" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
+                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="10" BorderBrush="#333333" Foreground="White" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Folder</Button>
+                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="10" BorderBrush="#333333" Foreground="White" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Exit</Button>
                 <Button Name="Mute" Canvas.Left="286" Canvas.Top="76" BorderBrush="#2F539B" Background="#6495ED" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
@@ -688,9 +704,21 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 </Button>
                 <Slider Name="Volume" Canvas.Left="310" Canvas.Top="80" Height="6" Width="90" Orientation="Horizontal" Minimum="0" Maximum="1" SmallChange=".01" LargeChange=".1" Background="#6495ED" Opacity="0.7"/>
                 <Slider Name="Position" Canvas.Left="90" Canvas.Top="180" Height="6" Width="310" Orientation="Horizontal" Background="#6495ED" Opacity="0.7"/>
-                <TextBlock Name="TimerA" Canvas.Left="53" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
-                <TextBlock Name="TimerB" Canvas.Left="406" Canvas.Top="175" Foreground="#CCCCCC" FontWeight="Bold"/>
-                <TextBlock Name="VolumePercent" Canvas.Left="406" Canvas.Top="75" Foreground="#CCCCCC" FontWeight="Bold"/>
+				<TextBlock Name="TimerA5" Canvas.Left="49" Canvas.Top="172" FontSize="14" Foreground="Purple" Margin="-1,-1"/>
+				<TextBlock Name="TimerA4" Canvas.Left="49" Canvas.Top="172" FontSize="14" Foreground="MediumPurple" Margin="-1,1"/>
+				<TextBlock Name="TimerA3" Canvas.Left="49" Canvas.Top="172" FontSize="14" Foreground="RoyalBlue" Margin="1,-1"/>
+				<TextBlock Name="TimerA2" Canvas.Left="49" Canvas.Top="172" FontSize="14" Foreground="LightBlue" Margin="1,1"/>
+				<TextBlock Name="TimerA1" Canvas.Left="49" Canvas.Top="172" FontSize="14" Foreground="LightGray"/>
+				<TextBlock Name="TimerB5" Canvas.Left="407" Canvas.Top="172" FontSize="14" Foreground="Purple" Margin="-1,-1"/>
+				<TextBlock Name="TimerB4" Canvas.Left="407" Canvas.Top="172" FontSize="14" Foreground="MediumPurple" Margin="-1,1"/>
+				<TextBlock Name="TimerB3" Canvas.Left="407" Canvas.Top="172" FontSize="14" Foreground="RoyalBlue" Margin="1,-1"/>
+				<TextBlock Name="TimerB2" Canvas.Left="407" Canvas.Top="172" FontSize="14" Foreground="LightBlue" Margin="1,1"/>
+				<TextBlock Name="TimerB1" Canvas.Left="407" Canvas.Top="172" FontSize="14" Foreground="LightGray"/>
+				<TextBlock Name="VolumePercent5" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="Purple" Margin="-1,-1"/>
+				<TextBlock Name="VolumePercent4" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="MediumPurple" Margin="-1,1"/>
+				<TextBlock Name="VolumePercent3" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="RoyalBlue" Margin="1,-1"/>
+				<TextBlock Name="VolumePercent2" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="LightBlue" Margin="1,1"/>
+				<TextBlock Name="VolumePercent1" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="LightGray"/>
 				<ListBox Canvas.Left="85" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Width="320" Height="245" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
@@ -720,10 +748,10 @@ $mediaPlayer.Add_MediaEnded({
 	$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 	$PlayImage.ImageSource=$resourcepath + 'Play.png'
 	$CurrentTrack1.Text='No Media Loaded'
-	$CurrentTrack2.Text='No Media Loaded'
-	$CurrentTrack3.Text='No Media Loaded'
-	$CurrentTrack4.Text='No Media Loaded'
-	$CurrentTrack5.Text='No Media Loaded'
+	$CurrentTrack2.Text=$CurrentTrack1.Text
+	$CurrentTrack3.Text=$CurrentTrack1.Text
+	$CurrentTrack4.Text=$CurrentTrack1.Text
+	$CurrentTrack5.Text=$CurrentTrack1.Text
 	$background.Stop()
 	$global:Playing=0
 	$StatusInfo.Text=''
@@ -751,7 +779,11 @@ $Mute.Add_Click({
 			$mediaPlayer.Volume=0
 			$global:Muted=1
 			$VolumeSlider.Value=$mediaPlayer.Volume
-			$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
+			$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
+			$VolumePercent2.Text=$VolumePercent1.Text
+			$VolumePercent3.Text=$VolumePercent1.Text
+			$VolumePercent4.Text=$VolumePercent1.Text
+			$VolumePercent5.Text=$VolumePercent1.Text
 		}
 		1{
 			if($UnMutedVolume -eq $null){
@@ -761,7 +793,11 @@ $Mute.Add_Click({
 			$mediaPlayer.Volume=$global:UnMutedVolume
 			$global:Muted=0
 			$VolumeSlider.Value=$mediaPlayer.Volume
-			$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
+			$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
+			$VolumePercent2.Text=$VolumePercent1.Text
+			$VolumePercent3.Text=$VolumePercent1.Text
+			$VolumePercent4.Text=$VolumePercent1.Text
+			$VolumePercent5.Text=$VolumePercent1.Text
 		}
 	}
 })
@@ -786,7 +822,11 @@ $VolumeSlider.Value=$mediaPlayer.Volume
 $VolumeSlider.Add_PreviewMouseUp({
 	closeMenus
 	$mediaPlayer.Volume=$VolumeSlider.Value
-	$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
+	$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
+	$VolumePercent2.Text=$VolumePercent1.Text
+	$VolumePercent3.Text=$VolumePercent1.Text
+	$VolumePercent4.Text=$VolumePercent1.Text
+	$VolumePercent5.Text=$VolumePercent1.Text
 })
 $PositionSlider=$Window.FindName("Position")
 $PositionSlider.Add_PreviewMouseUp({
@@ -816,25 +856,43 @@ $window.add_MouseLeftButtonDown({
 	closeMenus
 	$window.DragMove()
 })
-$StatusInfo=$Window.FindName("Status")
-$StatusInfo.Text=''
+$StatusInfo1=$Window.FindName("Status1")
+$StatusInfo2=$Window.FindName("Status2")
+$StatusInfo3=$Window.FindName("Status3")
+$StatusInfo4=$Window.FindName("Status4")
+$StatusInfo5=$Window.FindName("Status5")
+$StatusInfo1.Text=''
 $CurrentTrack1=$Window.FindName("CurrentTrack1")
 $CurrentTrack2=$Window.FindName("CurrentTrack2")
 $CurrentTrack3=$Window.FindName("CurrentTrack3")
 $CurrentTrack4=$Window.FindName("CurrentTrack4")
 $CurrentTrack5=$Window.FindName("CurrentTrack5")
-$TimerA=$Window.FindName("TimerA")
-$TimerB=$Window.FindName("TimerB")
-$VolumePercent=$Window.FindName("VolumePercent")
-$VolumePercent.Text=([double]$mediaPlayer.Volume).tostring("P0")
+$TimerA1=$Window.FindName("TimerA1")
+$TimerA2=$Window.FindName("TimerA2")
+$TimerA3=$Window.FindName("TimerA3")
+$TimerA4=$Window.FindName("TimerA4")
+$TimerA5=$Window.FindName("TimerA5")
+$TimerB1=$Window.FindName("TimerB1")
+$TimerB2=$Window.FindName("TimerB2")
+$TimerB3=$Window.FindName("TimerB3")
+$TimerB4=$Window.FindName("TimerB4")
+$TimerB5=$Window.FindName("TimerB5")
+$VolumePercent1=$Window.FindName("VolumePercent1")
+$VolumePercent2=$Window.FindName("VolumePercent2")
+$VolumePercent3=$Window.FindName("VolumePercent3")
+$VolumePercent4=$Window.FindName("VolumePercent4")
+$VolumePercent5=$Window.FindName("VolumePercent5")
+$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
+$VolumePercent2.Text=$VolumePercent1.Text
+$VolumePercent3.Text=$VolumePercent1.Text
+$VolumePercent4.Text=$VolumePercent1.Text
+$VolumePercent5.Text=$VolumePercent1.Text
 $MenuMain=$Window.FindName("Menu")
 $MenuMain.Add_MouseEnter({
 	$MenuMain.Background='#222222'
-	$MenuMain.Foreground='#CCCCCC'
 })
 $MenuMain.Add_MouseLeave({
 	$MenuMain.Background='#111111'
-	$MenuMain.Foreground='#CCCCCC'
 })
 $MenuMain.Add_Click({
 	if($Playlist.Visibility -eq 'Visible'){
@@ -847,11 +905,9 @@ $MenuMain.Add_Click({
 $MenuPlaylist=$Window.FindName("MenuPlaylist")
 $MenuPlaylist.Add_MouseEnter({
 	$MenuPlaylist.Background='#222222'
-	$MenuPlaylist.Foreground='#CCCCCC'
 })
 $MenuPlaylist.Add_MouseLeave({
 	$MenuPlaylist.Background='#111111'
-	$MenuPlaylist.Foreground='#CCCCCC'
 })
 $MenuPlaylist.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
@@ -872,11 +928,9 @@ $MenuPlaylist.Add_Click({
 $MenuFile=$Window.FindName("File")
 $MenuFile.Add_MouseEnter({
 	$MenuFile.Background='#222222'
-	$MenuFile.Foreground='#CCCCCC'
 })
 $MenuFile.Add_MouseLeave({
 	$MenuFile.Background='#111111'
-	$MenuFile.Foreground='#CCCCCC'
 })
 $MenuFile.Add_Click({
 	dropDownMenu
@@ -910,11 +964,9 @@ $MenuFile.Add_Click({
 $MenuFolder=$Window.FindName("Folder")
 $MenuFolder.Add_MouseEnter({
 	$MenuFolder.Background='#222222'
-	$MenuFolder.Foreground='#CCCCCC'
 })
 $MenuFolder.Add_MouseLeave({
 	$MenuFolder.Background='#111111'
-	$MenuFolder.Foreground='#CCCCCC'
 })
 $MenuFolder.Add_Click({
 	dropDownMenu
@@ -973,11 +1025,9 @@ $MenuFolder.Add_Click({
 $MenuExit=$Window.FindName("Exit")
 $MenuExit.Add_MouseEnter({
 	$MenuExit.Background='#222222'
-	$MenuExit.Foreground='#CCCCCC'
 })
 $MenuExit.Add_MouseLeave({
 	$MenuExit.Background='#111111'
-	$MenuExit.Foreground='#CCCCCC'
 })
 $MenuExit.Add_Click({
 	$window.Close()
@@ -986,11 +1036,9 @@ $MenuExit.Add_Click({
 $minWin=$Window.FindName("minWin")
 $minWin.Add_MouseEnter({
 	$minWin.Background='#222222'
-	$minWin.Foreground='#CCCCCC'
 })
 $minWin.Add_MouseLeave({
 	$minWin.Background='#111111'
-	$minWin.Foreground='#CCCCCC'
 })
 $minWin.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
@@ -1001,11 +1049,9 @@ $minWin.Add_Click({
 $Xbutton=$Window.FindName("X")
 $Xbutton.Add_MouseEnter({
 	$Xbutton.Background='#ff0000'
-	$Xbutton.Foreground='#CCCCCC'
 })
 $Xbutton.Add_MouseLeave({
 	$Xbutton.Background='#111111'
-	$Xbutton.Foreground='#CCCCCC'
 })
 $Xbutton.Add_Click({
 	$window.Close()
