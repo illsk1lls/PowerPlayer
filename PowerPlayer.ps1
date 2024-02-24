@@ -142,6 +142,8 @@ function TogglePlayButton(){
 			0{
 				$PlayImage.ImageSource=$resourcepath + 'Pause.png'
 				$mediaPlayer.Play()
+				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Play.png'
+				$window.TaskbarItemInfo.Description='Playing...'
 				$global:Playing=1
 				$StatusInfo1.Text="Now Playing"
 				$StatusInfo2.Text=$StatusInfo1.Text
@@ -158,6 +160,8 @@ function TogglePlayButton(){
 			1{
 				$PlayImage.ImageSource=$resourcepath + 'Play.png'
 				$mediaPlayer.Pause()
+				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Pause.png'
+				$window.TaskbarItemInfo.Description='Paused...'
 				$global:Playing=0
 				$StatusInfo1.Text="Paused"
 				$StatusInfo2.Text=$StatusInfo1.Text
@@ -443,11 +447,11 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		</Style>
 		<Style x:Key="AlternatingRowStyle" TargetType="{x:Type Control}" >
 			<Setter Property="Background" Value="#222222"/>
-			<Setter Property="Foreground" Value="#DDDDDD"/>
+			<Setter Property="Foreground" Value="#EEEEEE"/>
 			<Style.Triggers>
 				<Trigger Property="ItemsControl.AlternationIndex" Value="1">                            
 					<Setter Property="Background" Value="#111111"/>
-					<Setter Property="Foreground" Value="#DDDDDD"/>                                
+					<Setter Property="Foreground" Value="#EEEEEE"/>                                
 				</Trigger>                            
 			</Style.Triggers>
 		</Style>
@@ -457,23 +461,23 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			<Image Name="BackgroundStatic" Height="300" Width="500" Stretch="Fill"/>
             <MediaElement Name="Background" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True" Opacity="0"/>
             <Canvas>
-                <TextBlock Name="Status5" Canvas.Left="86" Canvas.Top="72" FontSize="16" FontFamily="Calibri" Foreground="Purple" Margin="-1,-1"/>
-                <TextBlock Name="Status4" Canvas.Left="86" Canvas.Top="72" FontSize="16" FontFamily="Calibri" Foreground="MediumPurple" Margin="-1,1"/>
-                <TextBlock Name="Status3" Canvas.Left="86" Canvas.Top="72" FontSize="16" FontFamily="Calibri" Foreground="RoyalBlue" Margin="1,-1"/>
-                <TextBlock Name="Status2" Canvas.Left="86" Canvas.Top="72" FontSize="16" FontFamily="Calibri" Foreground="LightBlue" Margin="1,1"/>
-                <TextBlock Name="Status1" Canvas.Left="86" Canvas.Top="72" FontSize="16" FontFamily="Calibri" Foreground="LightGray"/>
+                <TextBlock Name="Status5" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="Purple" Margin="-1,-1"/>
+                <TextBlock Name="Status4" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="MediumPurple" Margin="-1,1"/>
+                <TextBlock Name="Status3" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="RoyalBlue" Margin="1,-1"/>
+                <TextBlock Name="Status2" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="LightBlue" Margin="1,1"/>
+                <TextBlock Name="Status1" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="LightGray"/>
 				<TextBlock Name="CurrentTrack5" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="Purple" Margin="-1,-1"/>
 				<TextBlock Name="CurrentTrack4" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="MediumPurple" Margin="-1,1"/>
 				<TextBlock Name="CurrentTrack3" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="RoyalBlue" Margin="1,-1"/>
 				<TextBlock Name="CurrentTrack2" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
 				<TextBlock Name="CurrentTrack1" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
-                <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="12" FontFamily="Calibri" FontWeight="Bold" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
-                <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Bold" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
-                <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="12" FontWeight="Bold" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">__</Button>
-                <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="12" FontWeight="Bold" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
-                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="12" FontFamily="Calibri" BorderBrush="#333333" Foreground="#DDDDDD" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
-                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="12" FontFamily="Calibri" BorderBrush="#333333" Foreground="#DDDDDD" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Folder</Button>
-                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="12" FontFamily="Calibri" BorderBrush="#333333" Foreground="#DDDDDD" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Exit</Button>
+                <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
+                <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
+                <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="12" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">__</Button>
+                <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="12" FontWeight="Bold" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
+                <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#333333" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
+                <Button Name="Folder" Canvas.Left="0" Canvas.Top="34" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#333333" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Folder</Button>
+                <Button Name="Exit" Canvas.Left="0" Canvas.Top="51" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#333333" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;Exit</Button>
                 <Button Name="Mute" Canvas.Left="286" Canvas.Top="76" BorderBrush="#2F539B" Background="#6495ED" Opacity="0.85" Template="{StaticResource NoMouseOverButtonTemplate}">
                     <Button.Resources>
                         <Style TargetType="Border">
