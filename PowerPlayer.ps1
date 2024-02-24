@@ -462,11 +462,11 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 <TextBlock Name="Status3" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="RoyalBlue" Margin="1,-1"/>
                 <TextBlock Name="Status2" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="LightBlue" Margin="1,1"/>
                 <TextBlock Name="Status1" Canvas.Left="86" Canvas.Top="72" FontSize="14" Foreground="LightGray"/>
-				<TextBlock Name="CurrentTrack5" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="Purple" Margin="-1,-1"/>
-				<TextBlock Name="CurrentTrack4" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="MediumPurple" Margin="-1,1"/>
-				<TextBlock Name="CurrentTrack3" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="RoyalBlue" Margin="1,-1"/>
-				<TextBlock Name="CurrentTrack2" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
-				<TextBlock Name="CurrentTrack1" Canvas.Top="133" FontSize="20" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
+				<TextBlock Name="CurrentTrack5" Canvas.Top="133" FontSize="18" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="Purple" Margin="-1,-1"/>
+				<TextBlock Name="CurrentTrack4" Canvas.Top="133" FontSize="18" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="MediumPurple" Margin="-1,1"/>
+				<TextBlock Name="CurrentTrack3" Canvas.Top="133" FontSize="18" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="RoyalBlue" Margin="1,-1"/>
+				<TextBlock Name="CurrentTrack2" Canvas.Top="133" FontSize="18" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
+				<TextBlock Name="CurrentTrack1" Canvas.Top="133" FontSize="18" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="White" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
                 <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="10" BorderBrush="#111111" Foreground="White" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
                 <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="10" BorderBrush="#111111" Foreground="White" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">___</Button>
