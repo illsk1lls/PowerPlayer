@@ -481,7 +481,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			<EventTrigger RoutedEvent="PreviewMouseUp">
 				<BeginStoryboard>
 					<Storyboard>
-						<DoubleAnimation Name="ButtonAnimation1" From="70" To="207" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
+						<DoubleAnimation Name="ButtonAnimation1" From="70" To="233" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
 					</Storyboard>
 				</BeginStoryboard></EventTrigger>
 			</Button.Triggers>
@@ -490,7 +490,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			<EventTrigger RoutedEvent="PreviewMouseUp">
 				<BeginStoryboard>
 					<Storyboard>
-						<DoubleAnimation Name="ButtonAnimation2" From="207" To="70" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
+						<DoubleAnimation Name="ButtonAnimation2" From="233" To="70" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
 					</Storyboard>
 				</BeginStoryboard></EventTrigger>
 			</Button.Triggers>
