@@ -758,9 +758,21 @@ $mediaPlayer.Add_MediaEnded({
 	$CurrentTrack5.Text=$CurrentTrack1.Text
 	$background.Stop()
 	$global:Playing=0
-	$StatusInfo.Text=''
-	$TimerA.Text=''
-	$TimerB.Text=''
+	$StatusInfo1.Text=''
+	$StatusInfo2.Text=$StatusInfo1.Text
+	$StatusInfo3.Text=$StatusInfo1.Text
+	$StatusInfo4.Text=$StatusInfo1.Text
+	$StatusInfo5.Text=$StatusInfo1.Text
+	$TimerA1.Text=''
+	$TimerA2.Text=$TimerA1.Text
+	$TimerA3.Text=$TimerA1.Text
+	$TimerA4.Text=$TimerA1.Text
+	$TimerA5.Text=$TimerA1.Text	
+	$TimerB1.Text=''
+	$TimerB2.Text=$TimerB1.Text
+	$TimerB3.Text=$TimerB1.Text
+	$TimerB4.Text=$TimerB1.Text
+	$TimerB5.Text=$TimerB1.Text
 	}
 })
 $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pid})
