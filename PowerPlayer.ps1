@@ -107,6 +107,7 @@ $global:ShowPlaylist=0
 $global:tracking=0
 $global:icurrent=-1
 $global:AnimationStarted=0
+$global:AnimationThread=0
 function Update-Gui(){
 	$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
 }
@@ -134,6 +135,8 @@ function closeMenus(){
 		$Playlist.Visibility="Hidden"
 		$global:ShowPlaylist=0
 		$Playlist.SelectedIndex=$icurrent
+		$MenuPlaylist1.Visibility="Visible"
+		$MenuPlaylist2.Visibility="Hidden"		
 	}
 }
 function TogglePlayButton(){
@@ -266,7 +269,9 @@ function WaitForSong(){
 			$TimerA5.Text=$TimerA1.Text
 		}
 		Update-Gui
-		Start-Sleep -milliseconds 50
+		if($AnimationThread -eq 0){
+			Start-Sleep -milliseconds 50
+		}
 	}
 }
 function PlayTrack(){
@@ -472,7 +477,24 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 				<TextBlock Name="CurrentTrack2" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
 				<TextBlock Name="CurrentTrack1" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
-                <Button Name="MenuPlaylist" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist</Button>
+		<Button Name="MenuPlaylist1" Canvas.Left="70" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">>><Button.Triggers>
+			<EventTrigger RoutedEvent="PreviewMouseUp">
+				<BeginStoryboard>
+					<Storyboard>
+						<DoubleAnimation Name="ButtonAnimation1" From="70" To="207" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
+					</Storyboard>
+				</BeginStoryboard></EventTrigger>
+			</Button.Triggers>
+		</Button>
+		<Button Name="MenuPlaylist2" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist<Button.Triggers>
+			<EventTrigger RoutedEvent="PreviewMouseUp">
+				<BeginStoryboard>
+					<Storyboard>
+						<DoubleAnimation Name="ButtonAnimation2" From="207" To="70" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
+					</Storyboard>
+				</BeginStoryboard></EventTrigger>
+			</Button.Triggers>
+		</Button>
                 <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="12" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">__</Button>
                 <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="12" FontWeight="Bold" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#333333" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
@@ -744,7 +766,9 @@ $mediaPlayer.Add_MediaEnded({
 			}
 		}
 	} else {
-	$MenuPlaylist.Visibility="Hidden"
+	$MenuPlaylist1.Visibility="Hidden"
+	$MenuPlaylist2.Visibility="Hidden"
+	$Playlist.Visibility="Hidden"
 	$global:ShowPlaylist=0
 	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
@@ -918,28 +942,52 @@ $MenuMain.Add_Click({
 	}
 	dropDownMenu
 })
-$MenuPlaylist=$Window.FindName("MenuPlaylist")
-$MenuPlaylist.Add_MouseEnter({
-	$MenuPlaylist.Background='#222222'
+$MenuPlaylist1=$Window.FindName("MenuPlaylist1")
+$MenuPlaylist1.Add_MouseEnter({
+	$MenuPlaylist1.Background='#222222'
 })
-$MenuPlaylist.Add_MouseLeave({
-	$MenuPlaylist.Background='#111111'
+$MenuPlaylist1.Add_MouseLeave({
+	$MenuPlaylist1.Background='#111111'
 })
-$MenuPlaylist.Add_Click({
+$MenuPlaylist1.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	Switch($ShowPlaylist){
-		0{
-			$Playlist.Visibility="Visible"
-			$global:ShowPlaylist=1
-		}
-		1{
-			$Playlist.Visibility="Hidden"
-			$global:ShowPlaylist=0
-			$Playlist.SelectedIndex=$icurrent
-		}
+	$global:AnimationThread=1
+	$global:ShowPlaylist=1
+})
+$MenuPlaylist2=$Window.FindName("MenuPlaylist2")
+$MenuPlaylist2.Add_MouseEnter({
+	$MenuPlaylist2.Background='#222222'
+})
+$MenuPlaylist2.Add_MouseLeave({
+	$MenuPlaylist2.Background='#111111'
+})
+$MenuPlaylist2.Add_Click({
+	if($MenuFile.Visibility -eq 'Visible'){
+		dropDownMenu
 	}
+	$MenuPlaylist2.Content="<<"
+	$MenuPlaylist2.Width="25"
+	$global:AnimationThread=1
+	$Playlist.Visibility="Hidden"
+	$global:ShowPlaylist=0
+	$Playlist.SelectedIndex=$icurrent
+})
+$ButtonAnimation1=$Window.FindName("ButtonAnimation1")
+$ButtonAnimation1.Add_Completed({
+	$MenuPlaylist2.Content="Playlist"
+	$MenuPlaylist1.Visibility="Hidden"
+	$MenuPlaylist2.Visibility="Visible"
+	$Playlist.Visibility="Visible"
+	$global:AnimationThread=0
+})
+$ButtonAnimation2=$Window.FindName("ButtonAnimation2")
+$ButtonAnimation2.Add_Completed({
+	$MenuPlaylist1.Visibility="Visible"
+	$MenuPlaylist2.Visibility="Hidden"
+	$MenuPlaylist2.Width="70"
+	$global:AnimationThread=0
 })
 $MenuFile=$Window.FindName("File")
 $MenuFile.Add_MouseEnter({
@@ -971,7 +1019,7 @@ $MenuFile.Add_Click({
 		}
 		$Playlist.ItemsSource=$files -ireplace '.mp3$',''
 		if($files -ne ""){
-		$MenuPlaylist.Visibility="Visible"
+		$MenuPlaylist1.Visibility="Visible"
 		}
 		NextTrack
 		FileIdle
@@ -1033,7 +1081,7 @@ $MenuFolder.Add_Click({
 			$global:icurrent=-1
 		}
 		if($files -ne ""){
-		$MenuPlaylist.Visibility="Visible"
+		$MenuPlaylist1.Visibility="Visible"
 		}
 		FolderIdle
 	}
