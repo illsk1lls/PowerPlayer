@@ -103,11 +103,11 @@ if(!(Test-Path -Path $resourcepath)){
 $global:Playing=0
 $global:Repeating=0
 $global:ShuffleOn=0
-$global:ShowPlaylist=0
 $global:tracking=0
 $global:icurrent=-1
 $global:AnimationStarted=0
 $global:AnimationThread=0
+$global:flyoutPressed=0
 function Update-Gui(){
 	$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
 }
@@ -132,12 +132,35 @@ function closeMenus(){
 		dropDownMenu
 	}
 	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
 		$Playlist.SelectedIndex=$icurrent
-		$MenuPlaylist1.Visibility="Visible"
-		$MenuPlaylist2.Visibility="Hidden"		
+		toggleFlyOut
 	}
+}
+function toggleFlyOut(){
+	Switch($FlyOutPressed){
+	0{
+		$global:AnimationThread=1
+		$ButtonData.Text='1'
+		$MenuPlaylist1.Height="18"
+		$MenuPlaylist1.Width="70"
+		$MenuPlaylist1.Visibility="Visible"
+		$MenuPlaylist2.Visibility="Hidden"
+		$MenuPlaylist2.Content=">>"
+		$MenuPlaylist1.Content="Playlist"
+		$Playlist.Visibility="visible"
+		$global:flyoutPressed=1
+	}
+	1{
+		$global:AnimationThread=1
+		$ButtonData.Text='0'
+		$MenuPlaylist1.Height="18"
+		$MenuPlaylist1.Width="25"
+		$MenuPlaylist1.Visibility="Hidden"
+		$MenuPlaylist2.Visibility="Visible"
+		$Playlist.Visibility="Hidden"
+		$global:flyoutPressed=0
+	}
+	}	
 }
 function TogglePlayButton(){
 	if($files -ne $null){
@@ -271,6 +294,14 @@ function WaitForSong(){
 		Update-Gui
 		if($AnimationThread -eq 0){
 			Start-Sleep -milliseconds 50
+		}
+		if($AnimationThread -eq 1){
+			Update-Gui
+			$i++
+			if($i -ge 300){
+				$global:AnimationThread=0
+				$i=0
+			}
 		}
 	}
 }
@@ -466,6 +497,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			<Image Name="BackgroundStatic" Height="300" Width="500" Stretch="Fill"/>
             <MediaElement Name="Background" Height="300" Width="500" LoadedBehavior="Manual" Stretch="Fill" SpeedRatio="1" IsMuted="True" Opacity="0"/>
             <Canvas>
+				<TextBlock Visibility="Hidden" Name="ButtonData"/>
                 <TextBlock Name="Status5" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="Purple" Margin="-1,-1"/>
                 <TextBlock Name="Status4" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="MediumPurple" Margin="-1,1"/>
                 <TextBlock Name="Status3" Canvas.Left="90" Canvas.Top="74" FontSize="14" FontFamily="Calibri" FontWeight="Light" Foreground="RoyalBlue" Margin="1,-1"/>
@@ -477,24 +509,40 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 				<TextBlock Name="CurrentTrack2" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
 				<TextBlock Name="CurrentTrack1" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
-		<Button Name="MenuPlaylist1" Canvas.Left="70" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">>><Button.Triggers>
-			<EventTrigger RoutedEvent="PreviewMouseUp">
-				<BeginStoryboard>
-					<Storyboard>
-						<DoubleAnimation Name="ButtonAnimation1" From="70" To="233" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
-					</Storyboard>
-				</BeginStoryboard></EventTrigger>
-			</Button.Triggers>
-		</Button>
-		<Button Name="MenuPlaylist2" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist<Button.Triggers>
-			<EventTrigger RoutedEvent="PreviewMouseUp">
-				<BeginStoryboard>
-					<Storyboard>
-						<DoubleAnimation Name="ButtonAnimation2" From="233" To="70" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False" FillBehavior="Stop"/>
-					</Storyboard>
-				</BeginStoryboard></EventTrigger>
-			</Button.Triggers>
-		</Button>
+				<Button Name="MenuPlaylist1" Canvas.Left="70" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">>>
+					<Button.Style>
+						<Style>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding ElementName=ButtonData, Path=Text}" Value="1">
+									<DataTrigger.EnterActions>
+										<BeginStoryboard>
+											<Storyboard>
+												<DoubleAnimation From="70" To="207" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False"/>
+											</Storyboard>
+										</BeginStoryboard>
+									</DataTrigger.EnterActions>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Button.Style>
+				</Button>
+				<Button Name="MenuPlaylist2" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist
+					<Button.Style>
+						<Style>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding ElementName=ButtonData, Path=Text}" Value="0">
+									<DataTrigger.EnterActions>
+										<BeginStoryboard>
+											<Storyboard>
+												<DoubleAnimation From="233" To="70" Duration="0:0:0.25" Storyboard.TargetProperty="(Canvas.Left)" AutoReverse="False"/>
+											</Storyboard>
+										</BeginStoryboard>
+									</DataTrigger.EnterActions>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Button.Style>
+				</Button>
                 <Button Name="minWin" Canvas.Left="436" Canvas.Top="0" FontSize="12" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">__</Button>
                 <Button Name="X" Canvas.Left="458" Canvas.Top="0" FontSize="12" FontWeight="Bold" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="22" Template="{StaticResource NoMouseOverButtonTemplate}">X</Button>
                 <Button Name="File" Canvas.Left="0" Canvas.Top="17" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#333333" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Visibility="Collapsed" HorizontalContentAlignment="Left" Template="{StaticResource NoMouseOverButtonTemplate}" Opacity="0.9">&#160;&#160;&#160;File</Button>
@@ -769,7 +817,6 @@ $mediaPlayer.Add_MediaEnded({
 	$MenuPlaylist1.Visibility="Hidden"
 	$MenuPlaylist2.Visibility="Hidden"
 	$Playlist.Visibility="Hidden"
-	$global:ShowPlaylist=0
 	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$mediaPlayer.Stop()
@@ -936,12 +983,12 @@ $MenuMain.Add_MouseLeave({
 })
 $MenuMain.Add_Click({
 	if($Playlist.Visibility -eq 'Visible'){
-		$Playlist.Visibility="Hidden"
-		$global:ShowPlaylist=0
 		$Playlist.SelectedIndex=$icurrent
+		toggleFlyOut
 	}
 	dropDownMenu
 })
+$ButtonData=$Window.FindName("ButtonData")
 $MenuPlaylist1=$Window.FindName("MenuPlaylist1")
 $MenuPlaylist1.Add_MouseEnter({
 	$MenuPlaylist1.Background='#222222'
@@ -953,8 +1000,7 @@ $MenuPlaylist1.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	$global:AnimationThread=1
-	$global:ShowPlaylist=1
+	toggleFlyout
 })
 $MenuPlaylist2=$Window.FindName("MenuPlaylist2")
 $MenuPlaylist2.Add_MouseEnter({
@@ -967,27 +1013,7 @@ $MenuPlaylist2.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	$MenuPlaylist2.Content="<<"
-	$MenuPlaylist2.Width="25"
-	$global:AnimationThread=1
-	$Playlist.Visibility="Hidden"
-	$global:ShowPlaylist=0
-	$Playlist.SelectedIndex=$icurrent
-})
-$ButtonAnimation1=$Window.FindName("ButtonAnimation1")
-$ButtonAnimation1.Add_Completed({
-	$MenuPlaylist2.Content="Playlist"
-	$MenuPlaylist1.Visibility="Hidden"
-	$MenuPlaylist2.Visibility="Visible"
-	$Playlist.Visibility="Visible"
-	$global:AnimationThread=0
-})
-$ButtonAnimation2=$Window.FindName("ButtonAnimation2")
-$ButtonAnimation2.Add_Completed({
-	$MenuPlaylist1.Visibility="Visible"
-	$MenuPlaylist2.Visibility="Hidden"
-	$MenuPlaylist2.Width="70"
-	$global:AnimationThread=0
+	toggleFlyout
 })
 $MenuFile=$Window.FindName("File")
 $MenuFile.Add_MouseEnter({
