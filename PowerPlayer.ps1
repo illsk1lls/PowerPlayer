@@ -1165,12 +1165,12 @@ $Shuffle.Add_Click({
 			$Shuffle.BorderBrush='#5D3FD3'
 			$global:ShuffleOn=1
 			$global:filesShuffled=$files | Sort-Object {Get-Random}
-			$Playlist.ItemsSource=$filesShuffled -ireplace '.mp3$',''
+			$Playlist.ItemsSource=$filesShuffled -ireplace ".mp3$",''
 		}
 		1{
 			$Shuffle.BorderBrush='#728FCE'
 			$global:ShuffleOn=0
-			$Playlist.ItemsSource=$files -ireplace '.mp3$',''
+			$Playlist.ItemsSource=$files -ireplace ".mp3$",''
 		}
 	}
 })
