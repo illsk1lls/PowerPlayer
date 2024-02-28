@@ -1045,7 +1045,9 @@ $MenuFile.Add_Click({
 		}
 		$Playlist.ItemsSource=$files -ireplace '.mp3$',''
 		if($files -ne ""){
-		$MenuPlaylist1.Visibility="Visible"
+			if($MenuPlaylist2.Visibility -ne "Visible"){
+				$MenuPlaylist1.Visibility="Visible"
+			}
 		}
 		NextTrack
 		FileIdle
@@ -1107,7 +1109,9 @@ $MenuFolder.Add_Click({
 			$global:icurrent=-1
 		}
 		if($files -ne ""){
-		$MenuPlaylist1.Visibility="Visible"
+			if($MenuPlaylist2.Visibility -ne "Visible"){
+				$MenuPlaylist1.Visibility="Visible"
+			}
 		}
 		FolderIdle
 	}
