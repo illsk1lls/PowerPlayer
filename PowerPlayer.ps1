@@ -1043,7 +1043,7 @@ $MenuFile.Add_Click({
 		if($Playing -eq 0){
 			TogglePlayButton
 		}
-		$Playlist.ItemsSource=$files -ireplace '.mp3$',''
+		$Playlist.ItemsSource=$files -ireplace ".mp3$",''
 		if($files -ne ""){
 			if($MenuPlaylist2.Visibility -ne "Visible"){
 				$MenuPlaylist1.Visibility="Visible"
@@ -1096,9 +1096,9 @@ $MenuFolder.Add_Click({
 		}
 		if($ShuffleOn -eq 1){
 			$filesShuffled=$files | Sort-Object {Get-Random}			
-			$Playlist.ItemsSource=$filesShuffled
+			$Playlist.ItemsSource=$filesShuffled -ireplace ".mp3$",''
 		} else {
-			$Playlist.ItemsSource=$files -ireplace '.mp3$',''
+			$Playlist.ItemsSource=$files -ireplace ".mp3$",''
 		}
 		if($Repeating -eq 1){
 			$global:icurrent=0			
