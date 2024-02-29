@@ -296,7 +296,6 @@ function WaitForSong(){
 			Start-Sleep -milliseconds 50
 		}
 		if($AnimationThread -eq 1){
-			Update-Gui
 			$i++
 			if($i -ge 300){
 				$global:AnimationThread=0
