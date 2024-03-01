@@ -108,6 +108,8 @@ $global:icurrent=-1
 $global:AnimationStarted=0
 $global:AnimationThread=0
 $global:flyoutPressed=0
+$global:VolMax=0
+$global:CounterB=0
 function Update-Gui(){
 	$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background, [action]{})
 }
@@ -267,12 +269,15 @@ function PrevTrack(){
 	}
 }
 function trackLength(){
+	if($TimeLeft.Visibility -eq "Hidden"){
+		$TimeLeft.Visibility="Visible"
+	}
 	$Shell = New-Object -COMObject Shell.Application
 	$FolderL = $shell.Namespace($(Split-Path $FullName))
 	$FileL = $FolderL.ParseName($(Split-Path $FullName -Leaf))
 	[int]$h, [int]$m, [int]$s = ($FolderL.GetDetailsOf($FileL, 27)).split(":")
 	$global:totaltime=$h*60*60 + $m*60 +$s
-	$ReadableTotal=[timespan]::fromseconds($totaltime - 2)
+	$global:ReadableTotal=[timespan]::fromseconds($totaltime - 2)
 	$TimerB1.Text=("{0:mm\:ss}" -f $ReadableTotal)
 	$TimerB2.Text=$TimerB1.Text
 	$TimerB3.Text=$TimerB1.Text
@@ -290,6 +295,14 @@ function WaitForSong(){
 			$TimerA3.Text=$TimerA1.Text
 			$TimerA4.Text=$TimerA1.Text
 			$TimerA5.Text=$TimerA1.Text
+		}
+		if(([ref] $CounterB).Value -eq 1){
+			$TimeRemaining=$ReadableTotal - $TimePassed		
+			$TimerB1.Text=("{0:mm\:ss}" -f $TimeRemaining) + '-'
+			$TimerB2.Text=$TimerB1.Text
+			$TimerB3.Text=$TimerB1.Text
+			$TimerB4.Text=$TimerB1.Text
+			$TimerB5.Text=$TimerB1.Text			
 		}
 		Update-Gui
 		if($AnimationThread -eq 0){
@@ -792,6 +805,8 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 				<TextBlock Name="VolumePercent3" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="RoyalBlue" Margin="1,-1"/>
 				<TextBlock Name="VolumePercent2" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="LightBlue" Margin="1,1"/>
 				<TextBlock Name="VolumePercent1" Canvas.Left="407" Canvas.Top="72" FontSize="14" Foreground="LightGray"/>
+                <Button Name="MaxVolume" Canvas.Left="407" Canvas.Top="75" Height="15" Width="28" Opacity="0" Template="{StaticResource NoMouseOverButtonTemplate}"/>
+                <Button Name="TimeLeft" Canvas.Left="407" Canvas.Top="175" Visibility="Hidden" Height="15" Width="35" Opacity="0" Template="{StaticResource NoMouseOverButtonTemplate}"/>
 				<ListBox Canvas.Left="85" Canvas.Top="18" Name="Playlist" Visibility="Hidden" Width="320" Height="245" Opacity="0.95" ItemsSource="{Binding ActorList}" Style="{DynamicResource lbStyle}" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingRowStyle}"/>
             </Canvas>
         </Grid>
@@ -816,6 +831,7 @@ $mediaPlayer.Add_MediaEnded({
 	$MenuPlaylist1.Visibility="Hidden"
 	$MenuPlaylist2.Visibility="Hidden"
 	$Playlist.Visibility="Hidden"
+	$TimeLeft.Visibility="Hidden"
 	$global:icurrent=-1
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$mediaPlayer.Stop()
@@ -862,14 +878,15 @@ $Mute.Add_Click({
 		0{
 			$MuteImage.ImageSource=$resourcepath + 'Muted.png'
 			$global:UnMutedVolume=$mediaPlayer.Volume
+			$MaxVolume.Width=20
 			$mediaPlayer.Volume=0
-			$global:Muted=1
 			$VolumeSlider.Value=$mediaPlayer.Volume
 			$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
 			$VolumePercent2.Text=$VolumePercent1.Text
 			$VolumePercent3.Text=$VolumePercent1.Text
 			$VolumePercent4.Text=$VolumePercent1.Text
 			$VolumePercent5.Text=$VolumePercent1.Text
+			$global:Muted=1
 		}
 		1{
 			if($UnMutedVolume -eq $null){
@@ -877,13 +894,21 @@ $Mute.Add_Click({
 			}
 			$MuteImage.ImageSource=$resourcepath + 'UnMuted.png'
 			$mediaPlayer.Volume=$global:UnMutedVolume
-			$global:Muted=0
+			if($mediaPlayer.Volume -lt 0.1){
+				$MaxVolume.Width=20
+			} else {
+				$MaxVolume.Width=28
+			}
+			if($mediaPlayer.Volume -eq 1){
+				$MaxVolume.Width=35
+			}
 			$VolumeSlider.Value=$mediaPlayer.Volume
 			$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
 			$VolumePercent2.Text=$VolumePercent1.Text
 			$VolumePercent3.Text=$VolumePercent1.Text
 			$VolumePercent4.Text=$VolumePercent1.Text
 			$VolumePercent5.Text=$VolumePercent1.Text
+			$global:Muted=0
 		}
 	}
 })
@@ -907,12 +932,70 @@ $VolumeSlider=$Window.FindName("Volume")
 $VolumeSlider.Value=$mediaPlayer.Volume
 $VolumeSlider.Add_PreviewMouseUp({
 	closeMenus
+	$global:UnMaxxed=$VolumeSlider.Value
+	$global:UnMutedVolume=$VolumeSlider.Value
+	if($Muted -eq 1){
+		$MuteImage.ImageSource=$resourcepath + 'UnMuted.png'
+		$global:Muted=0		
+	}
+	if($VolMax -eq 1){
+		$global:VolMax=0		
+	}
 	$mediaPlayer.Volume=$VolumeSlider.Value
+	if($mediaPlayer.Volume -lt 0.1){
+		$MaxVolume.Width=20
+	} else {
+		$MaxVolume.Width=28
+	}
+	if($mediaPlayer.Volume -eq 1){
+		$MaxVolume.Width=35
+	}
 	$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
 	$VolumePercent2.Text=$VolumePercent1.Text
 	$VolumePercent3.Text=$VolumePercent1.Text
 	$VolumePercent4.Text=$VolumePercent1.Text
 	$VolumePercent5.Text=$VolumePercent1.Text
+})
+$MaxVolume=$Window.FindName("MaxVolume")
+$MaxVolume.Add_Click({
+	closeMenus
+	if(!($UnMaxxed -eq 1)){
+		Switch($VolMax){
+			0{
+				$global:UnMaxxed=$mediaPlayer.Volume
+				if($Muted -eq 1){
+					$MuteImage.ImageSource=$resourcepath + 'UnMuted.png'
+					$global:UnMutedVolume=0.5
+					$global:UnMaxxed=0.5
+					$global:Muted=0
+				}
+				$mediaPlayer.Volume=1
+				$MaxVolume.Width=35
+				$VolumeSlider.Value=$mediaPlayer.Volume
+				$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
+				$VolumePercent2.Text=$VolumePercent1.Text
+				$VolumePercent3.Text=$VolumePercent1.Text
+				$VolumePercent4.Text=$VolumePercent1.Text
+				$VolumePercent5.Text=$VolumePercent1.Text
+				$global:VolMax=1
+			}
+			1{
+				$mediaPlayer.Volume=$UnMaxxed
+				if($mediaPlayer.Volume -lt 0.1){
+					$MaxVolume.Width=20
+				} else {
+					$MaxVolume.Width=28
+				}
+				$VolumeSlider.Value=$mediaPlayer.Volume
+				$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
+				$VolumePercent2.Text=$VolumePercent1.Text
+				$VolumePercent3.Text=$VolumePercent1.Text
+				$VolumePercent4.Text=$VolumePercent1.Text
+				$VolumePercent5.Text=$VolumePercent1.Text
+				$global:VolMax=0
+			}
+		}
+	}
 })
 $PositionSlider=$Window.FindName("Position")
 $PositionSlider.Add_PreviewMouseUp({
@@ -922,6 +1005,24 @@ $PositionSlider.Add_PreviewMouseUp({
 $PositionSlider.Add_PreviewMouseDown({
 	closeMenus
 	$global:tracking=1
+})
+$TimeLeft=$Window.FindName("TimeLeft")
+$TimeLeft.Add_Click({
+	Switch($CounterB){
+		0{
+			$global:CounterB=1
+			$TimeLeft.Width=40
+		}
+		1{
+			$global:CounterB=0
+			$TimeLeft.Width=35
+			$TimerB1.Text=("{0:mm\:ss}" -f $ReadableTotal)
+			$TimerB2.Text=$TimerB1.Text
+			$TimerB3.Text=$TimerB1.Text
+			$TimerB4.Text=$TimerB1.Text
+			$TimerB5.Text=$TimerB1.Text	
+		}
+	}
 })
 $background=$Window.FindName("Background")
 $background.Source=$resourcepath + 'bg.gif'
