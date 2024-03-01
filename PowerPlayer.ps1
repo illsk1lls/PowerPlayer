@@ -278,6 +278,7 @@ function trackLength(){
 	[int]$h, [int]$m, [int]$s = ($FolderL.GetDetailsOf($FileL, 27)).split(":")
 	$global:totaltime=$h*60*60 + $m*60 +$s
 	$global:ReadableTotal=[timespan]::fromseconds($totaltime - 2)
+	$global:RemainingTotal=[timespan]::fromseconds($totaltime - 1)
 	$TimerB1.Text=("{0:mm\:ss}" -f $ReadableTotal)
 	$TimerB2.Text=$TimerB1.Text
 	$TimerB3.Text=$TimerB1.Text
@@ -297,7 +298,7 @@ function WaitForSong(){
 			$TimerA5.Text=$TimerA1.Text
 		}
 		if(([ref] $CounterB).Value -eq 1){
-			$TimeRemaining=$ReadableTotal - $TimePassed		
+			$TimeRemaining=$RemainingTotal - $TimePassed
 			$TimerB1.Text=("{0:mm\:ss}" -f $TimeRemaining) + '-'
 			$TimerB2.Text=$TimerB1.Text
 			$TimerB3.Text=$TimerB1.Text
