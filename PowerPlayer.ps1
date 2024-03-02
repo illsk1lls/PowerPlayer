@@ -1272,6 +1272,7 @@ $MenuExit.Add_MouseLeave({
 })
 $MenuExit.Add_Click({
 	$window.Close()
+	$Notify.Close()
 	Exit
 })
 $minWin=$Window.FindName("minWin")
@@ -1310,6 +1311,7 @@ $Xbutton.Add_MouseLeave({
 })
 $Xbutton.Add_Click({
 	$window.Close()
+	$Notify.Close()
 	Exit
 })
 $Shuffle=$Window.FindName("Shuffle")
