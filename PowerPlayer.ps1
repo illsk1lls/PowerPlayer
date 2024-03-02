@@ -1240,6 +1240,7 @@ $minWin.Add_Click({
 		dropDownMenu
 	}
 	$Window.WindowState='Minimized'
+	$Window.Activate() | Out-Null
 })
 $Xbutton=$Window.FindName("X")
 $Xbutton.Add_MouseEnter({
