@@ -356,7 +356,7 @@ Add-Type -AssemblyName PresentationFramework, System.Drawing, System.Windows.For
 [xml]$xaml='
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		Title="PowerPlayer" Height="300" Width="500" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+		Title="PowerPlayer" Height="300" Width="500" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
     <Window.Resources>
         <ControlTemplate x:Key="NoMouseOverButtonTemplate" TargetType="Button">
             <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
@@ -1240,7 +1240,6 @@ $minWin.Add_Click({
 		dropDownMenu
 	}
 	$Window.WindowState='Minimized'
-	$Window.Activate() | Out-Null
 })
 $Xbutton=$Window.FindName("X")
 $Xbutton.Add_MouseEnter({
