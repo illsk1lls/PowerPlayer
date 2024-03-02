@@ -11,7 +11,7 @@ if($ReLaunchInProgress -ne 'Relaunching'){
 }
 $localResources=([IO.Path]::GetFullPath('.\resources\'))
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
-$resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','UnMuted.png'
+$resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','TrayIcon.ico','UnMuted.png'
 $isMissing=0
 function updateResources(){
 	$ProgressPreference='SilentlyContinue'
@@ -172,6 +172,8 @@ function TogglePlayButton(){
 				$mediaPlayer.Play()
 				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Play.png'
 				$window.TaskbarItemInfo.Description='Playing...'
+				$Notify.TaskbarItemInfo.Overlay=$resourcepath + 'Play.png'
+				$Notify.TaskbarItemInfo.Description='Playing...'
 				$global:Playing=1
 				$StatusInfo1.Text="Now Playing"
 				$StatusInfo2.Text=$StatusInfo1.Text
@@ -190,6 +192,8 @@ function TogglePlayButton(){
 				$mediaPlayer.Pause()
 				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Pause.png'
 				$window.TaskbarItemInfo.Description='Paused...'
+				$Notify.TaskbarItemInfo.Overlay=$resourcepath + 'Pause.png'
+				$Notify.TaskbarItemInfo.Description='Paused...'
 				$global:Playing=0
 				$StatusInfo1.Text="Paused"
 				$StatusInfo2.Text=$StatusInfo1.Text
@@ -816,9 +820,48 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         <TaskbarItemInfo/>
     </Window.TaskbarItemInfo>
 </Window>'
+[xml]$xaml2='
+<Window	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	x:Name="Window" WindowStyle="None" 
+	Width= "350" Height="110"
+	Background="#333333"
+	Opacity="0.8"
+	AllowsTransparency="True">
+	<Window.Clip>
+		<RectangleGeometry Rect="0,0,350,110" RadiusX="20" RadiusY="20"/>
+	</Window.Clip>
+	<Canvas>
+		<TextBlock Name="Notifier1" Canvas.Top="45" Canvas.Left="35" FontSize="14" FontWeight="Bold" FontFamily="Calibri" Text="PowerPlayer has been" Foreground="#EEEEEE"/>
+		<TextBlock Name="Notifier2" Canvas.Top="62" Canvas.Left="35" FontSize="14" FontFamily="Calibri" Text="minimized to the SysTray" Foreground="#EEEEEE"/>
+	</Canvas>
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo/>
+    </Window.TaskbarItemInfo>
+</Window>
+'
 $reader=(New-Object System.Xml.XmlNodeReader $xaml)
+$reader2=(New-Object System.Xml.XmlNodeReader $xaml2)
 $window=[Windows.Markup.XamlReader]::Load($reader)
+$Notify=[Windows.Markup.XamlReader]::Load($reader2)
 $window.Title='PowerPlayer'
+$monitor = [System.Windows.Forms.Screen]::PrimaryScreen
+[void]::$monitor.WorkingArea.Width
+[void]::$monitor.WorkingArea.Height
+$Notify.Left=$monitor.WorkingArea.Width - $Notify.Width - 10
+$Notify.Top=$monitor.WorkingArea.Height - $Notify.Height - 10
+$Notify.TopMost=$true
+$NotifyAudio=New-Object System.Media.SoundPlayer
+$NotifyAudio.SoundLocation=$env:WinDir + '\Media\Windows Notify System Generic.wav'
+$TrayIcon=[System.Drawing.Icon]::ExtractAssociatedIcon($resourcepath + 'TrayIcon.ico')
+$SysTrayIcon=New-Object System.Windows.Forms.NotifyIcon
+$SysTrayIcon.Text="PowerPlayer"
+$SysTrayIcon.Icon=$TrayIcon
+$SysTrayIcon.Add_Click({     
+	$SysTrayIcon.Visible=$false
+	$Window.Show()
+	$Window.Activate() | Out-Null
+})
 $mediaPlayer=New-Object system.windows.media.mediaplayer
 $mediaPlayer.Add_MediaEnded({
 	if($Repeating -ne 0){
@@ -1036,10 +1079,13 @@ $background.Add_MediaEnded({
 $backgroundstatic=$Window.FindName("BackgroundStatic")
 $backgroundstatic.Source=$resourcepath + 'bg.gif'
 $bitmap=New-Object System.Windows.Media.Imaging.BitmapImage
-$bitmap=$background.Source
+$bitmap=$resourcepath + 'pause.png'
 $window.Icon=$bitmap
 $window.TaskbarItemInfo.Overlay=$bitmap
 $window.TaskbarItemInfo.Description=$window.Title
+$Notify.Icon=$bitmap
+$Notify.TaskbarItemInfo.Overlay=$bitmap
+$Notify.TaskbarItemInfo.Description=$window.Title
 $window.add_MouseLeftButtonDown({
 	closeMenus
 	$window.DragMove()
@@ -1239,7 +1285,21 @@ $minWin.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	$Window.WindowState='Minimized'
+	$SysTrayIcon.Visible=$true
+	$Window.Hide()
+	$Notify.Show()
+	if($notified -ne 1){
+		$NotifyAudio.playsync()
+		$global:notified=1
+	}
+	$delay=40
+	while ($delay -ge -1)
+	{
+	  Start-Sleep -Milliseconds 50
+	  Update-Gui
+	  $delay -= 1
+	}
+	$Notify.Hide()
 })
 $Xbutton=$Window.FindName("X")
 $Xbutton.Add_MouseEnter({
