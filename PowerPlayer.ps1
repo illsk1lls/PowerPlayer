@@ -845,7 +845,7 @@ $reader2=(New-Object System.Xml.XmlNodeReader $xaml2)
 $window=[Windows.Markup.XamlReader]::Load($reader)
 $Notify=[Windows.Markup.XamlReader]::Load($reader2)
 $window.Title='PowerPlayer'
-$monitor = [System.Windows.Forms.Screen]::PrimaryScreen
+$monitor=[System.Windows.Forms.Screen]::PrimaryScreen
 [void]::$monitor.WorkingArea.Width
 [void]::$monitor.WorkingArea.Height
 $Notify.Left=$monitor.WorkingArea.Width - $Notify.Width - 10
