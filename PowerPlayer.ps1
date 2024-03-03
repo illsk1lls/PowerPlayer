@@ -853,12 +853,17 @@ $Notify.Top=$monitor.WorkingArea.Height - $Notify.Height - 10
 $Notify.TopMost=$true
 $NotifyAudio=New-Object System.Media.SoundPlayer
 $NotifyAudio.SoundLocation=$env:WinDir + '\Media\Windows Notify System Generic.wav'
+$NotifyIconVisibility = "HKCU:\Control Panel\NotifyIconSettings\12316197674696056473"
+$NotifyIconKey = "IsPromoted"
 $TrayIcon=[System.Drawing.Icon]::ExtractAssociatedIcon($resourcepath + 'TrayIcon.ico')
 $SysTrayIcon=New-Object System.Windows.Forms.NotifyIcon
 $SysTrayIcon.Text="PowerPlayer"
 $SysTrayIcon.Icon=$TrayIcon
 $SysTrayIcon.Add_Click({     
 	$SysTrayIcon.Visible=$false
+	if($undoTraySetting -eq 1){
+		New-ItemProperty -Path $NotifyIconVisibility -Name $NotifyIconKey -Value 0 -PropertyType DWORD -Force | Out-Null
+	}
 	$Window.Show()
 	$Window.Activate() | Out-Null
 })
@@ -1286,6 +1291,13 @@ $minWin.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
+	if(!(Test-Path $NotifyIconVisibility)){
+		New-Item -Path $NotifyIconVisibility -Force | Out-Null
+	}
+	if((Get-ItemProperty -Path $NotifyIconVisibility -Name $NotifyIconKey).$NotifyIconKey -ne 1){
+		New-ItemProperty -Path $NotifyIconVisibility -Name $NotifyIconKey -Value 1 -PropertyType DWORD -Force | Out-Null
+		$global:undoTraySetting=1
+	}
 	$SysTrayIcon.Visible=$true
 	$Window.Hide()
 	$Notify.Show()
@@ -1294,11 +1306,10 @@ $minWin.Add_Click({
 		$global:notified=1
 	}
 	$delay=40
-	while ($delay -ge -1)
-	{
-	  Start-Sleep -Milliseconds 50
-	  Update-Gui
-	  $delay -= 1
+	while($delay -ge -1){
+		Start-Sleep -Milliseconds 50
+		Update-Gui
+		$delay-=1
 	}
 	$Notify.Hide()
 })
