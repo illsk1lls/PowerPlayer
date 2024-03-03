@@ -1287,26 +1287,24 @@ $minWin.Add_Click({
 		dropDownMenu
 	}
 	$SysTrayIcon.Visible=$true
-	if($TrayPromoted -ne 1){
+	if($TrayChecked -ne 1){
 		$AllTrayIcons=Get-ChildItem 'HKCU:\Control Panel\NotifyIconSettings'
 		$TrayIcons=$AllTrayIcons -ireplace 'HKEY_CURRENT_USER','HKCU:'
 		$TrayIcons | Foreach {
 			$Items = Get-ItemProperty "$_"
 			$global:NotifyRegKey=$_
-			if(![bool]((Get-itemproperty -Path $NotifyRegKey).SetupComplete)){			
+			if(![bool]((Get-ItemProperty -Path $NotifyRegKey).IgnoreIfPresent)){			
 				$Items.psobject.Properties | where name -notlike ps* | Foreach {
 					if($_.Value -like "*powershell.exe"){
 						if((Get-ItemProperty -Path $NotifyRegKey -Name IsPromoted).IsPromoted -ne 1){
 							New-ItemProperty -Path $NotifyRegKey -Name IsPromoted -Value 1 -PropertyType DWORD -Force | Out-Null
-							New-ItemProperty -Path $NotifyRegKey -Name SetupComplete -Value 1 -PropertyType DWORD -Force | Out-Null
-							$global:TrayPromoted=1
+							New-ItemProperty -Path $NotifyRegKey -Name IgnoreIfPresent -Value 1 -PropertyType DWORD -Force | Out-Null
 						}
 					}
 				}
-			} else {
-				$global:TrayPromoted=1
 			}
 		}
+		$global:TrayChecked=1
 	}	
 	$Window.Hide()
 	$Notify.Show()
