@@ -853,17 +853,12 @@ $Notify.Top=$monitor.WorkingArea.Height - $Notify.Height - 10
 $Notify.TopMost=$true
 $NotifyAudio=New-Object System.Media.SoundPlayer
 $NotifyAudio.SoundLocation=$env:WinDir + '\Media\Windows Notify System Generic.wav'
-$NotifyIconVisibility = "HKCU:\Control Panel\NotifyIconSettings\12316197674696056473"
-$NotifyIconKey = "IsPromoted"
 $TrayIcon=[System.Drawing.Icon]::ExtractAssociatedIcon($resourcepath + 'TrayIcon.ico')
 $SysTrayIcon=New-Object System.Windows.Forms.NotifyIcon
 $SysTrayIcon.Text="PowerPlayer"
 $SysTrayIcon.Icon=$TrayIcon
 $SysTrayIcon.Add_Click({     
 	$SysTrayIcon.Visible=$false
-	if($undoTraySetting -eq 1){
-		New-ItemProperty -Path $NotifyIconVisibility -Name $NotifyIconKey -Value 0 -PropertyType DWORD -Force | Out-Null
-	}
 	$Window.Show()
 	$Window.Activate() | Out-Null
 })
@@ -1291,14 +1286,28 @@ $minWin.Add_Click({
 	if($MenuFile.Visibility -eq 'Visible'){
 		dropDownMenu
 	}
-	if(!(Test-Path $NotifyIconVisibility)){
-		New-Item -Path $NotifyIconVisibility -Force | Out-Null
-	}
-	if((Get-ItemProperty -Path $NotifyIconVisibility -Name $NotifyIconKey).$NotifyIconKey -ne 1){
-		New-ItemProperty -Path $NotifyIconVisibility -Name $NotifyIconKey -Value 1 -PropertyType DWORD -Force | Out-Null
-		$global:undoTraySetting=1
-	}
 	$SysTrayIcon.Visible=$true
+	if($TrayPromoted -ne 1){
+		$AllTrayIcons=Get-ChildItem 'HKCU:\Control Panel\NotifyIconSettings'
+		$TrayIcons=$AllTrayIcons -ireplace 'HKEY_CURRENT_USER','HKCU:'
+		$TrayIcons | Foreach {
+			$Items = Get-ItemProperty "$_"
+			$global:NotifyRegKey=$_
+			if(![bool]((Get-itemproperty -Path $NotifyRegKey).SetupComplete)){			
+				$Items.psobject.Properties | where name -notlike ps* | Foreach {
+					if($_.Value -like "*powershell.exe"){
+						if((Get-ItemProperty -Path $NotifyRegKey -Name IsPromoted).IsPromoted -ne 1){
+							New-ItemProperty -Path $NotifyRegKey -Name IsPromoted -Value 1 -PropertyType DWORD -Force | Out-Null
+							New-ItemProperty -Path $NotifyRegKey -Name SetupComplete -Value 1 -PropertyType DWORD -Force | Out-Null
+							$global:TrayPromoted=1
+						}
+					}
+				}
+			} else {
+				$global:TrayPromoted=1
+			}
+		}
+	}	
 	$Window.Hide()
 	$Notify.Show()
 	if($notified -ne 1){
