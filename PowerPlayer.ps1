@@ -173,8 +173,6 @@ function TogglePlayButton(){
 				$window.Icon=$resourcepath + 'Play.png'
 				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Play.png'
 				$window.TaskbarItemInfo.Description='Playing...'
-				$Notify.TaskbarItemInfo.Overlay=$resourcepath + 'Play.png'
-				$Notify.TaskbarItemInfo.Description='Playing...'
 				$global:Playing=1
 				$StatusInfo1.Text="Now Playing"
 				$StatusInfo2.Text=$StatusInfo1.Text
@@ -194,8 +192,6 @@ function TogglePlayButton(){
 				$window.Icon=$resourcepath + 'Pause.png'
 				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Pause.png'
 				$window.TaskbarItemInfo.Description='Paused...'
-				$Notify.TaskbarItemInfo.Overlay=$resourcepath + 'Pause.png'
-				$Notify.TaskbarItemInfo.Description='Paused...'
 				$global:Playing=0
 				$StatusInfo1.Text="Paused"
 				$StatusInfo2.Text=$StatusInfo1.Text
@@ -861,7 +857,7 @@ $window.TaskbarItemInfo.Overlay=$ShowIcon
 $window.TaskbarItemInfo.Description=$window.Title
 $Notify.Icon=$ShowIcon
 $Notify.TaskbarItemInfo.Overlay=$ShowIcon
-$Notify.TaskbarItemInfo.Description=$window.Title
+$Notify.TaskbarItemInfo.Description='PowerPlayer Notification'
 $IconImage=[Drawing.Image]::FromFile($ShowIcon)
 $intPtr=New-Object IntPtr
 $IconThumbnail=$IconImage.GetThumbnailImage(64, 64, $null, $intPtr)
@@ -886,6 +882,8 @@ $mediaPlayer.Add_MediaEnded({
 			}
 		}
 	} else {
+	$window.TaskbarItemInfo.Overlay=$ShowIcon
+	$window.TaskbarItemInfo.Description=$window.Title
 	$MenuPlaylist1.Visibility="Hidden"
 	$MenuPlaylist2.Visibility="Hidden"
 	$Playlist.Visibility="Hidden"
@@ -918,11 +916,6 @@ $mediaPlayer.Add_MediaEnded({
 	$TimerB4.Text=$TimerB1.Text
 	$TimerB5.Text=$TimerB1.Text
 	$window.Icon=$ShowIcon
-	$window.TaskbarItemInfo.Overlay=$ShowIcon
-	$window.TaskbarItemInfo.Description=$window.Title
-	$Notify.Icon=$ShowIcon
-	$Notify.TaskbarItemInfo.Overlay=$ShowIcon
-	$Notify.TaskbarItemInfo.Description=$window.Title
 	}
 })
 $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pid})
