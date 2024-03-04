@@ -322,7 +322,7 @@ function WaitForSong(){
 }
 function PlayTrack(){
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-	$FullName="$path\$file"
+	$FullName="$file"
 	$mediaPlayer.open($FullName)
 	$CurrentTrack1.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
 	$CurrentTrack2.Text=$CurrentTrack1.Text
@@ -1187,15 +1187,15 @@ $MenuFile.Add_Click({
 		$global:singlefilemode=1
 		$global:icurrent=-1
 		$global:Playing=0
-		$path = Split-Path $file -Parent
-		$path = $path+'\'
+		$path=Split-Path $file -Parent
+		$path=$path+'\'
 		$files=$null
 		$files=@()
 		$files+=Split-Path $file -leaf
 		if($Playing -eq 0){
 			TogglePlayButton
 		}
-		$Playlist.ItemsSource=$files -ireplace ".mp3$",''
+		$Playlist.ItemsSource=$files -ireplace "^.+[\\]",'' -ireplace ".mp3$",''
 		if($files -ne ""){
 			if($MenuPlaylist2.Visibility -ne "Visible"){
 				$MenuPlaylist1.Visibility="Visible"
@@ -1214,43 +1214,43 @@ $MenuFolder.Add_MouseLeave({
 })
 $MenuFolder.Add_Click({
 	dropDownMenu
-	$AssemblyFullName = 'System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-	$Assembly = [System.Reflection.Assembly]::Load($AssemblyFullName)
-	$OpenFileDialog = [System.Windows.Forms.OpenFileDialog]::new()
-	$OpenFileDialog.AddExtension = $false
-	$OpenFileDialog.CheckFileExists = $false
-	$OpenFileDialog.DereferenceLinks = $true
-	$OpenFileDialog.Filter = "Folders|`n"
-	$OpenFileDialog.Multiselect = $false
-	$OpenFileDialog.Title = "Select a Folder"
+	$AssemblyFullName='System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+	$Assembly=[System.Reflection.Assembly]::Load($AssemblyFullName)
+	$OpenFileDialog=[System.Windows.Forms.OpenFileDialog]::new()
+	$OpenFileDialog.AddExtension=$false
+	$OpenFileDialog.CheckFileExists=$false
+	$OpenFileDialog.DereferenceLinks=$true
+	$OpenFileDialog.Filter="Folders|`n"
+	$OpenFileDialog.Multiselect=$false
+	$OpenFileDialog.Title="Select a Folder"
 	$OpenFileDialog.InitialDirectory="$env:UserProfile\Music"
-	$OpenFileDialogType = $OpenFileDialog.GetType()
-	$FileDialogInterfaceType = $Assembly.GetType('System.Windows.Forms.FileDialogNative+IFileDialog')
-	$IFileDialog = $OpenFileDialogType.GetMethod('CreateVistaDialog',@('NonPublic','Public','Static','Instance')).Invoke($OpenFileDialog,$null)
+	$OpenFileDialogType=$OpenFileDialog.GetType()
+	$FileDialogInterfaceType=$Assembly.GetType('System.Windows.Forms.FileDialogNative+IFileDialog')
+	$IFileDialog=$OpenFileDialogType.GetMethod('CreateVistaDialog',@('NonPublic','Public','Static','Instance')).Invoke($OpenFileDialog,$null)
 	$OpenFileDialogType.GetMethod('OnBeforeVistaDialog',@('NonPublic','Public','Static','Instance')).Invoke($OpenFileDialog,$IFileDialog)
-	[uint32]$PickFoldersOption = $Assembly.GetType('System.Windows.Forms.FileDialogNative+FOS').GetField('FOS_PICKFOLDERS').GetValue($null)
-	$FolderOptions = $OpenFileDialogType.GetMethod('get_Options',@('NonPublic','Public','Static','Instance')).Invoke($OpenFileDialog,$null) -bor $PickFoldersOption
+	[uint32]$PickFoldersOption=$Assembly.GetType('System.Windows.Forms.FileDialogNative+FOS').GetField('FOS_PICKFOLDERS').GetValue($null)
+	$FolderOptions=$OpenFileDialogType.GetMethod('get_Options',@('NonPublic','Public','Static','Instance')).Invoke($OpenFileDialog,$null) -bor $PickFoldersOption
 	$FileDialogInterfaceType.GetMethod('SetOptions',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$FolderOptions)
-	$VistaDialogEvent = [System.Activator]::CreateInstance($AssemblyFullName,'System.Windows.Forms.FileDialog+VistaDialogEvents',$false,0,$null,$OpenFileDialog,$null,$null).Unwrap()
-	[uint32]$AdviceCookie = 0
-	$AdvisoryParameters = @($VistaDialogEvent,$AdviceCookie)
-	$AdviseResult = $FileDialogInterfaceType.GetMethod('Advise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdvisoryParameters)
-	$AdviceCookie = $AdvisoryParameters[1]
-	$Result = $FileDialogInterfaceType.GetMethod('Show',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,[System.IntPtr]::Zero)
+	$VistaDialogEvent=[System.Activator]::CreateInstance($AssemblyFullName,'System.Windows.Forms.FileDialog+VistaDialogEvents',$false,0,$null,$OpenFileDialog,$null,$null).Unwrap()
+	[uint32]$AdviceCookie=0
+	$AdvisoryParameters=@($VistaDialogEvent,$AdviceCookie)
+	$AdviseResult=$FileDialogInterfaceType.GetMethod('Advise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdvisoryParameters)
+	$AdviceCookie=$AdvisoryParameters[1]
+	$Result=$FileDialogInterfaceType.GetMethod('Show',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,[System.IntPtr]::Zero)
 	$FileDialogInterfaceType.GetMethod('Unadvise',@('NonPublic','Public','Static','Instance')).Invoke($IFileDialog,$AdviceCookie)
 	if($OpenFileDialog.FileName -ne ""){
 		$global:singlefilemode=0
-		$path = $OpenFileDialog.FileName+'\'
+		$path=$OpenFileDialog.FileName+'\'
 		$files=$null
 		$files=@()
-		Get-ChildItem -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
-			$files+=$_
+		Get-ChildItem -Recurse -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
+			$files+=$path + $_
 		}
 		if($ShuffleOn -eq 1){
-			$filesShuffled=$files | Sort-Object {Get-Random}			
-			$Playlist.ItemsSource=$filesShuffled -ireplace ".mp3$",''
+			$filesShuffled=$files | Sort-Object {Get-Random}		
+			$Playlist.ItemsSource=$filesShuffled -ireplace "^.+[\\]",'' -ireplace ".mp3$",''
 		} else {
-			$Playlist.ItemsSource=$files -ireplace ".mp3$",''
+			$Playlist.ItemsSource=$files -ireplace "^.+[\\]",'' -ireplace ".mp3$",''
 		}
 		if($Repeating -eq 1){
 			$global:icurrent=0			
@@ -1355,12 +1355,12 @@ $Shuffle.Add_Click({
 			$Shuffle.BorderBrush='#5D3FD3'
 			$global:ShuffleOn=1
 			$global:filesShuffled=$files | Sort-Object {Get-Random}
-			$Playlist.ItemsSource=$filesShuffled -ireplace ".mp3$",''
+			$Playlist.ItemsSource=$filesShuffled -ireplace "^.+[\\]",'' -ireplace ".mp3$",''
 		}
 		1{
 			$Shuffle.BorderBrush='#728FCE'
 			$global:ShuffleOn=0
-			$Playlist.ItemsSource=$files -ireplace ".mp3$",''
+			$Playlist.ItemsSource=$files -ireplace "^.+[\\]",'' -ireplace ".mp3$",''
 		}
 	}
 })
