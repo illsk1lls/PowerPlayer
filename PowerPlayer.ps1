@@ -1243,7 +1243,7 @@ $MenuFolder.Add_Click({
 		$path=$OpenFileDialog.FileName+'\'
 		$files=$null
 		$files=@()
-		Get-ChildItem -Recurse -Path $path -Filter *.mp3 -File -Name| ForEach-Object {
+		Get-ChildItem -Path $path -Filter *.mp3 -Depth 5 -File -Name| ForEach-Object {
 			$files+=$path + $_
 		}
 		if($ShuffleOn -eq 1){
