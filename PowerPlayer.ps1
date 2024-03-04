@@ -11,7 +11,7 @@ if($ReLaunchInProgress -ne 'Relaunching'){
 }
 $localResources=([IO.Path]::GetFullPath('.\resources\'))
 $resourcepath=$env:ProgramData + '\PowerPlayer\'
-$resourcecheck='bg.gif','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','TrayIcon.ico','UnMuted.png'
+$resourcecheck='bg.gif','Icon.png','Muted.png','Next.png','Pause.png','Play.png','Prev.png','RepeatAll.png','RepeatOne.png','Shuffle.png','UnMuted.png'
 $isMissing=0
 function updateResources(){
 	$ProgressPreference='SilentlyContinue'
@@ -170,6 +170,7 @@ function TogglePlayButton(){
 			0{
 				$PlayImage.ImageSource=$resourcepath + 'Pause.png'
 				$mediaPlayer.Play()
+				$window.Icon=$resourcepath + 'Play.png'
 				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Play.png'
 				$window.TaskbarItemInfo.Description='Playing...'
 				$Notify.TaskbarItemInfo.Overlay=$resourcepath + 'Play.png'
@@ -190,6 +191,7 @@ function TogglePlayButton(){
 			1{
 				$PlayImage.ImageSource=$resourcepath + 'Play.png'
 				$mediaPlayer.Pause()
+				$window.Icon=$resourcepath + 'Pause.png'
 				$window.TaskbarItemInfo.Overlay=$resourcepath + 'Pause.png'
 				$window.TaskbarItemInfo.Description='Paused...'
 				$Notify.TaskbarItemInfo.Overlay=$resourcepath + 'Pause.png'
@@ -853,7 +855,19 @@ $Notify.Top=$monitor.WorkingArea.Height - $Notify.Height - 10
 $Notify.TopMost=$true
 $NotifyAudio=New-Object System.Media.SoundPlayer
 $NotifyAudio.SoundLocation=$env:WinDir + '\Media\Windows Notify System Generic.wav'
-$TrayIcon=[System.Drawing.Icon]::ExtractAssociatedIcon($resourcepath + 'TrayIcon.ico')
+$ShowIcon=$resourcepath + 'Icon.png'
+$window.Icon=$ShowIcon
+$window.TaskbarItemInfo.Overlay=$ShowIcon
+$window.TaskbarItemInfo.Description=$window.Title
+$Notify.Icon=$ShowIcon
+$Notify.TaskbarItemInfo.Overlay=$ShowIcon
+$Notify.TaskbarItemInfo.Description=$window.Title
+$IconImage=[Drawing.Image]::FromFile($ShowIcon)
+$intPtr=New-Object IntPtr
+$IconThumbnail=$IconImage.GetThumbnailImage(64, 64, $null, $intPtr)
+$IconBitmap=New-Object Drawing.Bitmap $IconThumbnail 
+$IconBitmap.SetResolution(64, 64) 
+$TrayIcon=[System.Drawing.Icon]::FromHandle($IconBitmap.GetHicon())
 $SysTrayIcon=New-Object System.Windows.Forms.NotifyIcon
 $SysTrayIcon.Text="PowerPlayer"
 $SysTrayIcon.Icon=$TrayIcon
@@ -903,6 +917,12 @@ $mediaPlayer.Add_MediaEnded({
 	$TimerB3.Text=$TimerB1.Text
 	$TimerB4.Text=$TimerB1.Text
 	$TimerB5.Text=$TimerB1.Text
+	$window.Icon=$ShowIcon
+	$window.TaskbarItemInfo.Overlay=$ShowIcon
+	$window.TaskbarItemInfo.Description=$window.Title
+	$Notify.Icon=$ShowIcon
+	$Notify.TaskbarItemInfo.Overlay=$ShowIcon
+	$Notify.TaskbarItemInfo.Description=$window.Title
 	}
 })
 $window.Add_Closing({[System.Windows.Forms.Application]::Exit();Stop-Process $pid})
@@ -1078,14 +1098,6 @@ $background.Add_MediaEnded({
 })
 $backgroundstatic=$Window.FindName("BackgroundStatic")
 $backgroundstatic.Source=$resourcepath + 'bg.gif'
-$bitmap=New-Object System.Windows.Media.Imaging.BitmapImage
-$bitmap=$resourcepath + 'pause.png'
-$window.Icon=$bitmap
-$window.TaskbarItemInfo.Overlay=$bitmap
-$window.TaskbarItemInfo.Description=$window.Title
-$Notify.Icon=$bitmap
-$Notify.TaskbarItemInfo.Overlay=$bitmap
-$Notify.TaskbarItemInfo.Description=$window.Title
 $window.add_MouseLeftButtonDown({
 	closeMenus
 	$window.DragMove()
