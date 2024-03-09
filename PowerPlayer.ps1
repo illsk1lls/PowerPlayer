@@ -1065,6 +1065,7 @@ $PositionSlider.Add_PreviewMouseDown({
 })
 $TimeLeft=$Window.FindName("TimeLeft")
 $TimeLeft.Add_Click({
+	closeMenus
 	Switch($CounterB){
 		0{
 			$global:CounterB=1
