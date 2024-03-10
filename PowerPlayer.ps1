@@ -139,6 +139,7 @@ function closeMenus(){
 	}
 }
 function toggleFlyOut(){
+	$global:AnimationInterval=0
 	Switch($FlyOutPressed){
 	0{
 		$global:AnimationThread=1
@@ -310,12 +311,11 @@ function WaitForSong(){
 		Update-Gui
 		if($AnimationThread -eq 0){
 			Start-Sleep -milliseconds 50
-		}
-		if($AnimationThread -eq 1){
-			$i++
-			if($i -ge 300){
+		} else {
+			$global:AnimationInterval++
+			if($AnimationInterval -ge 300){
 				$global:AnimationThread=0
-				$i=0
+				$global:AnimationInterval=0
 			}
 		}
 	}
@@ -1192,7 +1192,7 @@ $MenuFile.Add_Click({
 		$path=$path+'\'
 		$files=$null
 		$files=@()
-		$files+=Split-Path $file -leaf
+		$files+=$file
 		if($Playing -eq 0){
 			TogglePlayButton
 		}
