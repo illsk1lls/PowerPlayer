@@ -37,13 +37,13 @@ $CtrlKey = '0x11'
 $CheckCtrlHeldAtLaunch='[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]public static extern short GetAsyncKeyState(int virtualKeyCode);'
 Add-Type -MemberDefinition $CheckCtrlHeldAtLaunch -Name Keyboard -Namespace PsOneApi
 if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){ 
-	$Updater=New-Object -ComObject Wscript.Shell;$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1) | Tee-Object -Variable DoFullUpdate | Out-Null
+	$Updater=New-Object -ComObject Wscript.Shell;$DoFullUpdate=$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1)
 	if($DoFullUpdate -eq 1){
 		Remove-Item -Path $resourcepath -Recurse -Force | out-null
 		New-Item -Path $env:ProgramData -Name "PowerPlayer" -ItemType "directory" | out-null
 		updateResources
 		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o $PSCommandPath
-		$ReLauncher=New-Object -ComObject Wscript.Shell;$ReLauncher.Popup("Re-Launch PowerPlayer now?",0,'Update Mode Completed!',0x1) | Tee-Object -Variable DoRelaunch | Out-Null
+		$ReLauncher=New-Object -ComObject Wscript.Shell;$DoRelaunch=$ReLauncher.Popup("Re-Launch PowerPlayer now?",0,'Update Mode Completed!',0x1)
 		if($DoRelaunch -eq 1){
 			. $PSCommandPath 'Relaunching'
 			Exit
