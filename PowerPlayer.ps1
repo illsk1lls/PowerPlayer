@@ -524,7 +524,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 				<TextBlock Name="CurrentTrack2" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightBlue" Margin="1,1"/>
 				<TextBlock Name="CurrentTrack1" Canvas.Top="133" FontSize="19" FontFamily="Calibri" Text="No Media Loaded" TextAlignment="Center" Width="490" Foreground="LightGray"/>
                 <Button Name="Menu" Canvas.Left="0" Canvas.Top="0" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#EEEEEE" Background="#111111" Height="18" Width="70" Template="{StaticResource NoMouseOverButtonTemplate}">Menu</Button>
-				<Button Name="MenuPlaylist1" Canvas.Left="70" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">>>
+				<Button Name="MenuPlaylist1" Canvas.Left="70" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist
 					<Button.Style>
 						<Style>
 							<Style.Triggers>
@@ -541,7 +541,7 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						</Style>
 					</Button.Style>
 				</Button>
-				<Button Name="MenuPlaylist2" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">Playlist
+				<Button Name="MenuPlaylist2" Canvas.Left="207" Canvas.Top="0" Visibility="Hidden" FontSize="12" FontFamily="Calibri" FontWeight="Light" BorderBrush="#111111" Foreground="#DDDDDD" Background="#111111" Height="18" Width="25" Template="{StaticResource NoMouseOverButtonTemplate}">>>
 					<Button.Style>
 						<Style>
 							<Style.Triggers>
@@ -1142,6 +1142,11 @@ $MenuMain.Add_Click({
 	dropDownMenu
 })
 $ButtonData=$Window.FindName("ButtonData")
+$Window.Add_ContentRendered({    
+	$ButtonData.Text='1'
+	Start-Sleep -Milliseconds 50
+	$ButtonData.Text='0'		
+})
 $MenuPlaylist1=$Window.FindName("MenuPlaylist1")
 $MenuPlaylist1.Add_MouseEnter({
 	$MenuPlaylist1.Background='#222222'
@@ -1198,8 +1203,8 @@ $MenuFile.Add_Click({
 		}
 		$Playlist.ItemsSource=$files -ireplace "^.+[\\]",'' -ireplace ".mp3$",''
 		if($files -ne ""){
-			if($MenuPlaylist2.Visibility -ne "Visible"){
-				$MenuPlaylist1.Visibility="Visible"
+			if($MenuPlaylist1.Visibility -ne "Visible"){
+				$MenuPlaylist2.Visibility="Visible"
 			}
 		}
 		NextTrack
@@ -1262,8 +1267,8 @@ $MenuFolder.Add_Click({
 			$global:icurrent=-1
 		}
 		if($files -ne ""){
-			if($MenuPlaylist2.Visibility -ne "Visible"){
-				$MenuPlaylist1.Visibility="Visible"
+			if($MenuPlaylist1.Visibility -ne "Visible"){
+				$MenuPlaylist2.Visibility="Visible"
 			}
 		}
 		FolderIdle
