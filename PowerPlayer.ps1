@@ -1,6 +1,49 @@
+$ReLaunchInProgress=$args[0]
+$LEGACY='{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}'
+$TERMINAL='{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
+$TERMINAL2='{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
+function setTerminal(){
+	if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
+		$global:isEleven=1
+		$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
+		if($currentConsole.DelegationConsole -ne $LEGACY) {
+			$global:DEFAULTCONSOLE=$currentConsole.DelegationConsole
+			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LEGACY
+			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
+		}
+	}
+	$currentForceV2=Get-ItemProperty -Path 'HKCU:\Console' -Name 'ForceV2'
+	if($currentForceV2.ForceV2 -ne 1) {
+		$global:LEGACYTERM=0
+		Set-ItemProperty -Path 'HKCU:\Console' -Name 'ForceV2' -Value 1
+	} else {
+		$global:LEGACYTERM=1
+	}
+}
+function restoreTerminal(){
+	if($isEleven -eq 1) {
+		if($DEFAULTCONSOLE) {
+			if($DEFAULTCONSOLE -eq $TERMINAL) {
+				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $TERMINAL
+				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $TERMINAL2
+			} else {
+				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $DEFAULTCONSOLE
+				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $DEFAULTCONSOLE
+			}
+		}
+	}
+	if($LEGACYTERM -eq 0) {
+		Set-ItemProperty -Path "HKCU:\Console" -Name "ForceV2" -Value 0
+	}
+}
+if($ReLaunchInProgress -ne "TerminalSet"){
+	setTerminal
+	CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" TerminalSet
+	restoreTerminal
+	Exit
+}
 Add-Type -MemberDefinition '[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Namespace Win32 -Name Functions
 $closeConsoleUseGUI=[Win32.Functions]::ShowWindow((Get-Process -Id $PID).MainWindowHandle,0)
-$ReLaunchInProgress=$args[0]
 $AppId='PowerPlayer';$oneInstance=$false
 $script:SingleInstanceEvent=New-Object Threading.EventWaitHandle $true,([Threading.EventResetMode]::ManualReset),"Global\PowerPlayer",([ref] $oneInstance)
 if($ReLaunchInProgress -ne 'Relaunching'){
@@ -45,7 +88,7 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){
 		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o $PSCommandPath
 		$ReLauncher=New-Object -ComObject Wscript.Shell;$DoRelaunch=$ReLauncher.Popup("Re-Launch PowerPlayer now?",0,'Update Mode Completed!',0x1)
 		if($DoRelaunch -eq 1){
-			. $PSCommandPath 'Relaunching'
+		CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" Relaunching
 			Exit
 		} else {
 			Exit
