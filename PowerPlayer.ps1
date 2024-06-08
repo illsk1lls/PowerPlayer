@@ -12,13 +12,6 @@ function setTerminal(){
 			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
 		}
 	}
-	$currentForceV2=Get-ItemProperty -Path 'HKCU:\Console' -Name 'ForceV2'
-	if($currentForceV2.ForceV2 -ne 1) {
-		$global:LEGACYTERM=0
-		Set-ItemProperty -Path 'HKCU:\Console' -Name 'ForceV2' -Value 1
-	} else {
-		$global:LEGACYTERM=1
-	}
 }
 function restoreTerminal(){
 	if($isEleven -eq 1) {
@@ -31,9 +24,6 @@ function restoreTerminal(){
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $DEFAULTCONSOLE
 			}
 		}
-	}
-	if($LEGACYTERM -eq 0) {
-		Set-ItemProperty -Path "HKCU:\Console" -Name "ForceV2" -Value 0
 	}
 }
 if($ReLaunchInProgress -ne "TerminalSet"){
