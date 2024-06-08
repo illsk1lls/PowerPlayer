@@ -28,7 +28,7 @@ function restoreTerminal(){
 		}
 	}
 }
-if($ReLaunchInProgress -ne "TerminalSet"){
+if($ReLaunchInProgress -ne 'TerminalSet'){
 	setTerminal
 	CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" TerminalSet
 	restoreTerminal
@@ -78,7 +78,7 @@ if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){
 		irm https://raw.githubusercontent.com/illsk1lls/PowerPlayer/main/PowerPlayer.ps1 -o $PSCommandPath
 		$ReLauncher=New-Object -ComObject Wscript.Shell;$DoRelaunch=$ReLauncher.Popup("Re-Launch PowerPlayer now?",0,'Update Mode Completed!',0x1)
 		if($DoRelaunch -eq 1){
-		CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" Relaunching
+		. $PSCommandPath Relaunching
 			Exit
 		} else {
 			Exit
