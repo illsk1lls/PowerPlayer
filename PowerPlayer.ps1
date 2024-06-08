@@ -4,14 +4,13 @@ $ReLaunchInProgress=$args[0]
 $LEGACY='{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}'
 $TERMINAL='{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
 $TERMINAL2='{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
-$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
 if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
+	$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
 	if($currentConsole.DelegationConsole -ne $LEGACY) {
 		function setTerminal(){
-				$global:DEFAULTCONSOLE=$currentConsole.DelegationConsole
-				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LEGACY
-				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
-			
+			$global:DEFAULTCONSOLE=$currentConsole.DelegationConsole
+			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LEGACY
+			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
 		}
 		function restoreTerminal(){
 			if($DEFAULTCONSOLE -eq $TERMINAL) {
