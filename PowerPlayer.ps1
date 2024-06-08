@@ -4,20 +4,16 @@ $ReLaunchInProgress=$args[0]
 $LEGACY='{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}'
 $TERMINAL='{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
 $TERMINAL2='{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
-function setTerminal(){
-	if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
-		$global:isEleven=1
-		$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
-		if($currentConsole.DelegationConsole -ne $LEGACY) {
-			$global:DEFAULTCONSOLE=$currentConsole.DelegationConsole
-			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LEGACY
-			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
+$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
+if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
+	if($currentConsole.DelegationConsole -ne $LEGACY) {
+		function setTerminal(){
+				$global:DEFAULTCONSOLE=$currentConsole.DelegationConsole
+				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LEGACY
+				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
+			
 		}
-	}
-}
-function restoreTerminal(){
-	if($isEleven -eq 1) {
-		if($DEFAULTCONSOLE) {
+		function restoreTerminal(){
 			if($DEFAULTCONSOLE -eq $TERMINAL) {
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $TERMINAL
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $TERMINAL2
@@ -26,13 +22,13 @@ function restoreTerminal(){
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $DEFAULTCONSOLE
 			}
 		}
+		if($ReLaunchInProgress -ne 'TerminalSet'){
+			setTerminal
+			CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" TerminalSet
+			restoreTerminal
+			Exit
+		}
 	}
-}
-if($ReLaunchInProgress -ne 'TerminalSet'){
-	setTerminal
-	CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" TerminalSet
-	restoreTerminal
-	Exit
 }
 $AppId='PowerPlayer';$oneInstance=$false
 $script:SingleInstanceEvent=New-Object Threading.EventWaitHandle $true,([Threading.EventResetMode]::ManualReset),"Global\PowerPlayer",([ref] $oneInstance)
