@@ -1,18 +1,17 @@
 Add-Type -MemberDefinition '[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Namespace Win32 -Name Functions
 $closeConsoleUseGUI=[Win32.Functions]::ShowWindow((Get-Process -Id $PID).MainWindowHandle,0)
 $ReLaunchInProgress=$args[0]
-$LEGACY='{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}'
-$TERMINAL='{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
-$TERMINAL2='{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
-if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
-	$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
-	if($currentConsole.DelegationConsole -ne $LEGACY) {
-		function setTerminal(){
+if($ReLaunchInProgress -ne 'TerminalSet'){
+	if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
+		$LEGACY='{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}'
+		$TERMINAL='{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
+		$TERMINAL2='{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
+		$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
+		if($currentConsole.DelegationConsole -ne $LEGACY) {
 			$global:DEFAULTCONSOLE=$currentConsole.DelegationConsole
 			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LEGACY
 			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
-		}
-		function restoreTerminal(){
+			CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" TerminalSet
 			if($DEFAULTCONSOLE -eq $TERMINAL) {
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $TERMINAL
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $TERMINAL2
@@ -20,11 +19,6 @@ if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $DEFAULTCONSOLE
 				Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $DEFAULTCONSOLE
 			}
-		}
-		if($ReLaunchInProgress -ne 'TerminalSet'){
-			setTerminal
-			CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" TerminalSet
-			restoreTerminal
 			Exit
 		}
 	}
