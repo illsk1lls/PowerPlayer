@@ -1,3 +1,5 @@
+Add-Type -MemberDefinition '[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Namespace Win32 -Name Functions
+$closeConsoleUseGUI=[Win32.Functions]::ShowWindow((Get-Process -Id $PID).MainWindowHandle,0)
 $ReLaunchInProgress=$args[0]
 $LEGACY='{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}'
 $TERMINAL='{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
@@ -32,8 +34,6 @@ if($ReLaunchInProgress -ne "TerminalSet"){
 	restoreTerminal
 	Exit
 }
-Add-Type -MemberDefinition '[DllImport("User32.dll")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Namespace Win32 -Name Functions
-$closeConsoleUseGUI=[Win32.Functions]::ShowWindow((Get-Process -Id $PID).MainWindowHandle,0)
 $AppId='PowerPlayer';$oneInstance=$false
 $script:SingleInstanceEvent=New-Object Threading.EventWaitHandle $true,([Threading.EventResetMode]::ManualReset),"Global\PowerPlayer",([ref] $oneInstance)
 if($ReLaunchInProgress -ne 'Relaunching'){
@@ -69,7 +69,7 @@ if($PSCommandPath -eq $null){function GetPSCommandPath(){return $MyInvocation.PS
 $CtrlKey = '0x11'
 $CheckCtrlHeldAtLaunch='[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]public static extern short GetAsyncKeyState(int virtualKeyCode);'
 Add-Type -MemberDefinition $CheckCtrlHeldAtLaunch -Name Keyboard -Namespace PsOneApi
-if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){ 
+if([bool]([PsOneApi.Keyboard]::GetAsyncKeyState($CtrlKey) -eq -32767)){
 	$Updater=New-Object -ComObject Wscript.Shell;$DoFullUpdate=$Updater.Popup("Would you like to retrieve the latest version of PowerPlayer from Github?",0,'Update Mode Initialized',0x1)
 	if($DoFullUpdate -eq 1){
 		Remove-Item -Path $resourcepath -Recurse -Force | out-null
