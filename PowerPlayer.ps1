@@ -8,7 +8,7 @@ if($ReLaunchInProgress -ne 'TerminalSet'){
 		$TERMINAL2='{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
 		$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
 		if($currentConsole.DelegationConsole -ne $LEGACY) {
-			$global:DEFAULTCONSOLE=$currentConsole.DelegationConsole
+			$DEFAULTCONSOLE=$currentConsole.DelegationConsole
 			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LEGACY
 			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LEGACY
 			CMD /c START /MIN "" POWERSHELL -nop -file "$PSCommandPath" TerminalSet
