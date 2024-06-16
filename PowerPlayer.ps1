@@ -4,8 +4,13 @@ $ReLaunchInProgress=$args[0]
 if($ReLaunchInProgress -ne 'TerminalSet'){
 	if((Get-WmiObject -Class Win32_OperatingSystem).Caption -match "Windows 11") {
 		$LEGACY='{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}'
+		$LETWIN='{00000000-0000-0000-0000-000000000000}'
 		$TERMINAL='{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
 		$TERMINAL2='{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
+		if(!(Get-ItemProperty 'HKCU:\Console\%%Startup').PSObject.Properties.Name -contains 'DelegationConsole'){
+			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole' -Value $LETWIN
+			Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationTerminal' -Value $LETWIN
+		}
 		$currentConsole=Get-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name 'DelegationConsole'
 		if($currentConsole.DelegationConsole -ne $LEGACY) {
 			$DEFAULTCONSOLE=$currentConsole.DelegationConsole
