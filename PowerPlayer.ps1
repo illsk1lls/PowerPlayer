@@ -64,7 +64,7 @@ public class UnifiedVisualizer : FrameworkElement
 	private double prevTrebleDB = double.NegativeInfinity;
 	private double bassTriggerThreshold = 6.0;
 	private double trebleTriggerThreshold = 3.0;
-	private double starfieldOpacity = 1.0;
+	private double particleOpacity = 1.0;
 	private double fadeSpeed = 0.05;
 	public DispatcherTimer timer;
 	public AudioLevelCalculator AudioCalculator { get; set; }
@@ -149,7 +149,7 @@ public class UnifiedVisualizer : FrameworkElement
 
 		foreach (bool isUp in directions)
 		{
-			int numParticles = (int)(25 * strength) + 5; // Half for each direction
+			int numParticles = (int)(25 * strength) + 5; // split half each direction
 
 			for (int i = 0; i < numParticles; i++)
 			{
@@ -173,7 +173,7 @@ public class UnifiedVisualizer : FrameworkElement
 				else
 				{
 					particleSize = rand.NextDouble() * 2 + 0.5; // smaller for treble
-					particleSpeed = (rand.NextDouble() * 6 + 3) * (1 + strength); // faster base, scales with strength
+					particleSpeed = (rand.NextDouble() * 6 + 3) * (1 + strength); // faster treble, scales with strength
 				}
 
 				particles.Add(new Particle
@@ -204,7 +204,7 @@ public class UnifiedVisualizer : FrameworkElement
 			return;
 		}
 
-		// Update stars
+		// floating particles
 		foreach (var star in stars)
 		{
 			star.DirX += star.CurveFactor * 0.01;
@@ -226,7 +226,7 @@ public class UnifiedVisualizer : FrameworkElement
 			if (star.PosY > this.ActualHeight) star.PosY -= this.ActualHeight;
 		}
 
-		// Update particles
+		// particle position
 		double currentBassDB = double.NegativeInfinity;
 		double currentTrebleDB = double.NegativeInfinity;
 		if (AudioCalculator != null)
@@ -276,14 +276,14 @@ public class UnifiedVisualizer : FrameworkElement
 			}
 		}
 
-		// Adjust starfield opacity
+		// particle field opacity
 		if (particles.Count > 0)
 		{
-			starfieldOpacity = Math.Max(0, starfieldOpacity - fadeSpeed);
+			particleOpacity = Math.Max(0, particleOpacity - fadeSpeed);
 		}
 		else
 		{
-			starfieldOpacity = Math.Min(1, starfieldOpacity + fadeSpeed);
+			particleOpacity = Math.Min(1, particleOpacity + fadeSpeed);
 		}
 
 		this.InvalidateVisual();
@@ -311,7 +311,7 @@ public class UnifiedVisualizer : FrameworkElement
 
 		if (lineLength > 0)
 		{
-			// Draw upper line
+			// upper line
 			LinearGradientBrush upperLeftBrush = new LinearGradientBrush();
 			upperLeftBrush.MappingMode = BrushMappingMode.Absolute;
 			upperLeftBrush.StartPoint = new Point(startX, upperY);
@@ -332,7 +332,7 @@ public class UnifiedVisualizer : FrameworkElement
 			Pen upperRightPen = new Pen(upperRightBrush, 1.0);
 			drawingContext.DrawLine(upperRightPen, new Point(centerX, upperY), new Point(endX, upperY));
 
-			// Draw lower line
+			// lower line
 			LinearGradientBrush lowerLeftBrush = new LinearGradientBrush();
 			lowerLeftBrush.MappingMode = BrushMappingMode.Absolute;
 			lowerLeftBrush.StartPoint = new Point(startX, lowerY);
@@ -383,7 +383,7 @@ public class UnifiedVisualizer : FrameworkElement
 		foreach (var star in stars)
 		{
 			double blink = 0.3 + star.BlinkAmplitude * (Math.Sin(globalTime * blinkSpeed + star.BlinkPhase) + 1) / 2;
-			byte alpha = (byte)(Math.Min(255, 255 * blink * starfieldOpacity));
+			byte alpha = (byte)(Math.Min(255, 255 * blink * particleOpacity));
 
 			double colorFactor = (Math.Sin(globalTime * colorSpeed + star.ColorPhase) + 1) / 2;
 			byte r = (byte)(sColor1.R * (1 - colorFactor) + sColor2.R * colorFactor);
@@ -470,7 +470,7 @@ public class AudioLevelCalculator
 		public uint dwChannelMask;
 		public Guid SubFormat;
 	}
-
+	// Audio device related imports
 	[ComImport]
 	[Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
 	internal class MMDeviceEnumerator { }
@@ -669,7 +669,6 @@ public class AudioLevelCalculator
 		}
 		catch (Exception ex)
 		{
-			// For debugging, you can add a message box or log
 			MessageBox.Show("Error starting capture: " + ex.Message);
 		}
 	}
@@ -685,7 +684,6 @@ public class AudioLevelCalculator
 			return y;
 		}
 
-		// Base case for N == 2
 		if (N == 2)
 		{
 			y[0] = x[0] + x[1];
@@ -693,7 +691,7 @@ public class AudioLevelCalculator
 			return y;
 		}
 
-		// Split the input into two parts
+		// Split input in two
 		double[] x_even = new double[N / 2];
 		double[] x_odd = new double[N / 2];
 		for (int i = 0; i < N / 2; i++)
@@ -702,11 +700,11 @@ public class AudioLevelCalculator
 			x_odd[i] = x[2 * i + 1];
 		}
 
-		// Recursively compute the FFT of each part
+		// Compute FFT
 		Complex[] y_even = ComputeFFT(x_even);
 		Complex[] y_odd = ComputeFFT(x_odd);
 
-		// Combine the results
+		// Combine
 		for (int k = 0; k < N / 2; k++)
 		{
 			double angle = -2 * k * Math.PI / N;
@@ -1096,8 +1094,8 @@ function trackLength(){
 	if($TimeLeft.Visibility -eq "Hidden"){
 		$TimeLeft.Visibility="Visible"
 	}
-	$Shell = New-Object -COMObject Shell.Application
-	$FolderL = $shell.Namespace($(Split-Path $FullName))
+	$checkFile = New-Object -COMObject Shell.Application
+	$FolderL = $checkFile.Namespace($(Split-Path $FullName))
 	$FileL = $FolderL.ParseName($(Split-Path $FullName -Leaf))
 	[int]$h, [int]$m, [int]$s = ($FolderL.GetDetailsOf($FileL, 27)).split(":")
 	$global:totaltime=$h*60*60 + $m*60 +$s
@@ -2237,18 +2235,14 @@ $Prev.Add_Click({
 	closeMenus
 	$checkposition=$mediaPlayer.Position.ToString()
 	[int]$checkposition=$checkposition.Replace("(?=[.]).*",'').Replace(':','')
-	if($Playing -eq 0){
-		PrevTrack
-	} else {
-		if($checkposition -le 2){
-			if($singlefilemode -eq 1){
-				$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
-			} else {
-				PrevTrack
-			}
-		} else {
+	if($checkposition -le 2){
+		if($singlefilemode -eq 1){
 			$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
+		} else {
+			PrevTrack
 		}
+	} else {
+		$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	}
 })
 $Play=$Window.FindName("Play")
