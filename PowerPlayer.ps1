@@ -60,12 +60,14 @@ public class UnifiedVisualizer : FrameworkElement
 	private double colorSpeed = 0.03;
 	private double pulseFrequency = 0.05;
 	private double pulseAmplitude = 0.1;
-	private double prevBassDB = double.NegativeInfinity;
-	private double prevTrebleDB = double.NegativeInfinity;
-	private double bassTriggerThreshold = 6.0;
-	private double trebleTriggerThreshold = 3.0;
 	private double particleOpacity = 1.0;
 	private double fadeSpeed = 0.05;
+	private double lastBassTriggerTime = 0;
+	private double lastTrebleTriggerTime = 0;
+	private double triggerInterval = 0.1;
+	private double minTriggerStrength = 0.1;
+	private double prevBassStrength = 0;
+	private double prevTrebleStrength = 0;
 	public DispatcherTimer timer;
 	public AudioLevelCalculator AudioCalculator { get; set; }
 	public double PulseFactor { get; set; }
@@ -97,6 +99,7 @@ public class UnifiedVisualizer : FrameworkElement
 		public double MaxDist { get; set; }
 		public double Strength { get; set; }
 		public double CurveFactor { get; set; }
+		public double VerticalCurveFactor { get; set; }
 		public bool Switched { get; set; }
 		public bool IsUp { get; set; }
 
@@ -140,23 +143,24 @@ public class UnifiedVisualizer : FrameworkElement
 		timer.Start();
 	}
 
-	private void CreateWave(bool isBass, double strength)
+	private void CreateWave(bool isBass, double strength, double delta)
 	{
 		double centerX = this.ActualWidth / 2.0;
 		double centerY = this.ActualHeight / 2.0;
 
-		bool[] directions = new bool[] { true, false }; // up and down
+		bool[] directions = new bool[] { true, false }; // Split particles up/down
 
 		foreach (bool isUp in directions)
 		{
-			int numParticles = (int)(25 * strength) + 5; // split half each direction
+			double deltaFactor = Math.Max(0, delta) * 1.2;
+			int numParticles = (int)(13 * strength) + 5;
 
 			for (int i = 0; i < numParticles; i++)
 			{
 				double startX = this.ActualWidth * ((double)i / (numParticles - 1));
 				double lean = (startX - centerX) / centerX;
 
-				double dirY = (isUp ? -1 : 1) * (0.7 + Math.Abs(lean) * 0.3);
+				double dirY = (isUp ? -1 : 1) * (0.781 - 0.513 * Math.Abs(lean)); // default angle
 				double dirX = lean * 1.0;
 				double norm = Math.Sqrt(dirX * dirX + dirY * dirY);
 				dirX /= norm;
@@ -167,14 +171,16 @@ public class UnifiedVisualizer : FrameworkElement
 
 				if (isBass)
 				{
-					particleSize = rand.NextDouble() * 4 + 2; // bigger for bass
-					particleSpeed = (rand.NextDouble() * 3 + 1) * (1 + strength); // slower base, scales with strength
+					particleSize = (rand.NextDouble() * 4 + 2) * (1 + deltaFactor); // bigger for bass, scales with delta
+					particleSpeed = (rand.NextDouble() * 3 + 1) * (1 + strength) * (1 + deltaFactor); // slower base, scales with strength and delta
 				}
 				else
 				{
-					particleSize = rand.NextDouble() * 2 + 0.5; // smaller for treble
-					particleSpeed = (rand.NextDouble() * 6 + 3) * (1 + strength); // faster treble, scales with strength
+					particleSize = (rand.NextDouble() * 3 + 1) * (1 + deltaFactor); // smaller for treble, scales with delta
+					particleSpeed = (rand.NextDouble() * 6 + 3) * (1 + strength) * (1 + deltaFactor); // faster treble, scales with strength and delta
 				}
+
+				particleSpeed *= (0.5 + 0.5 * Math.Abs(lean));
 
 				particles.Add(new Particle
 				{
@@ -187,7 +193,8 @@ public class UnifiedVisualizer : FrameworkElement
 					DistTraveled = 0,
 					MaxDist = Math.Max(this.ActualWidth, this.ActualHeight) / 1.5,
 					Switched = false,
-					CurveFactor = (rand.NextDouble() - 0.5) * 0.1,
+					CurveFactor = (rand.NextDouble() - 0.5) * 0.8,
+					VerticalCurveFactor = (rand.NextDouble() - 0.5) * 0.6,
 					IsUp = isUp,
 					Strength = strength
 				});
@@ -204,7 +211,7 @@ public class UnifiedVisualizer : FrameworkElement
 			return;
 		}
 
-		// floating particles
+		// floating particles ('starfield' when nothing is playing, using same color ranges)
 		foreach (var star in stars)
 		{
 			star.DirX += star.CurveFactor * 0.01;
@@ -235,18 +242,30 @@ public class UnifiedVisualizer : FrameworkElement
 			currentTrebleDB = AudioCalculator.LatestTrebleRMSDB;
 		}
 
-		if (currentBassDB > prevBassDB + bassTriggerThreshold)
+		double bassStrength = Math.Max(0, Math.Min(1, (currentBassDB + 60) / 60));
+		double bassDelta = bassStrength - prevBassStrength;
+		double bassIntervalMultiplier = (bassDelta > 0) ? 0.3 : (bassDelta < 0 ? 2.5 : 1.0);
+		double bassBaseMultiplier = 1.0 - 0.5 * bassStrength;
+		double currentBassInterval = triggerInterval * bassBaseMultiplier * bassIntervalMultiplier;
+		if (bassStrength > minTriggerStrength && globalTime - lastBassTriggerTime > currentBassInterval)
 		{
-			double strength = Math.Max(0, Math.Min(1, (currentBassDB + 60) / 60));
-			CreateWave(true, strength);
+			CreateWave(true, bassStrength, bassDelta);
+			lastBassTriggerTime = globalTime;
 		}
-		if (currentTrebleDB > prevTrebleDB + trebleTriggerThreshold)
+
+		double trebleStrength = Math.Max(0, Math.Min(1, (currentTrebleDB + 60) / 60));
+		double trebleDelta = trebleStrength - prevTrebleStrength;
+		double trebleIntervalMultiplier = (trebleDelta > 0) ? 0.3 : (trebleDelta < 0 ? 2.5 : 1.0);
+		double trebleBaseMultiplier = 1.0 - 0.5 * trebleStrength;
+		double currentTrebleInterval = triggerInterval * trebleBaseMultiplier * trebleIntervalMultiplier;
+		if (trebleStrength > minTriggerStrength && globalTime - lastTrebleTriggerTime > currentTrebleInterval)
 		{
-			double strength = Math.Max(0, Math.Min(1, (currentTrebleDB + 60) / 60));
-			CreateWave(false, strength);
+			CreateWave(false, trebleStrength, trebleDelta);
+			lastTrebleTriggerTime = globalTime;
 		}
-		prevBassDB = currentBassDB;
-		prevTrebleDB = currentTrebleDB;
+
+		prevBassStrength = bassStrength;
+		prevTrebleStrength = trebleStrength;
 
 		for (int i = particles.Count - 1; i >= 0; i--)
 		{
@@ -259,7 +278,11 @@ public class UnifiedVisualizer : FrameworkElement
 				p.DirX *= 0.97;
 			}
 
-			p.DirX += p.CurveFactor * (moveDist / p.MaxDist);
+			double t = p.DistTraveled / p.MaxDist;
+			double sigma = 0.1;
+			double weighting = Math.Exp(-Math.Pow(t - 0.1, 2) / (2 * sigma * sigma)) / (sigma * Math.Sqrt(2 * Math.PI));
+			p.DirX += p.CurveFactor * (moveDist / p.MaxDist) * weighting;
+			p.DirY += p.VerticalCurveFactor * (moveDist / p.MaxDist) * weighting;
 			double norm = Math.Sqrt(p.DirX * p.DirX + p.DirY * p.DirY);
 			if (norm > 0)
 			{
@@ -303,15 +326,16 @@ public class UnifiedVisualizer : FrameworkElement
 		double centerY = this.ActualHeight / 2;
 		double startX = centerX - lineLength / 2;
 		double endX = centerX + lineLength / 2;
-		double upperY = centerY - 12; // Upper line 12 pixels above center
-		double lowerY = centerY + 12; // Lower line 12 pixels below center
+		// RMS DB wrapper, above/below track name
+		double upperY = centerY - 12; // Upper RMS 'level' line
+		double lowerY = centerY + 12; // Lower RMS 'level' line
 
 		Color centerColor = Color.FromRgb(0, 191, 255);
 		Color endColor = Color.FromRgb((byte)(148 * normalized), 0, (byte)(211 * normalized));
 
 		if (lineLength > 0)
 		{
-			// upper line
+			// Upper
 			LinearGradientBrush upperLeftBrush = new LinearGradientBrush();
 			upperLeftBrush.MappingMode = BrushMappingMode.Absolute;
 			upperLeftBrush.StartPoint = new Point(startX, upperY);
@@ -332,7 +356,7 @@ public class UnifiedVisualizer : FrameworkElement
 			Pen upperRightPen = new Pen(upperRightBrush, 1.0);
 			drawingContext.DrawLine(upperRightPen, new Point(centerX, upperY), new Point(endX, upperY));
 
-			// lower line
+			// Lower
 			LinearGradientBrush lowerLeftBrush = new LinearGradientBrush();
 			lowerLeftBrush.MappingMode = BrushMappingMode.Absolute;
 			lowerLeftBrush.StartPoint = new Point(startX, lowerY);
@@ -359,11 +383,13 @@ public class UnifiedVisualizer : FrameworkElement
 
 		foreach (var p in particles)
 		{
-			double effectiveSize = p.Size * effectivePulse * (1 - (p.DistTraveled / p.MaxDist));
+			double t = p.DistTraveled / p.MaxDist;
+			double sizeMultiplier = 0.6 + 1.6 * t * (1 - t);
+			double effectiveSize = p.Size * effectivePulse * sizeMultiplier;
 
 			if (effectiveSize > 0)
 			{
-				int alpha = (int)Math.Min(255, 255 * (1 - (p.DistTraveled / p.MaxDist)));
+				int alpha = (int)Math.Min(255, 255 * sizeMultiplier);
 				Color pColor1 = Color.FromRgb(0, 191, 255);
 				Color pColor2 = Color.FromRgb(148, 0, 211);
 				double colorFactor = p.Strength * 0.8;
@@ -417,121 +443,183 @@ public class UnifiedVisualizer : FrameworkElement
 	}
 }
 
-public class AudioLevelCalculator
+public enum EDataFlow
 {
-	public enum EDataFlow
-	{
-		eRender = 0,
-		eCapture = 1,
-		eAll = 2
-	}
+	eRender = 0,
+	eCapture = 1,
+	eAll = 2
+}
 
-	public enum ERole
-	{
-		eConsole = 0,
-		eMultimedia = 1,
-		eCommunications = 2
-	}
+public enum ERole
+{
+	eConsole = 0,
+	eMultimedia = 1,
+	eCommunications = 2
+}
 
-	public enum AUDCLNT_SHAREMODE
-	{
-		AUDCLNT_SHAREMODE_SHARED,
-		AUDCLNT_SHAREMODE_EXCLUSIVE
-	}
+public enum AUDCLNT_SHAREMODE
+{
+	AUDCLNT_SHAREMODE_SHARED,
+	AUDCLNT_SHAREMODE_EXCLUSIVE
+}
 
-	[Flags]
-	public enum AUDCLNT_STREAMFLAGS : uint
-	{
-		AUDCLNT_STREAMFLAGS_LOOPBACK = 0x00020000
-	}
+[Flags]
+public enum AUDCLNT_STREAMFLAGS : uint
+{
+	AUDCLNT_STREAMFLAGS_LOOPBACK = 0x00020000
+}
 
-	public enum CLSCTX : uint
-	{
-		CLSCTX_ALL = 0x17
-	}
+public enum CLSCTX : uint
+{
+	CLSCTX_ALL = 0x17
+}
 
-	[StructLayout(LayoutKind.Sequential, Pack = 2)]
-	public struct WAVEFORMATEX
-	{
-		public ushort wFormatTag;
-		public ushort nChannels;
-		public uint nSamplesPerSec;
-		public uint nAvgBytesPerSec;
-		public ushort nBlockAlign;
-		public ushort wBitsPerSample;
-		public ushort cbSize;
-	}
+[StructLayout(LayoutKind.Sequential, Pack = 2)]
+public struct WAVEFORMATEX
+{
+	public ushort wFormatTag;
+	public ushort nChannels;
+	public uint nSamplesPerSec;
+	public uint nAvgBytesPerSec;
+	public ushort nBlockAlign;
+	public ushort wBitsPerSample;
+	public ushort cbSize;
+}
 
-	[StructLayout(LayoutKind.Sequential, Pack = 2)]
-	public struct WAVEFORMATEXTENSIBLE
-	{
-		public WAVEFORMATEX Format;
-		public ushort wValidBitsPerSample;
-		public uint dwChannelMask;
-		public Guid SubFormat;
-	}
-	// Audio device related imports
-	[ComImport]
-	[Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
-	internal class MMDeviceEnumerator { }
+[StructLayout(LayoutKind.Sequential, Pack = 2)]
+public struct WAVEFORMATEXTENSIBLE
+{
+	public WAVEFORMATEX Format;
+	public ushort wValidBitsPerSample;
+	public uint dwChannelMask;
+	public Guid SubFormat;
+}
 
-	[ComImport]
-	[Guid("A95664D2-9614-4F35-A746-DE8DB63617E6")]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	internal interface IMMDeviceEnumerator
-	{
-		void EnumAudioEndpoints(EDataFlow dataFlow, uint dwStateMask, out IMMDeviceCollection ppDevices);
-		void GetDefaultAudioEndpoint(EDataFlow dataFlow, ERole role, out IMMDevice ppEndpoint);
-	}
+[ComImport]
+[Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
+internal class MMDeviceEnumerator { }
 
-	[ComImport]
-	[Guid("0BD7A1BE-7A1A-44DB-8397-CC5392387B5E")]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	internal interface IMMDeviceCollection
-	{
-		void GetCount(out uint pcDevices);
-		void Item(uint nDevice, out IMMDevice ppDevice);
-	}
+[ComImport]
+[Guid("A95664D2-9614-4F35-A746-DE8DB63617E6")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IMMDeviceEnumerator
+{
+	void EnumAudioEndpoints(EDataFlow dataFlow, uint dwStateMask, out IMMDeviceCollection ppDevices);
+	void GetDefaultAudioEndpoint(EDataFlow dataFlow, ERole role, out IMMDevice ppEndpoint);
+	void GetDevice([MarshalAs(UnmanagedType.LPWStr)] string pwstrId, out IMMDevice ppDevice);
+	[PreserveSig]
+	int RegisterEndpointNotificationCallback(IMMNotificationClient pClient);
+	[PreserveSig]
+	int UnregisterEndpointNotificationCallback(IMMNotificationClient pClient);
+}
 
-	[ComImport]
-	[Guid("D666063F-1587-4E43-81F1-B948E807363F")]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	internal interface IMMDevice
-	{
-		void Activate(ref Guid iid, CLSCTX dwClsCtx, IntPtr pActivationParams, [MarshalAs(UnmanagedType.IUnknown)] out object ppInterface);
-	}
+[ComImport]
+[Guid("0BD7A1BE-7A1A-44DB-8397-CC5392387B5E")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IMMDeviceCollection
+{
+	void GetCount(out uint pcDevices);
+	void Item(uint nDevice, out IMMDevice ppDevice);
+}
 
-	[ComImport]
-	[Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2")]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	internal interface IAudioClient
-	{
-		void Initialize(AUDCLNT_SHAREMODE ShareMode, AUDCLNT_STREAMFLAGS StreamFlags, long hnsBufferDuration, long hnsPeriodicity, IntPtr pFormat, ref Guid AudioSessionGuid);
-		void GetBufferSize(out uint pNumBufferFrames);
-		void GetStreamLatency(out long phnsLatency);
-		void GetCurrentPadding(out uint pNumPaddingFrames);
-		void IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, IntPtr pFormat, out IntPtr ppClosestMatch);
-		void GetMixFormat(out IntPtr ppDeviceFormat);
-		void GetDevicePeriod(out long phnsDefaultDevicePeriod, out long phnsMinimumDevicePeriod);
-		void Start();
-		void Stop();
-		void Reset();
-		void SetEventHandle(IntPtr eventHandle);
-		void GetService(ref Guid riid, [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
-	}
+[ComImport]
+[Guid("D666063F-1587-4E43-81F1-B948E807363F")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IMMDevice
+{
+	void Activate(ref Guid iid, CLSCTX dwClsCtx, IntPtr pActivationParams, [MarshalAs(UnmanagedType.IUnknown)] out object ppInterface);
+	void OpenPropertyStore(uint stgmAccess, [MarshalAs(UnmanagedType.Interface)] out IPropertyStore ppProperties);
+	[PreserveSig]
+	int GetId([MarshalAs(UnmanagedType.LPWStr)] out string ppstrId);
+}
 
-	[ComImport]
-	[Guid("C8ADBD64-E71E-48a0-A4DE-185C395CD317")]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	internal interface IAudioCaptureClient
-	{
-		void GetBuffer(out IntPtr ppData, out uint pNumFramesToRead, out uint pdwFlags, out long pu64DevicePosition, out long pu64QPCPosition);
-		void ReleaseBuffer(uint numFramesRead);
-		void GetNextPacketSize(out uint pNumFramesInNextPacket);
-	}
+[ComImport]
+[Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IAudioClient
+{
+	void Initialize(AUDCLNT_SHAREMODE ShareMode, AUDCLNT_STREAMFLAGS StreamFlags, long hnsBufferDuration, long hnsPeriodicity, IntPtr pFormat, ref Guid AudioSessionGuid);
+	void GetBufferSize(out uint pNumBufferFrames);
+	void GetStreamLatency(out long phnsLatency);
+	void GetCurrentPadding(out uint pNumPaddingFrames);
+	void IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, IntPtr pFormat, out IntPtr ppClosestMatch);
+	void GetMixFormat(out IntPtr ppDeviceFormat);
+	void GetDevicePeriod(out long phnsDefaultDevicePeriod, out long phnsMinimumDevicePeriod);
+	void Start();
+	void Stop();
+	void Reset();
+	void SetEventHandle(IntPtr eventHandle);
+	void GetService(ref Guid riid, [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
+}
 
+[ComImport]
+[Guid("C8ADBD64-E71E-48a0-A4DE-185C395CD317")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IAudioCaptureClient
+{
+	void GetBuffer(out IntPtr ppData, out uint pNumFramesToRead, out uint pdwFlags, out long pu64DevicePosition, out long pu64QPCPosition);
+	void ReleaseBuffer(uint numFramesRead);
+	void GetNextPacketSize(out uint pNumFramesInNextPacket);
+}
+
+[ComImport]
+[Guid("7991EEC9-7E89-4D85-8390-6C703CEC60C0")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IMMNotificationClient
+{
+	void OnDeviceStateChanged([MarshalAs(UnmanagedType.LPWStr)] string pwstrDeviceId, uint dwNewState);
+	void OnDeviceAdded([MarshalAs(UnmanagedType.LPWStr)] string pwstrDeviceId);
+	void OnDeviceRemoved([MarshalAs(UnmanagedType.LPWStr)] string pwstrDeviceId);
+	void OnDefaultDeviceChanged(EDataFlow flow, ERole role, [MarshalAs(UnmanagedType.LPWStr)] string pwstrDefaultDeviceId);
+	void OnPropertyValueChanged([MarshalAs(UnmanagedType.LPWStr)] string pwstrDeviceId, PROPERTYKEY key);
+}
+
+[ComImport]
+[Guid("886d8eeb-8cf2-4446-8d02-cdba1dbdcf99")]
+[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+internal interface IPropertyStore
+{
+	[PreserveSig]
+	int GetCount(out uint cProps);
+	[PreserveSig]
+	int GetAt(uint iProp, out PROPERTYKEY pkey);
+	[PreserveSig]
+	int GetValue(ref PROPERTYKEY key, out PROPVARIANT pv);
+	[PreserveSig]
+	int SetValue(ref PROPERTYKEY key, ref PROPVARIANT pv);
+	[PreserveSig]
+	int Commit();
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct PROPERTYKEY
+{
+	public Guid fmtid;
+	public uint pid;
+}
+
+[StructLayout(LayoutKind.Explicit)]
+public struct PROPVARIANT
+{
+	[FieldOffset(0)]
+	public ushort vt;
+	[FieldOffset(2)]
+	public ushort reserved1;
+	[FieldOffset(4)]
+	public ushort reserved2;
+	[FieldOffset(6)]
+	public ushort reserved3;
+	[FieldOffset(8)]
+	public IntPtr pszVal;
+}
+
+public class AudioLevelCalculator : IMMNotificationClient
+{
 	[DllImport("ole32.dll")]
 	public static extern void CoTaskMemFree(IntPtr pv);
+
+	[DllImport("ole32.dll")]
+	public static extern int PropVariantClear(ref PROPVARIANT pvar);
 
 	private static readonly Guid KSDATAFORMAT_SUBTYPE_PCM = new Guid("00000001-0000-0010-8000-00aa00389b71");
 	private static readonly Guid KSDATAFORMAT_SUBTYPE_IEEE_FLOAT = new Guid("00000003-0000-0010-8000-00aa00389b71");
@@ -548,6 +636,7 @@ public class AudioLevelCalculator
 	private readonly object lockObject = new object();
 	private bool isFloat;
 	private ushort bitsPerSample;
+	private IMMDeviceEnumerator deviceEnumerator;
 
 	public double LatestPeakDB
 	{
@@ -597,7 +686,12 @@ public class AudioLevelCalculator
 	{
 		try
 		{
-			IMMDeviceEnumerator deviceEnumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+			if (deviceEnumerator == null)
+			{
+				deviceEnumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+				deviceEnumerator.RegisterEndpointNotificationCallback(this);
+			}
+
 			IMMDevice device;
 			deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eConsole, out device);
 
@@ -667,53 +761,9 @@ public class AudioLevelCalculator
 			captureThread = new Thread(CaptureLoop);
 			captureThread.Start();
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
-			MessageBox.Show("Error starting capture: " + ex.Message);
 		}
-	}
-
-	private static Complex[] ComputeFFT(double[] x)
-	{
-		int N = x.Length;
-		Complex[] y = new Complex[N];
-
-		if (N <= 1)
-		{
-			if (N == 1) y[0] = x[0];
-			return y;
-		}
-
-		if (N == 2)
-		{
-			y[0] = x[0] + x[1];
-			y[1] = x[0] - x[1];
-			return y;
-		}
-
-		// Split input in two
-		double[] x_even = new double[N / 2];
-		double[] x_odd = new double[N / 2];
-		for (int i = 0; i < N / 2; i++)
-		{
-			x_even[i] = x[2 * i];
-			x_odd[i] = x[2 * i + 1];
-		}
-
-		// Compute FFT
-		Complex[] y_even = ComputeFFT(x_even);
-		Complex[] y_odd = ComputeFFT(x_odd);
-
-		// Combine
-		for (int k = 0; k < N / 2; k++)
-		{
-			double angle = -2 * k * Math.PI / N;
-			Complex w = Complex.FromPolarCoordinates(1, angle);
-			y[k] = y_even[k] + w * y_odd[k];
-			y[k + N / 2] = y_even[k] - w * y_odd[k];
-		}
-
-		return y;
 	}
 
 	private void CaptureLoop()
@@ -735,141 +785,98 @@ public class AudioLevelCalculator
 				byte[] buffer = new byte[byteLength];
 				Marshal.Copy(pData, buffer, 0, byteLength);
 
-				int numSamples = (int)(numFrames * waveFormat.nChannels);
-				double maxAbs = 0.0;
-				double sumSquares = 0.0;
 				int bytesPerSample = bitsPerSample / 8;
+				int step = waveFormat.nBlockAlign;
+				double[] samples = new double[numFrames];
 
-				for (int i = 0; i < byteLength; i += bytesPerSample)
-			   {
-					double norm;
-					double value = 0.0;
-					if (isFloat)
+				for (uint f = 0; f < numFrames; f++)
+				{
+					double avg = 0.0;
+					for (ushort c = 0; c < waveFormat.nChannels; c++)
 					{
-						if (bitsPerSample == 32)
+						int idx = (int)(f * step + c * bytesPerSample);
+						double value;
+						if (isFloat)
 						{
-							float sample = BitConverter.ToSingle(buffer, i);
-							value = sample;
-							norm = Math.Abs(sample);
+							if (bitsPerSample == 32)
+								value = BitConverter.ToSingle(buffer, idx);
+							else
+								value = BitConverter.ToDouble(buffer, idx);
 						}
 						else
 						{
-							double sample = BitConverter.ToDouble(buffer, i);
-							value = sample;
-							norm = Math.Abs(sample);
+							if (bitsPerSample == 16)
+								value = BitConverter.ToInt16(buffer, idx) / 32768.0;
+							else
+								value = BitConverter.ToInt32(buffer, idx) / 2147483648.0;
 						}
+						avg += value;
 					}
-					else
-					{
-						if (bitsPerSample == 16)
-						{
-							short sample = BitConverter.ToInt16(buffer, i);
-							value = sample / 32768.0;
-							norm = Math.Abs(value);
-						}
-						else
-						{
-							int sample = BitConverter.ToInt32(buffer, i);
-							value = sample / 2147483648.0;
-							norm = Math.Abs(value);
-						}
-					}
-					if (norm > maxAbs) maxAbs = norm;
-					sumSquares += value * value;
+					samples[f] = avg / waveFormat.nChannels;
 				}
 
-				double rms = (numSamples > 0) ? Math.Sqrt(sumSquares / numSamples) : 0.0;
+				// Calculate overall peak and RMS
+				double maxAbs = 0.0;
+				double sumSquares = 0.0;
+				for (int i = 0; i < samples.Length; i++)
+				{
+					double abs = Math.Abs(samples[i]);
+					if (abs > maxAbs) maxAbs = abs;
+					sumSquares += samples[i] * samples[i];
+				}
+				double rms = (samples.Length > 0) ? Math.Sqrt(sumSquares / samples.Length) : 0.0;
 				double peakDB = (maxAbs > 0) ? 20 * Math.Log10(maxAbs) : double.NegativeInfinity;
 				double rmsDB = (rms > 0) ? 20 * Math.Log10(rms) : double.NegativeInfinity;
 
-				double bassRMSDB = double.NegativeInfinity;
-				double trebleRMSDB = double.NegativeInfinity;
+				// Calculate bass and treble using FFT
+				double bassDB = double.NegativeInfinity;
+				double trebleDB = double.NegativeInfinity;
 
-				if (numFrames >= 4)
+				if (samples.Length > 0)
 				{
-					int log2N = (int)Math.Floor(Math.Log(numFrames, 2));
-					int fftSize = 1 << log2N;
-					if (fftSize >= 4)
+					// Prepare for FFT: pad to next power of 2
+					int fftSize = (int)Math.Pow(2, Math.Ceiling(Math.Log(samples.Length, 2)));
+					double[] fftInput = new double[fftSize];
+					Array.Copy(samples, fftInput, samples.Length);
+
+					Complex[] spectrum = FFT(fftInput);
+
+					double binWidth = (double)waveFormat.nSamplesPerSec / fftSize;
+
+					// Bass: 20-250 Hz
+					int bassEndBin = (int)(250 / binWidth);
+
+					// Treble: 4000 (nyquist Hz)
+					int trebleStartBin = (int)(4000 / binWidth);
+					int trebleEndBin = fftSize / 2;
+
+					double bassSumSquares = 0.0;
+					for (int k = 1; k < bassEndBin && k < spectrum.Length; k++) // skip DC
 					{
-						double[] monoSamples = new double[fftSize];
-
-						for (int frame = 0; frame < fftSize; frame++)
-						{
-							double sumChannels = 0.0;
-							for (int ch = 0; ch < waveFormat.nChannels; ch++)
-							{
-								int offset = frame * waveFormat.nBlockAlign + ch * bytesPerSample;
-								double value;
-								if (isFloat)
-								{
-									if (bitsPerSample == 32)
-									{
-										value = BitConverter.ToSingle(buffer, offset);
-									}
-									else
-									{
-										value = BitConverter.ToDouble(buffer, offset);
-									}
-								}
-								else
-								{
-									if (bitsPerSample == 16)
-									{
-										value = BitConverter.ToInt16(buffer, offset) / 32768.0;
-									}
-									else
-									{
-										value = BitConverter.ToInt32(buffer, offset) / 2147483648.0;
-									}
-								}
-								sumChannels += value;
-							}
-							monoSamples[frame] = sumChannels / waveFormat.nChannels;
-						}
-
-						Complex[] spectrum = ComputeFFT(monoSamples);
-
-						double deltaF = (double)waveFormat.nSamplesPerSec / fftSize;
-						int nyquistBin = fftSize / 2;
-
-						// Bass: 20-250 Hz
-						int bassLowBin = (int)Math.Ceiling(20 / deltaF);
-						int bassHighBin = (int)Math.Floor(250 / deltaF);
-						if (bassHighBin > nyquistBin) bassHighBin = nyquistBin;
-						double bassPower = 0.0;
-						for (int k = bassLowBin; k <= bassHighBin; k++)
-						{
-							double mag2 = spectrum[k].Real * spectrum[k].Real + spectrum[k].Imaginary * spectrum[k].Imaginary;
-							double factor = (k == 0 || k == nyquistBin) ? 1.0 : 2.0;
-							bassPower += factor * mag2;
-						}
-						bassPower /= fftSize;
-						double bassRMS = bassPower > 0 ? Math.Sqrt(bassPower) : 0;
-						bassRMSDB = bassRMS > 0 ? 20 * Math.Log10(bassRMS) : double.NegativeInfinity;
-
-						// Treble: 2000-20000 Hz
-						int trebleLowBin = (int)Math.Ceiling(2000 / deltaF);
-						int trebleHighBin = (int)Math.Floor(20000 / deltaF);
-						if (trebleHighBin > nyquistBin) trebleHighBin = nyquistBin;
-						double treblePower = 0.0;
-						for (int k = trebleLowBin; k <= trebleHighBin; k++)
-						{
-							double mag2 = spectrum[k].Real * spectrum[k].Real + spectrum[k].Imaginary * spectrum[k].Imaginary;
-							double factor = (k == 0 || k == nyquistBin) ? 1.0 : 2.0;
-							treblePower += factor * mag2;
-						}
-						treblePower /= fftSize;
-						double trebleRMS = treblePower > 0 ? Math.Sqrt(treblePower) : 0;
-						trebleRMSDB = trebleRMS > 0 ? 20 * Math.Log10(trebleRMS) : double.NegativeInfinity;
+						double power = (spectrum[k].Real * spectrum[k].Real + spectrum[k].Imaginary * spectrum[k].Imaginary) / fftSize;
+						bassSumSquares += power;
 					}
+					int bassNumBins = bassEndBin - 1;
+					double bassRMS = (bassNumBins > 0) ? Math.Sqrt(bassSumSquares / bassNumBins) : 0.0;
+					bassDB = (bassRMS > 0) ? 20 * Math.Log10(bassRMS) : double.NegativeInfinity;
+
+					double trebleSumSquares = 0.0;
+					for (int k = trebleStartBin; k < trebleEndBin && k < spectrum.Length; k++)
+					{
+						double power = (spectrum[k].Real * spectrum[k].Real + spectrum[k].Imaginary * spectrum[k].Imaginary) / fftSize;
+						trebleSumSquares += power;
+					}
+					int trebleNumBins = trebleEndBin - trebleStartBin;
+					double trebleRMS = (trebleNumBins > 0) ? Math.Sqrt(trebleSumSquares / trebleNumBins) : 0.0;
+					trebleDB = (trebleRMS > 0) ? 20 * Math.Log10(trebleRMS) : double.NegativeInfinity;
 				}
 
 				lock (lockObject)
 				{
 					latestPeakDB = peakDB;
 					latestRMSDB = rmsDB;
-					latestBassRMSDB = bassRMSDB;
-					latestTrebleRMSDB = trebleRMSDB;
+					latestBassRMSDB = bassDB;
+					latestTrebleRMSDB = trebleDB;
 				}
 			}
 
@@ -877,14 +884,90 @@ public class AudioLevelCalculator
 		}
 	}
 
-	public void StopCapture()
+	private static Complex[] FFT(double[] x)
 	{
-		if (isCapturing)
+		int N = x.Length;
+		Complex[] y = new Complex[N];
+
+		if (N == 1)
 		{
-			isCapturing = false;
-			captureThread.Join();
-			audioClient.Stop();
+			y[0] = x[0];
+			return y;
 		}
+
+		if (N == 2)
+		{
+			y[0] = x[0] + x[1];
+			y[1] = x[0] - x[1];
+			return y;
+		}
+
+		double[] x_even = new double[N / 2];
+		double[] x_odd = new double[N / 2];
+		for (int i = 0; i < N / 2; i++)
+		{
+			x_even[i] = x[2 * i];
+			x_odd[i] = x[2 * i + 1];
+		}
+
+		Complex[] y_even = FFT(x_even);
+		Complex[] y_odd = FFT(x_odd);
+
+		for (int k = 0; k < N / 2; k++)
+		{
+			double angle = -2 * k * Math.PI / N;
+			Complex w = Complex.FromPolarCoordinates(1, angle);
+			y[k] = y_even[k] + w * y_odd[k];
+			y[k + N / 2] = y_even[k] - w * y_odd[k];
+		}
+
+		return y;
+	}
+
+	public void StopCapture(bool final = false)
+	{
+		try
+		{
+			if (isCapturing)
+			{
+				isCapturing = false;
+				captureThread.Join();
+				audioClient.Stop();
+			}
+			if (final && deviceEnumerator != null)
+			{
+				deviceEnumerator.UnregisterEndpointNotificationCallback(this);
+				deviceEnumerator = null;
+			}
+		}
+		catch (Exception)
+		{
+		}
+	}
+
+	public void OnDeviceStateChanged(string pwstrDeviceId, uint dwNewState)
+	{
+	}
+
+	public void OnDeviceAdded(string pwstrDeviceId)
+	{
+	}
+
+	public void OnDeviceRemoved(string pwstrDeviceId)
+	{
+	}
+
+	public void OnDefaultDeviceChanged(EDataFlow flow, ERole role, string pwstrDefaultDeviceId)
+	{
+		if (flow == EDataFlow.eRender && role == ERole.eConsole)
+		{
+			StopCapture();
+			StartCapture();
+		}
+	}
+
+	public void OnPropertyValueChanged(string pwstrDeviceId, PROPERTYKEY key)
+	{
 	}
 }
 '@
@@ -1689,6 +1772,7 @@ $window=[Windows.Markup.XamlReader]::Load($playerCore)
 $Notify=[Windows.Markup.XamlReader]::Load($notifyCore)
 $MainGrid = $window.FindName("MainWindow")
 $particlefield = New-Object UnifiedVisualizer
+$particlefield.IsHitTestVisible = $false
 $particlefield.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Stretch
 $particlefield.VerticalAlignment = [System.Windows.VerticalAlignment]::Stretch
 $MainGrid.Children.Insert(0, $particlefield)
