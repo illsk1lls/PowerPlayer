@@ -102,6 +102,7 @@ public class UnifiedVisualizer : FrameworkElement
 		public double VerticalCurveFactor { get; set; }
 		public bool Switched { get; set; }
 		public bool IsUp { get; set; }
+		public double Delta { get; set; }
 
 	}
 
@@ -152,7 +153,12 @@ public class UnifiedVisualizer : FrameworkElement
 
 		foreach (bool isUp in directions)
 		{
-			double deltaFactor = Math.Max(0, delta) * 1.2;
+			double epsilon = 0.05;
+			double amplification = 1 / (1 - prevBassStrength + epsilon);
+			if (!isBass) {
+				amplification = 1 / (1 - prevTrebleStrength + epsilon);
+			}
+			double deltaFactor = Math.Max(0, delta) * 1.2 * amplification;
 			int numParticles = (int)(13 * strength) + 5;
 
 			for (int i = 0; i < numParticles; i++)
@@ -160,7 +166,7 @@ public class UnifiedVisualizer : FrameworkElement
 				double startX = this.ActualWidth * ((double)i / (numParticles - 1));
 				double lean = (startX - centerX) / centerX;
 
-				double dirY = (isUp ? -1 : 1) * (0.781 - 0.513 * Math.Abs(lean)); // default angle
+				double dirY = (isUp ? -1 : 1) * Math.Max(0, 0.781 - 0.868 * Math.Abs(lean)); // default angle
 				double dirX = lean * 1.0;
 				double norm = Math.Sqrt(dirX * dirX + dirY * dirY);
 				dirX /= norm;
@@ -196,7 +202,8 @@ public class UnifiedVisualizer : FrameworkElement
 					CurveFactor = (rand.NextDouble() - 0.5) * 0.8,
 					VerticalCurveFactor = (rand.NextDouble() - 0.5) * 0.6,
 					IsUp = isUp,
-					Strength = strength
+					Strength = strength,
+					Delta = delta
 				});
 			}
 		}
@@ -271,6 +278,10 @@ public class UnifiedVisualizer : FrameworkElement
 		{
 			var p = particles[i];
 			double moveDist = p.Speed * SpeedMultiplier;
+			if (p.Delta < 0.05)
+			{
+				moveDist *= 0.8;
+			}
 			p.DistTraveled += moveDist;
 
 			if (p.DistTraveled > p.MaxDist * 0.2)
