@@ -2197,10 +2197,7 @@ $MenuFolder.Add_Click({
 		$global:singlefilemode=0
 		$path=$OpenFileDialog.FileName+'\'
 		$files=$null
-		$files=@()
-		Get-ChildItem -Path $path -Filter *.mp3 -Depth 5 -File -Name| ForEach-Object {
-			$files+=$path + $_
-		}
+		$files = @([System.IO.Directory]::EnumerateFiles($path, "*.mp3", [System.IO.SearchOption]::AllDirectories)) | Sort-Object
 		if($ShuffleOn -eq 1){
 			$filesShuffled=$files | Sort-Object {Get-Random}
 			$Playlist.ItemsSource=$filesShuffled -ireplace "^.+[\\]",'' -ireplace ".mp3$",''
