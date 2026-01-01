@@ -1031,6 +1031,14 @@ $global:CounterB=0
 function Update-Gui(){
 	$window.Dispatcher.Invoke([Windows.Threading.DispatcherPriority]::Background,[action]{})
 }
+function FontEffect {
+	param([string]$BaseName,[string]$Text)
+	1..5 | ForEach-Object {
+		if($element = Get-Variable "$BaseName$_" -ValueOnly) {
+			$element.Text = $Text
+		}
+	}
+}
 function dropDownMenu(){
 	Switch($MenuFile.Visibility){
 		'Visible'{
@@ -1090,11 +1098,7 @@ function TogglePlayButton(){
 				$mediaPlayer.Play()
 				$window.TaskbarItemInfo.Description='Playing...'
 				$global:Playing=1
-				$StatusInfo1.Text="Now Playing"
-				$StatusInfo2.Text=$StatusInfo1.Text
-				$StatusInfo3.Text=$StatusInfo1.Text
-				$StatusInfo4.Text=$StatusInfo1.Text
-				$StatusInfo5.Text=$StatusInfo1.Text
+				FontEffect "StatusInfo" 'Now Playing'
 				$PlayPath.Visibility = "Hidden"
 				$PausePath.Visibility = "Visible"
 			}
@@ -1102,11 +1106,7 @@ function TogglePlayButton(){
 				$mediaPlayer.Pause()
 				$window.TaskbarItemInfo.Description='Paused...'
 				$global:Playing=0
-				$StatusInfo1.Text="Paused"
-				$StatusInfo2.Text=$StatusInfo1.Text
-				$StatusInfo3.Text=$StatusInfo1.Text
-				$StatusInfo4.Text=$StatusInfo1.Text
-				$StatusInfo5.Text=$StatusInfo1.Text
+				FontEffect "StatusInfo" 'Paused'
 				$PlayPath.Visibility = "Visible"
 				$PausePath.Visibility = "Hidden"
 			}
@@ -1115,7 +1115,7 @@ function TogglePlayButton(){
 }
 function NextTrack(){
 	if($icurrent -lt $files.Length - 1){
-		if(!($Repeating -eq 1)){
+		if($Repeating -ne 1){
 			$global:icurrent++
 		}
 		if($ShuffleOn -eq 0){
@@ -1149,7 +1149,7 @@ function NextTrack(){
 }
 function PrevTrack(){
 	if($icurrent -ge 1){
-		if(!($Repeating -eq 1)){
+		if($Repeating -ne 1){
 			$global:icurrent--
 		}
 		if($ShuffleOn -eq 0){
@@ -1191,11 +1191,7 @@ function trackLength(){
 	$global:totaltime=$h*60*60 + $m*60 +$s
 	$global:ReadableTotal=[timespan]::fromseconds($totaltime - 2)
 	$global:RemainingTotal=[timespan]::fromseconds($totaltime - 1)
-	$TimerB1.Text=("{0:mm\:ss}" -f $ReadableTotal)
-	$TimerB2.Text=$TimerB1.Text
-	$TimerB3.Text=$TimerB1.Text
-	$TimerB4.Text=$TimerB1.Text
-	$TimerB5.Text=$TimerB1.Text
+	FontEffect "TimerB" ("{0:mm\:ss}" -f $ReadableTotal)
 	$PositionSlider.Maximum=$totaltime
 }
 function WaitForSong(){
@@ -1203,19 +1199,11 @@ function WaitForSong(){
 		if(([ref] $tracking).Value -eq 0){
 			$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 			$TimePassed=[timespan]::fromseconds(([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds)
-			$TimerA1.Text=("{0:mm\:ss}" -f $TimePassed)
-			$TimerA2.Text=$TimerA1.Text
-			$TimerA3.Text=$TimerA1.Text
-			$TimerA4.Text=$TimerA1.Text
-			$TimerA5.Text=$TimerA1.Text
+			FontEffect "TimerA" ("{0:mm\:ss}" -f $TimePassed)
 		}
 		if(([ref] $CounterB).Value -eq 1){
 			$TimeRemaining=$RemainingTotal - $TimePassed
-			$TimerB1.Text=("{0:mm\:ss}" -f $TimeRemaining) + '-'
-			$TimerB2.Text=$TimerB1.Text
-			$TimerB3.Text=$TimerB1.Text
-			$TimerB4.Text=$TimerB1.Text
-			$TimerB5.Text=$TimerB1.Text
+			FontEffect "TimerB" ("{0:mm\:ss}" -f $TimeRemaining + '-')
 		}
 		Update-Gui
 		Start-Sleep -milliseconds 10
@@ -1225,11 +1213,7 @@ function PlayTrack(){
 	$mediaPlayer.Position=New-Object System.TimeSpan(0, 0, 0, 0, 0)
 	$FullName="$file"
 	$mediaPlayer.open($FullName)
-	$CurrentTrack1.Text=[System.IO.Path]::GetFileNameWithoutExtension($file)
-	$CurrentTrack2.Text=$CurrentTrack1.Text
-	$CurrentTrack3.Text=$CurrentTrack1.Text
-	$CurrentTrack4.Text=$CurrentTrack1.Text
-	$CurrentTrack5.Text=$CurrentTrack1.Text
+	FontEffect "CurrentTrack" ([System.IO.Path]::GetFileNameWithoutExtension($file))
 	if($Playing -eq 1){
 		$mediaPlayer.Play()
 	}
@@ -1837,27 +1821,11 @@ $mediaPlayer.Add_MediaEnded({
 		$PositionSlider.Value=([TimeSpan]::Parse($mediaPlayer.Position)).TotalSeconds
 		$PlayPath.Visibility = "Visible"
 		$PausePath.Visibility = "Hidden"
-		$CurrentTrack1.Text='No Media Loaded'
-		$CurrentTrack2.Text=$CurrentTrack1.Text
-		$CurrentTrack3.Text=$CurrentTrack1.Text
-		$CurrentTrack4.Text=$CurrentTrack1.Text
-		$CurrentTrack5.Text=$CurrentTrack1.Text
+		FontEffect "CurrentTrack" 'No Media Loaded'
 		$global:Playing=0
-		$StatusInfo1.Text=''
-		$StatusInfo2.Text=$StatusInfo1.Text
-		$StatusInfo3.Text=$StatusInfo1.Text
-		$StatusInfo4.Text=$StatusInfo1.Text
-		$StatusInfo5.Text=$StatusInfo1.Text
-		$TimerA1.Text=''
-		$TimerA2.Text=$TimerA1.Text
-		$TimerA3.Text=$TimerA1.Text
-		$TimerA4.Text=$TimerA1.Text
-		$TimerA5.Text=$TimerA1.Text
-		$TimerB1.Text=''
-		$TimerB2.Text=$TimerB1.Text
-		$TimerB3.Text=$TimerB1.Text
-		$TimerB4.Text=$TimerB1.Text
-		$TimerB5.Text=$TimerB1.Text
+		FontEffect "TimerA" ''
+		FontEffect "TimerB" ''
+		FontEffect "StatusInfo" ''
 		$window.Icon=$ShowIcon
 	}
 })
@@ -1895,11 +1863,7 @@ $Mute.Add_Click({
 			$MaxVolume.Width=20
 			$mediaPlayer.Volume=0
 			$VolumeSlider.Value=$mediaPlayer.Volume
-			$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
-			$VolumePercent2.Text=$VolumePercent1.Text
-			$VolumePercent3.Text=$VolumePercent1.Text
-			$VolumePercent4.Text=$VolumePercent1.Text
-			$VolumePercent5.Text=$VolumePercent1.Text
+			FontEffect "VolumePercent" ([double]$mediaPlayer.Volume).ToString("P0")
 			$global:Muted=1
 			$MutedPath.Visibility = "Visible"
 			$UnMutedPath.Visibility = "Hidden"
@@ -1918,11 +1882,7 @@ $Mute.Add_Click({
 				$MaxVolume.Width=35
 			}
 			$VolumeSlider.Value=$mediaPlayer.Volume
-			$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
-			$VolumePercent2.Text=$VolumePercent1.Text
-			$VolumePercent3.Text=$VolumePercent1.Text
-			$VolumePercent4.Text=$VolumePercent1.Text
-			$VolumePercent5.Text=$VolumePercent1.Text
+			FontEffect "VolumePercent" ([double]$mediaPlayer.Volume).ToString("P0")
 			$global:Muted=0
 			$MutedPath.Visibility = "Hidden"
 			$UnMutedPath.Visibility = "Visible"
@@ -1961,16 +1921,12 @@ $VolumeSlider.Add_PreviewMouseUp({
 	if($mediaPlayer.Volume -eq 1){
 		$MaxVolume.Width=35
 	}
-	$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
-	$VolumePercent2.Text=$VolumePercent1.Text
-	$VolumePercent3.Text=$VolumePercent1.Text
-	$VolumePercent4.Text=$VolumePercent1.Text
-	$VolumePercent5.Text=$VolumePercent1.Text
+	FontEffect "VolumePercent" ([double]$mediaPlayer.Volume).ToString("P0")
 })
 $MaxVolume=$Window.FindName("MaxVolume")
 $MaxVolume.Add_Click({
 	closeMenus
-	if(!($UnMaxxed -eq 1)){
+	if($UnMaxxed -ne 1){
 		Switch($VolMax){
 			0{
 				$global:UnMaxxed=$mediaPlayer.Volume
@@ -1984,11 +1940,7 @@ $MaxVolume.Add_Click({
 				$mediaPlayer.Volume=1
 				$MaxVolume.Width=35
 				$VolumeSlider.Value=$mediaPlayer.Volume
-				$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
-				$VolumePercent2.Text=$VolumePercent1.Text
-				$VolumePercent3.Text=$VolumePercent1.Text
-				$VolumePercent4.Text=$VolumePercent1.Text
-				$VolumePercent5.Text=$VolumePercent1.Text
+				FontEffect "VolumePercent" ([double]$mediaPlayer.Volume).ToString("P0")
 				$global:VolMax=1
 			}
 			1{
@@ -1999,11 +1951,7 @@ $MaxVolume.Add_Click({
 					$MaxVolume.Width=28
 				}
 				$VolumeSlider.Value=$mediaPlayer.Volume
-				$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
-				$VolumePercent2.Text=$VolumePercent1.Text
-				$VolumePercent3.Text=$VolumePercent1.Text
-				$VolumePercent4.Text=$VolumePercent1.Text
-				$VolumePercent5.Text=$VolumePercent1.Text
+				FontEffect "VolumePercent" ([double]$mediaPlayer.Volume).ToString("P0")
 				$global:VolMax=0
 			}
 		}
@@ -2029,11 +1977,7 @@ $TimeLeft.Add_Click({
 		1{
 			$global:CounterB=0
 			$TimeLeft.Width=35
-			$TimerB1.Text=("{0:mm\:ss}" -f $ReadableTotal)
-			$TimerB2.Text=$TimerB1.Text
-			$TimerB3.Text=$TimerB1.Text
-			$TimerB4.Text=$TimerB1.Text
-			$TimerB5.Text=$TimerB1.Text
+			FontEffect "TimerB" ("{0:mm\:ss}" -f $ReadableTotal)
 		}
 	}
 })
@@ -2041,37 +1985,14 @@ $window.add_MouseLeftButtonDown({
 	closeMenus
 	$window.DragMove()
 })
-$StatusInfo1=$Window.FindName("Status1")
-$StatusInfo2=$Window.FindName("Status2")
-$StatusInfo3=$Window.FindName("Status3")
-$StatusInfo4=$Window.FindName("Status4")
-$StatusInfo5=$Window.FindName("Status5")
-$StatusInfo1.Text=''
-$CurrentTrack1=$Window.FindName("CurrentTrack1")
-$CurrentTrack2=$Window.FindName("CurrentTrack2")
-$CurrentTrack3=$Window.FindName("CurrentTrack3")
-$CurrentTrack4=$Window.FindName("CurrentTrack4")
-$CurrentTrack5=$Window.FindName("CurrentTrack5")
-$TimerA1=$Window.FindName("TimerA1")
-$TimerA2=$Window.FindName("TimerA2")
-$TimerA3=$Window.FindName("TimerA3")
-$TimerA4=$Window.FindName("TimerA4")
-$TimerA5=$Window.FindName("TimerA5")
-$TimerB1=$Window.FindName("TimerB1")
-$TimerB2=$Window.FindName("TimerB2")
-$TimerB3=$Window.FindName("TimerB3")
-$TimerB4=$Window.FindName("TimerB4")
-$TimerB5=$Window.FindName("TimerB5")
-$VolumePercent1=$Window.FindName("VolumePercent1")
-$VolumePercent2=$Window.FindName("VolumePercent2")
-$VolumePercent3=$Window.FindName("VolumePercent3")
-$VolumePercent4=$Window.FindName("VolumePercent4")
-$VolumePercent5=$Window.FindName("VolumePercent5")
-$VolumePercent1.Text=([double]$mediaPlayer.Volume).tostring("P0")
-$VolumePercent2.Text=$VolumePercent1.Text
-$VolumePercent3.Text=$VolumePercent1.Text
-$VolumePercent4.Text=$VolumePercent1.Text
-$VolumePercent5.Text=$VolumePercent1.Text
+@('StatusInfo', 'CurrentTrack', 'TimerA', 'TimerB', 'VolumePercent') | ForEach-Object {
+	$uiText = $_
+	1..5 | ForEach-Object {
+		Set-Variable -Name "$uiText$_" -Value $Window.FindName("$uiText$_")
+	}
+}
+FontEffect StatusInfo ''
+FontEffect VolumePercent ([double]$mediaPlayer.Volume).ToString("P0")
 $MenuMain=$Window.FindName("Menu")
 $MenuMain.Add_MouseEnter({
 	$MenuMain.Background='#222222'
