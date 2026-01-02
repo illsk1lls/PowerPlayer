@@ -1098,7 +1098,7 @@ function TogglePlayButton(){
 				$mediaPlayer.Play()
 				$window.TaskbarItemInfo.Description='Playing...'
 				$global:Playing=1
-				FontEffect "StatusInfo" 'Now Playing'
+				FontEffect "Status" 'Now Playing'
 				$PlayPath.Visibility = "Hidden"
 				$PausePath.Visibility = "Visible"
 			}
@@ -1106,7 +1106,7 @@ function TogglePlayButton(){
 				$mediaPlayer.Pause()
 				$window.TaskbarItemInfo.Description='Paused...'
 				$global:Playing=0
-				FontEffect "StatusInfo" 'Paused'
+				FontEffect "Status" 'Paused'
 				$PlayPath.Visibility = "Visible"
 				$PausePath.Visibility = "Hidden"
 			}
@@ -1825,7 +1825,7 @@ $mediaPlayer.Add_MediaEnded({
 		$global:Playing=0
 		FontEffect "TimerA" ''
 		FontEffect "TimerB" ''
-		FontEffect "StatusInfo" ''
+		FontEffect "Status" ''
 		$window.Icon=$ShowIcon
 	}
 })
@@ -1985,14 +1985,14 @@ $window.add_MouseLeftButtonDown({
 	closeMenus
 	$window.DragMove()
 })
-@('StatusInfo', 'CurrentTrack', 'TimerA', 'TimerB', 'VolumePercent') | ForEach-Object {
+@('Status', 'CurrentTrack', 'TimerA', 'TimerB', 'VolumePercent') | ForEach-Object {
 	$uiText = $_
 	1..5 | ForEach-Object {
 		Set-Variable -Name "$uiText$_" -Value $Window.FindName("$uiText$_")
 	}
 }
-FontEffect StatusInfo ''
-FontEffect VolumePercent ([double]$mediaPlayer.Volume).ToString("P0")
+FontEffect "Status" ''
+FontEffect "VolumePercent" ([double]$mediaPlayer.Volume).ToString("P0")
 $MenuMain=$Window.FindName("Menu")
 $MenuMain.Add_MouseEnter({
 	$MenuMain.Background='#222222'
